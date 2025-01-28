@@ -25,6 +25,7 @@ class SymbolType(enum.Enum):
     # Add ReLU
     RELU = "RELU"
     # Add LeakyReLU
+    # TODO: add slope for anti-entropy purpose
     LEAKY_RELU = "LEAKY_RELU"
     # Add Tanh
     TANH = "TANH"
