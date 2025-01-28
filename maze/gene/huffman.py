@@ -8,7 +8,7 @@ import typing
 @dataclasses.dataclass(frozen=True, repr=True)
 class TreeNode:
     freq: float
-    symbols: frozenset[str]
+    symbols: frozenset[typing.Any]
     left: typing.Self | None = None
     right: typing.Self | None = None
 
@@ -19,7 +19,7 @@ class TreeNode:
         return self.freq < other.freq
 
 
-def build_huffman_tree(freq_table: dict[str, int]) -> TreeNode | None:
+def build_huffman_tree(freq_table: dict[typing.Any, int]) -> TreeNode | None:
     """Build a huffman tree for the given frequency table
 
     :param freq_table: frequency table mapping from symbol to its frequency
@@ -44,7 +44,7 @@ def build_huffman_tree(freq_table: dict[str, int]) -> TreeNode | None:
     return heap[0]
 
 
-def next_symbol(bits: typing.Iterator[int | bool], root: TreeNode) -> str:
+def next_symbol(bits: typing.Iterator[int | bool], root: TreeNode) -> typing.Any:
     """Get next symbol in the Huffman tree with the bits from bits iterator
 
     :param bits: bits iterator

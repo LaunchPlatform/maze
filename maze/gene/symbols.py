@@ -1,3 +1,4 @@
+import dataclasses
 import enum
 import typing
 
@@ -31,18 +32,26 @@ class Symbol(enum.Enum):
     LINEAR = "LINEAR"
 
 
+@dataclasses.dataclass(frozen=True)
+class SymbolArgs:
+    symbol: Symbol
+    args: dict = dataclasses.field(default_factory=dict)
+
+
 def parse_symbols(
     bits: typing.Sequence[int], root: TreeNode
-) -> typing.Generator[Symbol, None, None]:
+) -> typing.Generator[SymbolArgs, None, None]:
     bits_iter = iter(bits)
     while True:
         symbol = next_symbol(bits=bits_iter, root=root)
         if symbol == Symbol.REPEAT_START:
             times = consume_int(bits=bits_iter, bit_len=8)
-            yield symbol, times
+            yield SymbolArgs(symbol=symbol, args=dict(times=times))
         elif symbol == Symbol.LINEAR:
             bias = bool(next(bits_iter))
             output_features = consume_int(bits=bits_iter, bit_len=16)
-            yield symbol, bias, output_features
+            yield SymbolArgs(
+                symbol=symbol, args=dict(bias=bias, output_features=output_features)
+            )
         else:
-            yield symbol
+            yield SymbolArgs(symbol=symbol)
