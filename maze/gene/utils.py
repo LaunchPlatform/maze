@@ -1,11 +1,11 @@
 import typing
 
 
-def gen_bits(data: bytes) -> typing.Generator[int]:
+def gen_bits(data: bytes) -> typing.Generator[int, None, None]:
     for byte in data:
         for i in range(8):
-            byte >>= 1
             yield byte & 0x1
+            byte >>= 1
 
 
 def consume_int(bits: typing.Iterator[int], bit_len: int) -> int:
