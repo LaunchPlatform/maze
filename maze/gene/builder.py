@@ -58,9 +58,13 @@ def build_models(
                     case SymbolType.BRANCH_START:
                         # TODO:
                         pass
-                    case (SymbolType.DEACTIVATE, _):
-                        # TODO:
-                        pass
+                    case SymbolType.DEACTIVATE:
+                        ignored_symbols, _ = read_enclosure(
+                            symbols=symbols,
+                            start_symbol=lambda s: False,
+                            end_symbol=lambda s: isinstance(s, SimpleSymbol)
+                            and s.type == SymbolType.ACTIVATE,
+                        )
                     case SymbolType.RELU:
                         modules.append(nn.ReLU())
                     case SymbolType.LEAKY_RELU:
