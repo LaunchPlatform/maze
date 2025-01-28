@@ -20,6 +20,11 @@ class TreeNode:
 
 
 def build_huffman_tree(freq_table: dict[str, int]) -> TreeNode | None:
+    """Build a huffman tree for the given frequency table
+
+    :param freq_table: frequency table mapping from symbol to its frequency
+    :return: The root tree node or None if no elements in the tree
+    """
     heap = []
     for symbol, freq in freq_table.items():
         heapq.heappush(heap, TreeNode(freq, symbols=frozenset([symbol])))
@@ -37,3 +42,21 @@ def build_huffman_tree(freq_table: dict[str, int]) -> TreeNode | None:
     if not heap:
         return None
     return heap[0]
+
+
+def next_symbol(bits: typing.Iterator[int | bool], root: TreeNode) -> str:
+    """Get next symbol in the Huffman tree with the bits from bits iterator
+
+    :param bits: bits iterator
+    :param root: root node of huffman tree
+    :return: Symbol string
+    """
+    current_node = root
+    while True:
+        if len(current_node.symbols) == 1:
+            return list(current_node.symbols)[0]
+        bit = next(bits)
+        if bit:
+            current_node = current_node.right
+        else:
+            current_node = current_node.left
