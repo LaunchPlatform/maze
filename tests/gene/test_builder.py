@@ -81,6 +81,41 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 nn.Tanh(),
             ],
         ),
+        pytest.param(
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                RepeatStartSymbol(times=2),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                RepeatStartSymbol(times=3),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                SimpleSymbol(type=SymbolType.TANH),
+            ],
+            [
+                nn.ReLU(),
+                nn.LazyLinear(bias=True, out_features=789),
+                nn.LeakyReLU(),
+                nn.LeakyReLU(),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LazyLinear(bias=True, out_features=789),
+                nn.LeakyReLU(),
+                nn.LeakyReLU(),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LeakyReLU(),
+                nn.Tanh(),
+            ],
+            id="nested-repeat",
+        ),
     ],
 )
 def test_build_models(symbols: list[SimpleSymbol], expected: list[nn.Module]):
