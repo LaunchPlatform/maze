@@ -1,9 +1,9 @@
 import enum
 import typing
 
-from maze.gene.huffman import next_symbol
-from maze.gene.huffman import TreeNode
-from maze.gene.utils import consume_int
+from .huffman import next_symbol
+from .huffman import TreeNode
+from .utils import consume_int
 
 
 @enum.unique
