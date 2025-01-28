@@ -74,9 +74,9 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             ],
             [
                 nn.ReLU(),
-                nn.LazyLinear(bias=False, out_features=789),
+                nn.LazyLinear(bias=True, out_features=789),
                 nn.LeakyReLU(),
-                nn.LazyLinear(bias=False, out_features=789),
+                nn.LazyLinear(bias=True, out_features=789),
                 nn.LeakyReLU(),
                 nn.Tanh(),
             ],
