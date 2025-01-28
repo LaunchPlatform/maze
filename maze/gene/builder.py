@@ -19,9 +19,12 @@ def build_models(
             return modules, item
         match item:
             case (Symbol.REPEAT_START, times):
-                repeating_modules, _ = build_models(
-                    symbols=symbols, till_symbols=[Symbol.REPEAT_END]
-                )
+                result = build_models(symbols=symbols, till_symbols=[Symbol.REPEAT_END])
+                # it could be either encountering EOF or the ending symbols
+                if isinstance(result, typing.Tuple):
+                    repeating_modules = result[0]
+                else:
+                    repeating_modules = result
                 for _ in range(times):
                     modules.extend(repeating_modules)
             case (Symbol.LINEAR, bias, output_features):

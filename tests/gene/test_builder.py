@@ -25,6 +25,22 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
         ([Symbol.LEAKY_RELU], [nn.LeakyReLU()]),
         ([Symbol.TANH], [nn.Tanh()]),
         ([(Symbol.LINEAR, False, 123)], [nn.LazyLinear(bias=False, out_features=123)]),
+        (
+            [(Symbol.REPEAT_START, 3), (Symbol.LINEAR, False, 123)],
+            [
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LazyLinear(bias=False, out_features=123),
+            ],
+        ),
+        (
+            [(Symbol.REPEAT_START, 3), (Symbol.LINEAR, False, 123), Symbol.REPEAT_END],
+            [
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LazyLinear(bias=False, out_features=123),
+            ],
+        ),
     ],
 )
 def test_build_models(symbols: list[Symbol], expected: list[nn.Module]):
