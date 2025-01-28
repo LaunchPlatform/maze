@@ -9,14 +9,20 @@ from .symbols import SimpleSymbol
 from .symbols import SymbolType
 
 
-def read_symbols_until(
+def read_enclosure(
     symbols: typing.Iterator[BaseSymbol],
-    till: typing.Container[SymbolType],
+    start_symbol: typing.Callable[[BaseSymbol], bool],
+    end_symbol: typing.Callable[[BaseSymbol], bool],
 ) -> tuple[list[BaseSymbol], BaseSymbol | None]:
     result: list[BaseSymbol] = []
+    nest_level = 0
     for symbol in symbols:
-        if isinstance(symbol, SimpleSymbol) and symbol.type in till:
-            return result, symbol
+        if start_symbol(symbol):
+            nest_level += 1
+        elif end_symbol(symbol):
+            if not nest_level:
+                return result, symbol
+            nest_level -= 1
         result.append(symbol)
     return result, None
 
@@ -32,8 +38,11 @@ def build_models(
             break
         match symbol:
             case RepeatStartSymbol(times):
-                repeating_symbols, _ = read_symbols_until(
-                    symbols=symbols, till=[SymbolType.REPEAT_END]
+                repeating_symbols, _ = read_enclosure(
+                    symbols=symbols,
+                    start_symbol=lambda s: isinstance(s, RepeatStartSymbol),
+                    end_symbol=lambda s: isinstance(s, SimpleSymbol)
+                    and s.type == SymbolType.REPEAT_END,
                 )
                 for _ in range(times):
                     modules.extend(build_models(symbols=iter(repeating_symbols)))
