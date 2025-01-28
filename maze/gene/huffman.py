@@ -5,7 +5,7 @@ import typing
 
 
 @functools.total_ordering
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True, repr=True)
 class TreeNode:
     freq: float
     left: typing.Self | None = None
