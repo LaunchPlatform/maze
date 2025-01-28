@@ -22,5 +22,5 @@ class Symbol(enum.Enum):
     LEAKY_RELU = "LEAKY_RELU"
     # Add Tanh
     TANH = "TANH"
-    # Linear, take two args (input_features, output_features), 16 bits each
+    # Linear, take one arg (output_features), 16 bits
     LINEAR = "LINEAR"
