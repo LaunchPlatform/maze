@@ -41,6 +41,26 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 nn.LazyLinear(bias=False, out_features=123),
             ],
         ),
+        (
+            [
+                Symbol.RELU,
+                (Symbol.REPEAT_START, 3),
+                (Symbol.LINEAR, False, 123),
+                Symbol.LEAKY_RELU,
+                Symbol.REPEAT_END,
+                Symbol.TANH,
+            ],
+            [
+                nn.ReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.LeakyReLU(),
+                nn.Tanh(),
+            ],
+        ),
     ],
 )
 def test_build_models(symbols: list[Symbol], expected: list[nn.Module]):
