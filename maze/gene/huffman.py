@@ -8,9 +8,9 @@ import typing
 @dataclasses.dataclass(frozen=True, repr=True)
 class TreeNode:
     freq: float
+    symbols: frozenset[str]
     left: typing.Self | None = None
     right: typing.Self | None = None
-    symbols: frozenset[str] = frozenset()
 
     def __eq__(self, other: typing.Self):
         return self.freq == other.freq
