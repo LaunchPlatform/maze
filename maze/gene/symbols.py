@@ -1,4 +1,9 @@
 import enum
+import typing
+
+from maze.gene.huffman import next_symbol
+from maze.gene.huffman import TreeNode
+from maze.gene.utils import consume_int
 
 
 @enum.unique
@@ -24,3 +29,19 @@ class Symbol(enum.Enum):
     TANH = "TANH"
     # Linear, take one arg (output_features), 16 bits
     LINEAR = "LINEAR"
+
+
+def parse_symbols(
+    bits: typing.Sequence[int], root: TreeNode
+) -> typing.Generator[Symbol, None, None]:
+    bits_iter = iter(bits)
+    while True:
+        symbol = next_symbol(bits=bits_iter, root=root)
+        if symbol == Symbol.REPEAT_START:
+            times = consume_int(bits=bits_iter, bit_len=8)
+            yield symbol, times
+        elif symbol == Symbol.LINEAR:
+            output_features = consume_int(bits=bits_iter, bit_len=16)
+            yield symbol, output_features
+        else:
+            yield symbol
