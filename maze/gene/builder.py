@@ -24,8 +24,8 @@ def build_models(
                 )
                 for _ in range(times):
                     modules.extend(repeating_modules)
-            case (Symbol.LINEAR, output_features):
-                modules.append(nn.LazyLinear(out_features=output_features))
+            case (Symbol.LINEAR, bias, output_features):
+                modules.append(nn.LazyLinear(bias=bias, out_features=output_features))
             case Symbol.BRANCH_START:
                 # TODO:
                 pass

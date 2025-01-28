@@ -27,7 +27,7 @@ class Symbol(enum.Enum):
     LEAKY_RELU = "LEAKY_RELU"
     # Add Tanh
     TANH = "TANH"
-    # Linear, take one arg (output_features), 16 bits
+    # Linear, take one arg (bias, output_features), 1 bit and 16 bits
     LINEAR = "LINEAR"
 
 
@@ -41,7 +41,8 @@ def parse_symbols(
             times = consume_int(bits=bits_iter, bit_len=8)
             yield symbol, times
         elif symbol == Symbol.LINEAR:
+            bias = bool(next(bits_iter))
             output_features = consume_int(bits=bits_iter, bit_len=16)
-            yield symbol, output_features
+            yield symbol, bias, output_features
         else:
             yield symbol

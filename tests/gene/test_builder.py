@@ -11,7 +11,11 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
     module_type = type(module)
     match module_type:
         case nn.ReLU | nn.LeakyReLU | nn.Tanh:
-            return (module_type, {})
+            return module_type, {}
+        case nn.LazyLinear:
+            return module_type, dict(
+                output_features=module.out_features, bias=module.bias is not None
+            )
 
 
 @pytest.mark.parametrize(
