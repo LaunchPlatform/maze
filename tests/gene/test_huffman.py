@@ -106,6 +106,56 @@ def test_build_huffman_tree(freq_table: dict[str, int], expected_tree: TreeNode)
             "B",
             (1, 0, 1, 1),
         ),
+        (
+            TreeNode(
+                freq=6,
+                left=TreeNode(
+                    freq=3,
+                    symbols=frozenset("B"),
+                ),
+                right=TreeNode(
+                    freq=3,
+                    left=TreeNode(
+                        freq=1,
+                        symbols=frozenset("A"),
+                    ),
+                    right=TreeNode(
+                        freq=2,
+                        symbols=frozenset("C"),
+                    ),
+                    symbols=frozenset("AC"),
+                ),
+                symbols=frozenset("ABC"),
+            ),
+            (1, 0, 0, 1, 1),
+            "A",
+            (0, 1, 1),
+        ),
+        (
+            TreeNode(
+                freq=6,
+                left=TreeNode(
+                    freq=3,
+                    symbols=frozenset("B"),
+                ),
+                right=TreeNode(
+                    freq=3,
+                    left=TreeNode(
+                        freq=1,
+                        symbols=frozenset("A"),
+                    ),
+                    right=TreeNode(
+                        freq=2,
+                        symbols=frozenset("C"),
+                    ),
+                    symbols=frozenset("AC"),
+                ),
+                symbols=frozenset("ABC"),
+            ),
+            (1, 1, 0, 1, 1),
+            "C",
+            (0, 1, 1),
+        ),
     ],
 )
 def test_next_symbol(
