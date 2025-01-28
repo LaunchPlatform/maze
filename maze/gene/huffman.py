@@ -53,10 +53,12 @@ def next_symbol(bits: typing.Iterator[int | bool], root: TreeNode) -> str:
     """
     current_node = root
     while True:
+        bit = next(bits)
         if len(current_node.symbols) == 1:
             return list(current_node.symbols)[0]
-        bit = next(bits)
         if bit:
             current_node = current_node.right
         else:
             current_node = current_node.left
+        if len(current_node.symbols) == 1:
+            return list(current_node.symbols)[0]
