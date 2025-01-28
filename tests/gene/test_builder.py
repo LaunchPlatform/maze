@@ -4,8 +4,10 @@ import pytest
 from torch import nn
 
 from maze.gene.builder import build_models
-from maze.gene.symbols import Symbol
-from maze.gene.symbols import SymbolArgs
+from maze.gene.symbols import LinearSymbol
+from maze.gene.symbols import RepeatStartSymbol
+from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import SymbolType
 
 
 def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
@@ -22,18 +24,19 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
 @pytest.mark.parametrize(
     "symbols, expected",
     [
-        ([SymbolArgs(symbol=Symbol.RELU)], [nn.ReLU()]),
-        ([SymbolArgs(symbol=Symbol.LEAKY_RELU)], [nn.LeakyReLU()]),
-        ([SymbolArgs(symbol=Symbol.TANH)], [nn.Tanh()]),
+        ([SimpleSymbol(type=SymbolType.RELU)], [nn.ReLU()]),
+        ([SimpleSymbol(type=SymbolType.LEAKY_RELU)], [nn.LeakyReLU()]),
+        ([SimpleSymbol(type=SymbolType.TANH)], [nn.Tanh()]),
         (
-            [SymbolArgs(symbol=Symbol.LINEAR, args=dict(bias=False, out_features=123))],
+            [LinearSymbol(bias=False, out_features=123)],
             [nn.LazyLinear(bias=False, out_features=123)],
         ),
         (
             [
-                SymbolArgs(symbol=Symbol.REPEAT_START, args=dict(bias=3)),
-                SymbolArgs(
-                    symbol=Symbol.LINEAR, args=dict(bias=False, out_features=123)
+                RepeatStartSymbol(times=3),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
                 ),
             ],
             [
@@ -44,11 +47,12 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
         ),
         (
             [
-                SymbolArgs(symbol=Symbol.REPEAT_START, args=dict(bias=3)),
-                SymbolArgs(
-                    symbol=Symbol.LINEAR, args=dict(bias=True, out_features=456)
+                RepeatStartSymbol(times=3),
+                LinearSymbol(
+                    bias=True,
+                    out_features=456,
                 ),
-                Symbol.REPEAT_END,
+                SimpleSymbol(type=SymbolType.REPEAT_END),
             ],
             [
                 nn.LazyLinear(bias=True, out_features=456),
@@ -58,31 +62,28 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
         ),
         (
             [
-                SymbolArgs(symbol=Symbol.RELU),
-                SymbolArgs(symbol=Symbol.REPEAT_START, args=dict(bias=2)),
-                SymbolArgs(
-                    symbol=Symbol.LINEAR, args=dict(bias=True, out_features=789)
+                SimpleSymbol(type=SymbolType.RELU),
+                RepeatStartSymbol(times=2),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
                 ),
-                SymbolArgs(symbol=Symbol.LEAKY_RELU),
-                SymbolArgs(symbol=Symbol.REPEAT_END),
-                SymbolArgs(symbol=Symbol.TANH),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                SimpleSymbol(type=SymbolType.TANH),
             ],
             [
-                SymbolArgs(symbol=Symbol.RELU),
-                SymbolArgs(
-                    symbol=Symbol.LINEAR, args=dict(bias=True, out_features=789)
-                ),
-                SymbolArgs(symbol=Symbol.LEAKY_RELU),
-                SymbolArgs(
-                    symbol=Symbol.LINEAR, args=dict(bias=True, out_features=789)
-                ),
-                SymbolArgs(symbol=Symbol.LEAKY_RELU),
-                SymbolArgs(symbol=Symbol.TANH),
+                nn.ReLU(),
+                nn.LazyLinear(bias=False, out_features=789),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=False, out_features=789),
+                nn.LeakyReLU(),
+                nn.Tanh(),
             ],
         ),
     ],
 )
-def test_build_models(symbols: list[SymbolArgs], expected: list[nn.Module]):
+def test_build_models(symbols: list[SimpleSymbol], expected: list[nn.Module]):
     assert list(map(module_type_kwargs, build_models(symbols=iter(symbols)))) == list(
         map(module_type_kwargs, expected)
     )
