@@ -27,7 +27,7 @@ def read_enclosure(
     return result, None
 
 
-def build_models(
+def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
 ) -> list[nn.Module]:
     modules: list[nn.Module] = []
@@ -45,7 +45,7 @@ def build_models(
                     and s.type == SymbolType.REPEAT_END,
                 )
                 for _ in range(times):
-                    modules.extend(build_models(symbols=iter(repeating_symbols)))
+                    modules.extend(_do_build_models(symbols=iter(repeating_symbols)))
             case LinearSymbol(bias, out_features):
                 modules.append(
                     nn.LazyLinear(
@@ -74,3 +74,34 @@ def build_models(
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
     return modules
+
+
+def skip_deactivated_symbols(
+    symbols: typing.Iterator[BaseSymbol],
+) -> typing.Generator[BaseSymbol, None, None]:
+    while True:
+        try:
+            symbol = next(symbols)
+        except StopIteration:
+            break
+        if not isinstance(symbol, SimpleSymbol):
+            yield symbol
+            continue
+        if symbol.type == SymbolType.DEACTIVATE:
+            # consume all symbols in the deactivated block
+            for deactivated_symbol in symbols:
+                if (
+                    isinstance(deactivated_symbol, SimpleSymbol)
+                    and deactivated_symbol.type == SymbolType.ACTIVATE
+                ):
+                    break
+        else:
+            yield symbol
+            continue
+
+
+def build_models(
+    symbols: typing.Iterator[BaseSymbol],
+) -> list[nn.Module]:
+    symbols_iter = skip_deactivated_symbols(symbols)
+    return _do_build_models(symbols_iter)

@@ -115,6 +115,88 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             ],
             id="nested-repeat",
         ),
+        pytest.param(
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+                SimpleSymbol(type=SymbolType.TANH),
+            ],
+            [
+                nn.ReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.Tanh(),
+            ],
+            id="simple-deactivate",
+        ),
+        pytest.param(
+            [
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                SimpleSymbol(type=SymbolType.TANH),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+            ],
+            [
+                nn.ReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.Tanh(),
+            ],
+            id="repeating-deactivate",
+        ),
+        pytest.param(
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                RepeatStartSymbol(times=2),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                RepeatStartSymbol(times=3),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                SimpleSymbol(type=SymbolType.TANH),
+            ],
+            [
+                nn.ReLU(),
+                nn.LazyLinear(bias=True, out_features=789),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=True, out_features=789),
+                nn.LeakyReLU(),
+                nn.LazyLinear(bias=False, out_features=123),
+                nn.Tanh(),
+            ],
+            id="deactivate-nested-repeat",
+        ),
     ],
 )
 def test_build_models(symbols: list[SimpleSymbol], expected: list[nn.Module]):
