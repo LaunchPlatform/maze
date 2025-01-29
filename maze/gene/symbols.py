@@ -58,16 +58,19 @@ def parse_symbols(
 ) -> typing.Generator[BaseSymbol, None, None]:
     bits_iter = iter(bits)
     while True:
-        symbol = next_symbol(bits=bits_iter, root=root)
-        if symbol == SymbolType.REPEAT_START:
-            times = consume_int(bits=bits_iter, bit_len=8)
-            yield RepeatStartSymbol(times=times)
-        elif symbol == SymbolType.LINEAR:
-            bias = bool(next(bits_iter))
-            output_features = consume_int(bits=bits_iter, bit_len=16)
-            yield LinearSymbol(
-                bias=bias,
-                out_features=output_features,
-            )
-        else:
-            yield SimpleSymbol(type=symbol)
+        try:
+            symbol = next_symbol(bits=bits_iter, root=root)
+            if symbol == SymbolType.REPEAT_START:
+                times = consume_int(bits=bits_iter, bit_len=8)
+                yield RepeatStartSymbol(times=times)
+            elif symbol == SymbolType.LINEAR:
+                bias = bool(next(bits_iter))
+                output_features = consume_int(bits=bits_iter, bit_len=16)
+                yield LinearSymbol(
+                    bias=bias,
+                    out_features=output_features,
+                )
+            else:
+                yield SimpleSymbol(type=symbol)
+        except StopIteration:
+            break
