@@ -21,7 +21,33 @@ from maze.gene.merge import merge_gene
                 (1,),
                 (0,),
             ],
-        )
+        ),
+        # 01000001
+        # 01000010 01000011
+        (
+            b"A",
+            b"BC",
+            [
+                # A + B
+                (0, 1),
+                (0, 1),
+                (0,),
+                (0,),
+                (0,),
+                (0,),
+                (1,),
+                (0,),
+                # C
+                (1,),
+                (1,),
+                (0,),
+                (0,),
+                (0,),
+                (0,),
+                (1,),
+                (0,),
+            ],
+        ),
     ],
 )
 def test_merge_gene(lhs: bytes, rhs: bytes, expected: list[int]):
