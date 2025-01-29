@@ -1,5 +1,10 @@
+import os
+import random
+import typing
+
 import pytest
 
+from maze.gene.huffman import build_huffman_tree
 from maze.gene.huffman import TreeNode
 from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import LinearSymbol
@@ -7,6 +12,12 @@ from maze.gene.symbols import parse_symbols
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_bits
+
+
+def gen_random_symbol_freq_table(
+    symbols: list[SymbolType], random_range: typing.Tuple[float, float]
+):
+    return {symbol: random.randint(*random_range) for symbol in symbols}
 
 
 @pytest.mark.parametrize(
@@ -51,3 +62,13 @@ from maze.gene.utils import gen_bits
 )
 def test_parse_symbols(data: bytes, tree: TreeNode, expected: list[BaseSymbol]):
     assert list(parse_symbols(bits=gen_bits(data), root=tree)) == expected
+
+
+def test_parse_symbols_random_gene():
+    for _ in range(10000):
+        freq_table = gen_random_symbol_freq_table(
+            symbols=list(SymbolType), random_range=(1, 1024)
+        )
+        tree = build_huffman_tree(freq_table)
+        gene = os.urandom(random.randint(1, 2048))
+        list(parse_symbols(bits=gen_bits(gene), root=tree))
