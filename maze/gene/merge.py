@@ -5,6 +5,14 @@ import typing
 from .utils import gen_bits
 
 
+def shift(gene: bytes) -> bytes:
+    """Randomly shift +-n bits at i to and fill the missing bits with random values or drop them based on if the n is
+    positive or negative
+
+    """
+    # TODO:
+
+
 def merge_gene(lhs: bytes, rhs: bytes) -> typing.Generator[int, None, None]:
     lhs_bits = gen_bits(lhs)
     rhs_bits = gen_bits(rhs)
