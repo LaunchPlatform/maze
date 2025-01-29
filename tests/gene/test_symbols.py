@@ -1,6 +1,5 @@
 import os
 import random
-import typing
 
 import pytest
 
@@ -12,12 +11,7 @@ from maze.gene.symbols import parse_symbols
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_bits
-
-
-def gen_random_symbol_freq_table(
-    symbols: list[SymbolType], random_range: typing.Tuple[float, float]
-):
-    return {symbol: random.randint(*random_range) for symbol in symbols}
+from maze.gene.utils import gen_random_symbol_freq_table
 
 
 @pytest.mark.parametrize(
