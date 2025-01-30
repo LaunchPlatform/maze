@@ -56,6 +56,13 @@ def _do_build_models(
             case SimpleSymbol(type):
                 match type:
                     case SymbolType.BRANCH_START:
+                        branch_symbols, _ = read_enclosure(
+                            symbols=symbols,
+                            start_symbol=lambda s: isinstance(s, SimpleSymbol)
+                            and s.type == SymbolType.BRANCH_START,
+                            end_symbol=lambda s: isinstance(s, SimpleSymbol)
+                            and s.type == SymbolType.BRANCH_STOP,
+                        )
                         # TODO:
                         pass
                     case SymbolType.DEACTIVATE:
