@@ -76,7 +76,7 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 ),
             ],
             (123,),
-            28 * 28 * 123 + 123 * 123 + 123 * 123,
+            (28 * 28 * 123) + (123 * 123) + (123 * 123),
             [
                 nn.Flatten(),
                 nn.Linear(bias=False, in_features=28 * 28, out_features=123),
@@ -84,21 +84,25 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 nn.Linear(bias=False, in_features=123, out_features=123),
             ],
         ),
-        # (
-        #     [
-        #         RepeatStartSymbol(times=3),
-        #         LinearSymbol(
-        #             bias=True,
-        #             out_features=456,
-        #         ),
-        #         SimpleSymbol(type=SymbolType.REPEAT_END),
-        #     ],
-        #     [
-        #         nn.LazyLinear(bias=True, out_features=456),
-        #         nn.LazyLinear(bias=True, out_features=456),
-        #         nn.LazyLinear(bias=True, out_features=456),
-        #     ],
-        # ),
+        (
+            (28, 28),
+            [
+                RepeatStartSymbol(times=3),
+                LinearSymbol(
+                    bias=True,
+                    out_features=456,
+                ),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+            ],
+            (456,),
+            (28 * 28 * 456) + 456 + (456 * 456) + 456 + (456 * 456) + 456,
+            [
+                nn.Flatten(),
+                nn.Linear(bias=True, in_features=28 * 28, out_features=456),
+                nn.Linear(bias=True, in_features=456, out_features=456),
+                nn.Linear(bias=True, in_features=456, out_features=456),
+            ],
+        ),
         # (
         #     [
         #         SimpleSymbol(type=SymbolType.RELU),
