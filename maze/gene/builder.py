@@ -211,10 +211,13 @@ def build_models(
     input_shape: typing.Tuple[int, ...],
     operation_budget: int | None = None,
 ) -> Model:
-    symbols_iter = skip_enclosure(
-        symbols,
-        start_symbol=functools.partial(is_symbol_type, SymbolType.DEACTIVATE),
-        end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
+    symbols_iter = filter(
+        lambda s: not is_symbol_type(SymbolType.ACTIVATE, s),
+        skip_enclosure(
+            symbols,
+            start_symbol=functools.partial(is_symbol_type, SymbolType.DEACTIVATE),
+            end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
+        ),
     )
     return _do_build_models(
         symbols_iter, input_shape=input_shape, operation_budget=operation_budget
