@@ -11,6 +11,14 @@ from .symbols import SimpleSymbol
 from .symbols import SymbolType
 
 
+class BuildError(RuntimeError):
+    pass
+
+
+class ExceedOperationBudgetError(RuntimeError):
+    pass
+
+
 @dataclasses.dataclass
 class ModelContext:
     # the output shape of the current model
@@ -39,7 +47,14 @@ def read_enclosure(
 def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
     context: ModelContext,
+    operation_budget: int | None = None,
 ) -> list[nn.Module]:
+    def check_op_budget():
+        if context.operation_cost > operation_budget:
+            raise ExceedOperationBudgetError(
+                f"The current operation cost {context.operation_cost} already exceeds operation budget {operation_budget}"
+            )
+
     modules: list[nn.Module] = []
     while True:
         try:
@@ -64,15 +79,17 @@ def _do_build_models(
                     in_features = context.output_shape[0]
                 else:
                     raise ValueError("Unexpected output shape")
+                context.operation_cost += in_features * out_features + (
+                    out_features if bias else 0
+                )
+                check_op_budget()
+
                 modules.append(
                     nn.Linear(
                         bias=bias,
                         in_features=in_features,
                         out_features=out_features,
                     )
-                )
-                context.operation_cost += in_features * out_features + (
-                    out_features if bias else 0
                 )
                 context.output_shape = (out_features,)
             case SimpleSymbol(symbol_type):
@@ -90,12 +107,15 @@ def _do_build_models(
                     case SymbolType.RELU:
                         modules.append(nn.ReLU())
                         context.operation_cost += math.prod(context.output_shape)
+                        check_op_budget()
                     case SymbolType.LEAKY_RELU:
                         modules.append(nn.LeakyReLU())
                         context.operation_cost += math.prod(context.output_shape)
+                        check_op_budget()
                     case SymbolType.TANH:
                         modules.append(nn.Tanh())
                         context.operation_cost += math.prod(context.output_shape)
+                        check_op_budget()
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
     return modules
@@ -126,8 +146,12 @@ def skip_deactivated_symbols(
 
 
 def build_models(
-    symbols: typing.Iterator[BaseSymbol], input_shape: typing.Tuple[int, ...]
+    symbols: typing.Iterator[BaseSymbol],
+    input_shape: typing.Tuple[int, ...],
+    operation_budget: int | None = None,
 ) -> list[nn.Module]:
     symbols_iter = skip_deactivated_symbols(symbols)
     context = ModelContext(output_shape=input_shape)
-    return _do_build_models(symbols_iter, context=context)
+    return _do_build_models(
+        symbols_iter, context=context, operation_budget=operation_budget
+    )
