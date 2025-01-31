@@ -15,9 +15,11 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
     match module_type:
         case nn.ReLU | nn.LeakyReLU | nn.Tanh:
             return module_type, {}
-        case nn.LazyLinear:
+        case nn.Linear:
             return module_type, dict(
-                output_features=module.out_features, bias=module.bias is not None
+                in_features=module.in_features,
+                out_features=module.out_features,
+                bias=module.bias is not None,
             )
 
 
@@ -31,12 +33,27 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             28 * 28,
             [nn.ReLU()],
         ),
-        # ([SimpleSymbol(type=SymbolType.LEAKY_RELU)], [nn.LeakyReLU()]),
-        # ([SimpleSymbol(type=SymbolType.TANH)], [nn.Tanh()]),
-        # (
-        #     [LinearSymbol(bias=False, out_features=123)],
-        #     [nn.LazyLinear(bias=False, out_features=123)],
-        # ),
+        (
+            (28, 28),
+            [SimpleSymbol(type=SymbolType.LEAKY_RELU)],
+            (28, 28),
+            28 * 28,
+            [nn.LeakyReLU()],
+        ),
+        (
+            (28, 28),
+            [SimpleSymbol(type=SymbolType.TANH)],
+            (28, 28),
+            28 * 28,
+            [nn.Tanh()],
+        ),
+        (
+            (28, 28),
+            [LinearSymbol(bias=False, out_features=123)],
+            (123,),
+            28 * 28 * 123,
+            [nn.Linear(bias=False, in_features=28 * 28, out_features=123)],
+        ),
         # (
         #     [
         #         RepeatStartSymbol(times=3),
