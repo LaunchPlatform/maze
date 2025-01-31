@@ -183,6 +183,10 @@ def _do_build_models(
                                 iter(branch_symbols)
                             )
                         ]
+                        for segment_model in segment_models:
+                            model.operation_cost += segment_model.operation_cost
+                            check_op_budget()
+
                         # TODO: join modules
                         pass
                     case SymbolType.RELU:
