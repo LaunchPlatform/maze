@@ -61,6 +61,18 @@ class LinearSymbol(BaseSymbol):
     out_features: int
 
 
+def is_symbol_type(symbol: BaseSymbol, symbol_type: SymbolType) -> bool:
+    if symbol_type == SymbolType.LINEAR and isinstance(symbol, LinearSymbol):
+        return True
+    elif symbol_type == SymbolType.REPEAT_START and isinstance(
+        symbol, RepeatStartSymbol
+    ):
+        return True
+    elif isinstance(symbol, SimpleSymbol):
+        return symbol.type == symbol_type
+    return False
+
+
 def parse_symbols(
     bits: typing.Sequence[int], root: TreeNode
 ) -> typing.Generator[BaseSymbol, None, None]:

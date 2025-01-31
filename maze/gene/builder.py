@@ -1,10 +1,12 @@
 import dataclasses
+import functools
 import math
 import typing
 
 from torch import nn
 
 from .symbols import BaseSymbol
+from .symbols import is_symbol_type
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
@@ -65,6 +67,17 @@ def skip_enclosure(
             continue
 
 
+def break_branch_segments(
+    symbols: typing.Iterator[BaseSymbol],
+) -> typing.Generator[list[BaseSymbol], None, None]:
+    current_segment = []
+    nest_level = 0
+    for symbol in symbols:
+        if isinstance():
+            pass
+        current_segment.append()
+
+
 def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
     model: Model,
@@ -86,9 +99,10 @@ def _do_build_models(
             case RepeatStartSymbol(times):
                 repeating_symbols, _ = read_enclosure(
                     symbols=symbols,
-                    start_symbol=lambda s: isinstance(s, RepeatStartSymbol),
-                    end_symbol=lambda s: isinstance(s, SimpleSymbol)
-                    and s.type == SymbolType.REPEAT_END,
+                    start_symbol=functools.partial(
+                        is_symbol_type, SymbolType.REPEAT_START
+                    ),
+                    end_symbol=functools.partial(is_symbol_type, SymbolType.REPEAT_END),
                 )
                 for _ in range(times):
                     modules.extend(
@@ -124,10 +138,12 @@ def _do_build_models(
                     case SymbolType.BRANCH_START:
                         branch_symbols, _ = read_enclosure(
                             symbols=symbols,
-                            start_symbol=lambda s: isinstance(s, SimpleSymbol)
-                            and s.type == SymbolType.BRANCH_START,
-                            end_symbol=lambda s: isinstance(s, SimpleSymbol)
-                            and s.type == SymbolType.BRANCH_STOP,
+                            start_symbol=functools.partial(
+                                is_symbol_type, SymbolType.BRANCH_START
+                            ),
+                            end_symbol=functools.partial(
+                                is_symbol_type, SymbolType.BRANCH_STOP
+                            ),
                         )
                         # TODO:
                         pass
@@ -155,10 +171,8 @@ def build_models(
 ) -> Model:
     symbols_iter = skip_enclosure(
         symbols,
-        start_symbol=lambda s: isinstance(s, SimpleSymbol)
-        and s.type == SymbolType.DEACTIVATE,
-        end_symbol=lambda s: isinstance(s, SimpleSymbol)
-        and s.type == SymbolType.ACTIVATE,
+        start_symbol=functools.partial(is_symbol_type, SymbolType.DEACTIVATE),
+        end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
     )
     model = Model(modules=[], output_shape=input_shape)
     model.modules = _do_build_models(
