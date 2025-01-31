@@ -13,6 +13,10 @@ def shift(gene: bytes) -> bytes:
     # TODO:
 
 
+def flip_bit(gene: bytes) -> bytes:
+    pass
+
+
 def merge_gene(lhs: bytes, rhs: bytes) -> typing.Generator[int, None, None]:
     lhs_bits = gen_bits(lhs)
     rhs_bits = gen_bits(rhs)

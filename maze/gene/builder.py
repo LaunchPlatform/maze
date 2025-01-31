@@ -1,3 +1,5 @@
+import dataclasses
+import math
 import typing
 
 from torch import nn
@@ -7,6 +9,13 @@ from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
 from .symbols import SymbolType
+
+
+@dataclasses.dataclass
+class ModelContext:
+    # the output shape of the current model
+    output_shape: typing.Tuple[int, ...]
+    operation_cost: int = 0
 
 
 def read_enclosure(
@@ -29,6 +38,7 @@ def read_enclosure(
 
 def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
+    context: ModelContext,
 ) -> list[nn.Module]:
     modules: list[nn.Module] = []
     while True:
@@ -47,14 +57,26 @@ def _do_build_models(
                 for _ in range(times):
                     modules.extend(_do_build_models(symbols=iter(repeating_symbols)))
             case LinearSymbol(bias, out_features):
+                if len(context.output_shape) > 1:
+                    modules.append(nn.Flatten())
+                    in_features = math.prod(context.output_shape)
+                elif len(context.output_shape) == 1:
+                    in_features = context.output_shape[0]
+                else:
+                    raise ValueError("Unexpected output shape")
                 modules.append(
-                    nn.LazyLinear(
+                    nn.Linear(
                         bias=bias,
+                        in_features=in_features,
                         out_features=out_features,
                     )
                 )
-            case SimpleSymbol(type):
-                match type:
+                context.operation_cost += in_features * out_features + (
+                    out_features if bias else 0
+                )
+                context.output_shape = (out_features,)
+            case SimpleSymbol(symbol_type):
+                match symbol_type:
                     case SymbolType.BRANCH_START:
                         branch_symbols, _ = read_enclosure(
                             symbols=symbols,
@@ -65,13 +87,6 @@ def _do_build_models(
                         )
                         # TODO:
                         pass
-                    case SymbolType.DEACTIVATE:
-                        ignored_symbols, _ = read_enclosure(
-                            symbols=symbols,
-                            start_symbol=lambda s: False,
-                            end_symbol=lambda s: isinstance(s, SimpleSymbol)
-                            and s.type == SymbolType.ACTIVATE,
-                        )
                     case SymbolType.RELU:
                         modules.append(nn.ReLU())
                     case SymbolType.LEAKY_RELU:
@@ -108,7 +123,8 @@ def skip_deactivated_symbols(
 
 
 def build_models(
-    symbols: typing.Iterator[BaseSymbol],
+    symbols: typing.Iterator[BaseSymbol], input_shape: typing.Tuple[int, ...]
 ) -> list[nn.Module]:
     symbols_iter = skip_deactivated_symbols(symbols)
-    return _do_build_models(symbols_iter)
+    context = ModelContext(output_shape=input_shape)
+    return _do_build_models(symbols_iter, context=context)
