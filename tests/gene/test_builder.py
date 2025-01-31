@@ -4,6 +4,7 @@ import pytest
 from torch import nn
 
 from maze.gene.builder import build_models
+from maze.gene.builder import ExceedOperationBudgetError
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import RepeatStartSymbol
 from maze.gene.symbols import SimpleSymbol
@@ -296,3 +297,32 @@ def test_build_models(
     assert list(map(module_type_kwargs, model.modules)) == list(
         map(module_type_kwargs, expected_modules)
     )
+
+
+def test_build_models_exceed_quota():
+    operation_budget = (28 * 28 * 100) + 100
+    build_models(
+        symbols=iter(
+            [
+                LinearSymbol(
+                    bias=True,
+                    out_features=100,
+                ),
+            ]
+        ),
+        input_shape=(28, 28),
+        operation_budget=operation_budget,
+    )
+    with pytest.raises(ExceedOperationBudgetError):
+        build_models(
+            symbols=iter(
+                [
+                    LinearSymbol(
+                        bias=True,
+                        out_features=100,
+                    ),
+                ]
+            ),
+            input_shape=(28, 28),
+            operation_budget=operation_budget - 1,
+        )
