@@ -82,9 +82,10 @@ def break_branch_segments(
             if nest_level < 0:
                 nest_level = 0
             current_segment.append(symbol)
-        elif is_symbol_type(symbol, SymbolType.BRANCH_SEGMENT_MARKER):
-            if current_segment and nest_level == 0:
-                yield current_segment
+        elif (
+            is_symbol_type(symbol, SymbolType.BRANCH_SEGMENT_MARKER) and nest_level == 0
+        ):
+            yield current_segment
             current_segment = []
         else:
             current_segment.append(symbol)
