@@ -35,6 +35,10 @@ class SymbolType(enum.Enum):
     LINEAR = "LINEAR"
     # Conv1d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
     CONV1D = "CONV1D"
+    # Conv2d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
+    CONV2D = "CONV2D"
+    # Conv3d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
+    CONV3D = "CONV3D"
 
 
 class BaseSymbol:
