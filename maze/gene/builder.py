@@ -45,6 +45,26 @@ def read_enclosure(
     return result, None
 
 
+def skip_enclosure(
+    symbols: typing.Iterator[BaseSymbol],
+    start_symbol: typing.Callable[[BaseSymbol], bool],
+    end_symbol: typing.Callable[[BaseSymbol], bool],
+) -> typing.Generator[BaseSymbol, None, None]:
+    while True:
+        try:
+            symbol = next(symbols)
+        except StopIteration:
+            break
+        if start_symbol(symbol):
+            # consume all symbols in the skipped block
+            for skipped_symbol in symbols:
+                if end_symbol(skipped_symbol):
+                    break
+        else:
+            yield symbol
+            continue
+
+
 def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
     model: Model,
@@ -128,36 +148,18 @@ def _do_build_models(
     return modules
 
 
-def skip_deactivated_symbols(
-    symbols: typing.Iterator[BaseSymbol],
-) -> typing.Generator[BaseSymbol, None, None]:
-    while True:
-        try:
-            symbol = next(symbols)
-        except StopIteration:
-            break
-        if not isinstance(symbol, SimpleSymbol):
-            yield symbol
-            continue
-        if symbol.type == SymbolType.DEACTIVATE:
-            # consume all symbols in the deactivated block
-            for deactivated_symbol in symbols:
-                if (
-                    isinstance(deactivated_symbol, SimpleSymbol)
-                    and deactivated_symbol.type == SymbolType.ACTIVATE
-                ):
-                    break
-        else:
-            yield symbol
-            continue
-
-
 def build_models(
     symbols: typing.Iterator[BaseSymbol],
     input_shape: typing.Tuple[int, ...],
     operation_budget: int | None = None,
 ) -> Model:
-    symbols_iter = skip_deactivated_symbols(symbols)
+    symbols_iter = skip_enclosure(
+        symbols,
+        start_symbol=lambda s: isinstance(s, SimpleSymbol)
+        and s.type == SymbolType.DEACTIVATE,
+        end_symbol=lambda s: isinstance(s, SimpleSymbol)
+        and s.type == SymbolType.ACTIVATE,
+    )
     model = Model(modules=[], output_shape=input_shape)
     model.modules = _do_build_models(
         symbols_iter, model=model, operation_budget=operation_budget
