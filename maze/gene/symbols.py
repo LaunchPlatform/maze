@@ -61,7 +61,7 @@ class LinearSymbol(BaseSymbol):
     out_features: int
 
 
-def is_symbol_type(symbol: BaseSymbol, symbol_type: SymbolType) -> bool:
+def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
     if symbol_type == SymbolType.LINEAR and isinstance(symbol, LinearSymbol):
         return True
     elif symbol_type == SymbolType.REPEAT_START and isinstance(

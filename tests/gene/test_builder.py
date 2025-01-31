@@ -338,7 +338,7 @@ def test_build_models(
 ):
     model = build_models(symbols=iter(symbols), input_shape=input_shape)
     assert model.output_shape == expected_output_shape
-    # assert model.operation_cost == expected_op_cost
+    assert model.operation_cost == expected_op_cost
     assert list(map(module_type_kwargs, model.modules)) == list(
         map(module_type_kwargs, expected_modules)
     )
