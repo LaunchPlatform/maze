@@ -3,8 +3,10 @@ import typing
 import pytest
 from torch import nn
 
+from maze.gene.builder import break_branch_segments
 from maze.gene.builder import build_models
 from maze.gene.builder import ExceedOperationBudgetError
+from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import RepeatStartSymbol
 from maze.gene.symbols import SimpleSymbol
@@ -326,3 +328,36 @@ def test_build_models_exceed_quota():
             input_shape=(28, 28),
             operation_budget=operation_budget - 1,
         )
+
+
+@pytest.mark.parametrize(
+    "symbols, expected",
+    [
+        (
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.BRANCH_START),
+                LinearSymbol(
+                    bias=True,
+                    out_features=100,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.BRANCH_STOP),
+            ],
+            [
+                [
+                    SimpleSymbol(type=SymbolType.RELU),
+                    LinearSymbol(
+                        bias=True,
+                        out_features=100,
+                    ),
+                    SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                ]
+            ],
+        ),
+    ],
+)
+def test_break_branch_segments(
+    symbols: list[BaseSymbol], expected: list[list[BaseSymbol]]
+):
+    assert list(break_branch_segments(iter(symbols))) == expected
