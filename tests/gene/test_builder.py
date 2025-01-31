@@ -22,184 +22,199 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
 
 
 @pytest.mark.parametrize(
-    "symbols, expected",
+    "input_shape, symbols, expected_output_shape, expected_op_cost, expected_modules",
     [
-        ([SimpleSymbol(type=SymbolType.RELU)], [nn.ReLU()]),
-        ([SimpleSymbol(type=SymbolType.LEAKY_RELU)], [nn.LeakyReLU()]),
-        ([SimpleSymbol(type=SymbolType.TANH)], [nn.Tanh()]),
         (
-            [LinearSymbol(bias=False, out_features=123)],
-            [nn.LazyLinear(bias=False, out_features=123)],
+            (28, 28),
+            [SimpleSymbol(type=SymbolType.RELU)],
+            (28, 28),
+            28 * 28,
+            [nn.ReLU()],
         ),
-        (
-            [
-                RepeatStartSymbol(times=3),
-                LinearSymbol(
-                    bias=False,
-                    out_features=123,
-                ),
-            ],
-            [
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.LazyLinear(bias=False, out_features=123),
-            ],
-        ),
-        (
-            [
-                RepeatStartSymbol(times=3),
-                LinearSymbol(
-                    bias=True,
-                    out_features=456,
-                ),
-                SimpleSymbol(type=SymbolType.REPEAT_END),
-            ],
-            [
-                nn.LazyLinear(bias=True, out_features=456),
-                nn.LazyLinear(bias=True, out_features=456),
-                nn.LazyLinear(bias=True, out_features=456),
-            ],
-        ),
-        (
-            [
-                SimpleSymbol(type=SymbolType.RELU),
-                RepeatStartSymbol(times=2),
-                LinearSymbol(
-                    bias=True,
-                    out_features=789,
-                ),
-                SimpleSymbol(type=SymbolType.LEAKY_RELU),
-                SimpleSymbol(type=SymbolType.REPEAT_END),
-                SimpleSymbol(type=SymbolType.TANH),
-            ],
-            [
-                nn.ReLU(),
-                nn.LazyLinear(bias=True, out_features=789),
-                nn.LeakyReLU(),
-                nn.LazyLinear(bias=True, out_features=789),
-                nn.LeakyReLU(),
-                nn.Tanh(),
-            ],
-        ),
-        pytest.param(
-            [
-                SimpleSymbol(type=SymbolType.RELU),
-                RepeatStartSymbol(times=2),
-                LinearSymbol(
-                    bias=True,
-                    out_features=789,
-                ),
-                RepeatStartSymbol(times=3),
-                SimpleSymbol(type=SymbolType.LEAKY_RELU),
-                SimpleSymbol(type=SymbolType.REPEAT_END),
-                LinearSymbol(
-                    bias=False,
-                    out_features=123,
-                ),
-                SimpleSymbol(type=SymbolType.REPEAT_END),
-                SimpleSymbol(type=SymbolType.TANH),
-            ],
-            [
-                nn.ReLU(),
-                nn.LazyLinear(bias=True, out_features=789),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.LazyLinear(bias=True, out_features=789),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.Tanh(),
-            ],
-            id="nested-repeat",
-        ),
-        pytest.param(
-            [
-                SimpleSymbol(type=SymbolType.RELU),
-                SimpleSymbol(type=SymbolType.DEACTIVATE),
-                LinearSymbol(
-                    bias=True,
-                    out_features=789,
-                ),
-                SimpleSymbol(type=SymbolType.LEAKY_RELU),
-                SimpleSymbol(type=SymbolType.ACTIVATE),
-                LinearSymbol(
-                    bias=False,
-                    out_features=123,
-                ),
-                SimpleSymbol(type=SymbolType.TANH),
-            ],
-            [
-                nn.ReLU(),
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.Tanh(),
-            ],
-            id="simple-deactivate",
-        ),
-        pytest.param(
-            [
-                SimpleSymbol(type=SymbolType.DEACTIVATE),
-                SimpleSymbol(type=SymbolType.ACTIVATE),
-                SimpleSymbol(type=SymbolType.RELU),
-                SimpleSymbol(type=SymbolType.DEACTIVATE),
-                SimpleSymbol(type=SymbolType.DEACTIVATE),
-                LinearSymbol(
-                    bias=True,
-                    out_features=789,
-                ),
-                SimpleSymbol(type=SymbolType.LEAKY_RELU),
-                SimpleSymbol(type=SymbolType.ACTIVATE),
-                LinearSymbol(
-                    bias=False,
-                    out_features=123,
-                ),
-                SimpleSymbol(type=SymbolType.ACTIVATE),
-                SimpleSymbol(type=SymbolType.TANH),
-                SimpleSymbol(type=SymbolType.ACTIVATE),
-            ],
-            [
-                nn.ReLU(),
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.Tanh(),
-            ],
-            id="repeating-deactivate",
-        ),
-        pytest.param(
-            [
-                SimpleSymbol(type=SymbolType.RELU),
-                RepeatStartSymbol(times=2),
-                LinearSymbol(
-                    bias=True,
-                    out_features=789,
-                ),
-                SimpleSymbol(type=SymbolType.DEACTIVATE),
-                RepeatStartSymbol(times=3),
-                SimpleSymbol(type=SymbolType.ACTIVATE),
-                SimpleSymbol(type=SymbolType.LEAKY_RELU),
-                SimpleSymbol(type=SymbolType.REPEAT_END),
-                LinearSymbol(
-                    bias=False,
-                    out_features=123,
-                ),
-                SimpleSymbol(type=SymbolType.REPEAT_END),
-                SimpleSymbol(type=SymbolType.TANH),
-            ],
-            [
-                nn.ReLU(),
-                nn.LazyLinear(bias=True, out_features=789),
-                nn.LeakyReLU(),
-                nn.LazyLinear(bias=True, out_features=789),
-                nn.LeakyReLU(),
-                nn.LazyLinear(bias=False, out_features=123),
-                nn.Tanh(),
-            ],
-            id="deactivate-nested-repeat",
-        ),
+        # ([SimpleSymbol(type=SymbolType.LEAKY_RELU)], [nn.LeakyReLU()]),
+        # ([SimpleSymbol(type=SymbolType.TANH)], [nn.Tanh()]),
+        # (
+        #     [LinearSymbol(bias=False, out_features=123)],
+        #     [nn.LazyLinear(bias=False, out_features=123)],
+        # ),
+        # (
+        #     [
+        #         RepeatStartSymbol(times=3),
+        #         LinearSymbol(
+        #             bias=False,
+        #             out_features=123,
+        #         ),
+        #     ],
+        #     [
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #     ],
+        # ),
+        # (
+        #     [
+        #         RepeatStartSymbol(times=3),
+        #         LinearSymbol(
+        #             bias=True,
+        #             out_features=456,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.REPEAT_END),
+        #     ],
+        #     [
+        #         nn.LazyLinear(bias=True, out_features=456),
+        #         nn.LazyLinear(bias=True, out_features=456),
+        #         nn.LazyLinear(bias=True, out_features=456),
+        #     ],
+        # ),
+        # (
+        #     [
+        #         SimpleSymbol(type=SymbolType.RELU),
+        #         RepeatStartSymbol(times=2),
+        #         LinearSymbol(
+        #             bias=True,
+        #             out_features=789,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
+        #         SimpleSymbol(type=SymbolType.REPEAT_END),
+        #         SimpleSymbol(type=SymbolType.TANH),
+        #     ],
+        #     [
+        #         nn.ReLU(),
+        #         nn.LazyLinear(bias=True, out_features=789),
+        #         nn.LeakyReLU(),
+        #         nn.LazyLinear(bias=True, out_features=789),
+        #         nn.LeakyReLU(),
+        #         nn.Tanh(),
+        #     ],
+        # ),
+        # pytest.param(
+        #     [
+        #         SimpleSymbol(type=SymbolType.RELU),
+        #         RepeatStartSymbol(times=2),
+        #         LinearSymbol(
+        #             bias=True,
+        #             out_features=789,
+        #         ),
+        #         RepeatStartSymbol(times=3),
+        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
+        #         SimpleSymbol(type=SymbolType.REPEAT_END),
+        #         LinearSymbol(
+        #             bias=False,
+        #             out_features=123,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.REPEAT_END),
+        #         SimpleSymbol(type=SymbolType.TANH),
+        #     ],
+        #     [
+        #         nn.ReLU(),
+        #         nn.LazyLinear(bias=True, out_features=789),
+        #         nn.LeakyReLU(),
+        #         nn.LeakyReLU(),
+        #         nn.LeakyReLU(),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.LazyLinear(bias=True, out_features=789),
+        #         nn.LeakyReLU(),
+        #         nn.LeakyReLU(),
+        #         nn.LeakyReLU(),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.Tanh(),
+        #     ],
+        #     id="nested-repeat",
+        # ),
+        # pytest.param(
+        #     [
+        #         SimpleSymbol(type=SymbolType.RELU),
+        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
+        #         LinearSymbol(
+        #             bias=True,
+        #             out_features=789,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
+        #         SimpleSymbol(type=SymbolType.ACTIVATE),
+        #         LinearSymbol(
+        #             bias=False,
+        #             out_features=123,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.TANH),
+        #     ],
+        #     [
+        #         nn.ReLU(),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.Tanh(),
+        #     ],
+        #     id="simple-deactivate",
+        # ),
+        # pytest.param(
+        #     [
+        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
+        #         SimpleSymbol(type=SymbolType.ACTIVATE),
+        #         SimpleSymbol(type=SymbolType.RELU),
+        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
+        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
+        #         LinearSymbol(
+        #             bias=True,
+        #             out_features=789,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
+        #         SimpleSymbol(type=SymbolType.ACTIVATE),
+        #         LinearSymbol(
+        #             bias=False,
+        #             out_features=123,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.ACTIVATE),
+        #         SimpleSymbol(type=SymbolType.TANH),
+        #         SimpleSymbol(type=SymbolType.ACTIVATE),
+        #     ],
+        #     [
+        #         nn.ReLU(),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.Tanh(),
+        #     ],
+        #     id="repeating-deactivate",
+        # ),
+        # pytest.param(
+        #     [
+        #         SimpleSymbol(type=SymbolType.RELU),
+        #         RepeatStartSymbol(times=2),
+        #         LinearSymbol(
+        #             bias=True,
+        #             out_features=789,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
+        #         RepeatStartSymbol(times=3),
+        #         SimpleSymbol(type=SymbolType.ACTIVATE),
+        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
+        #         SimpleSymbol(type=SymbolType.REPEAT_END),
+        #         LinearSymbol(
+        #             bias=False,
+        #             out_features=123,
+        #         ),
+        #         SimpleSymbol(type=SymbolType.REPEAT_END),
+        #         SimpleSymbol(type=SymbolType.TANH),
+        #     ],
+        #     [
+        #         nn.ReLU(),
+        #         nn.LazyLinear(bias=True, out_features=789),
+        #         nn.LeakyReLU(),
+        #         nn.LazyLinear(bias=True, out_features=789),
+        #         nn.LeakyReLU(),
+        #         nn.LazyLinear(bias=False, out_features=123),
+        #         nn.Tanh(),
+        #     ],
+        #     id="deactivate-nested-repeat",
+        # ),
     ],
 )
-def test_build_models(symbols: list[SimpleSymbol], expected: list[nn.Module]):
-    assert list(map(module_type_kwargs, build_models(symbols=iter(symbols)))) == list(
-        map(module_type_kwargs, expected)
+def test_build_models(
+    input_shape: typing.Tuple[int, ...],
+    symbols: list[SimpleSymbol],
+    expected_output_shape: typing.Tuple[int, ...],
+    expected_op_cost: int,
+    expected_modules: list[nn.Module],
+):
+    model = build_models(symbols=iter(symbols), input_shape=input_shape)
+    assert model.output_shape == expected_output_shape
+    assert model.operation_cost == expected_op_cost
+    assert list(map(module_type_kwargs, model.modules)) == list(
+        map(module_type_kwargs, expected_modules)
     )

@@ -15,12 +15,13 @@ class BuildError(RuntimeError):
     pass
 
 
-class ExceedOperationBudgetError(RuntimeError):
+class ExceedOperationBudgetError(BuildError):
     pass
 
 
 @dataclasses.dataclass
-class ModelContext:
+class Model:
+    modules: list[nn.Module]
     # the output shape of the current model
     output_shape: typing.Tuple[int, ...]
     operation_cost: int = 0
@@ -46,13 +47,13 @@ def read_enclosure(
 
 def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
-    context: ModelContext,
+    model: Model,
     operation_budget: int | None = None,
 ) -> list[nn.Module]:
     def check_op_budget():
-        if context.operation_cost > operation_budget:
+        if operation_budget is not None and model.operation_cost > operation_budget:
             raise ExceedOperationBudgetError(
-                f"The current operation cost {context.operation_cost} already exceeds operation budget {operation_budget}"
+                f"The current operation cost {model.operation_cost:,} already exceeds operation budget {operation_budget:,}"
             )
 
     modules: list[nn.Module] = []
@@ -72,14 +73,14 @@ def _do_build_models(
                 for _ in range(times):
                     modules.extend(_do_build_models(symbols=iter(repeating_symbols)))
             case LinearSymbol(bias, out_features):
-                if len(context.output_shape) > 1:
+                if len(model.output_shape) > 1:
                     modules.append(nn.Flatten())
-                    in_features = math.prod(context.output_shape)
-                elif len(context.output_shape) == 1:
-                    in_features = context.output_shape[0]
+                    in_features = math.prod(model.output_shape)
+                elif len(model.output_shape) == 1:
+                    in_features = model.output_shape[0]
                 else:
                     raise ValueError("Unexpected output shape")
-                context.operation_cost += in_features * out_features + (
+                model.operation_cost += in_features * out_features + (
                     out_features if bias else 0
                 )
                 check_op_budget()
@@ -91,7 +92,7 @@ def _do_build_models(
                         out_features=out_features,
                     )
                 )
-                context.output_shape = (out_features,)
+                model.output_shape = (out_features,)
             case SimpleSymbol(symbol_type):
                 match symbol_type:
                     case SymbolType.BRANCH_START:
@@ -106,15 +107,15 @@ def _do_build_models(
                         pass
                     case SymbolType.RELU:
                         modules.append(nn.ReLU())
-                        context.operation_cost += math.prod(context.output_shape)
+                        model.operation_cost += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.LEAKY_RELU:
                         modules.append(nn.LeakyReLU())
-                        context.operation_cost += math.prod(context.output_shape)
+                        model.operation_cost += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.TANH:
                         modules.append(nn.Tanh())
-                        context.operation_cost += math.prod(context.output_shape)
+                        model.operation_cost += math.prod(model.output_shape)
                         check_op_budget()
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
@@ -149,9 +150,10 @@ def build_models(
     symbols: typing.Iterator[BaseSymbol],
     input_shape: typing.Tuple[int, ...],
     operation_budget: int | None = None,
-) -> list[nn.Module]:
+) -> Model:
     symbols_iter = skip_deactivated_symbols(symbols)
-    context = ModelContext(output_shape=input_shape)
-    return _do_build_models(
-        symbols_iter, context=context, operation_budget=operation_budget
+    model = Model(modules=[], output_shape=input_shape)
+    model.modules = _do_build_models(
+        symbols_iter, model=model, operation_budget=operation_budget
     )
+    return model
