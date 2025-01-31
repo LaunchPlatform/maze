@@ -8,6 +8,7 @@ from maze.gene.builder import break_branch_segments
 from maze.gene.builder import build_models
 from maze.gene.builder import ExceedOperationBudgetError
 from maze.gene.builder import read_enclosure
+from maze.gene.builder import skip_enclosure
 from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import is_symbol_type
 from maze.gene.symbols import LinearSymbol
@@ -457,3 +458,46 @@ def test_break_branch_segments(
     symbols: list[BaseSymbol], expected: list[list[BaseSymbol]]
 ):
     assert list(break_branch_segments(iter(symbols))) == expected
+
+
+@pytest.mark.parametrize(
+    "symbols, expected",
+    [
+        (
+            [],
+            [],
+        ),
+        (
+            [
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+            ],
+            [],
+        ),
+        (
+            [
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.RELU),
+            ],
+            [
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+            ],
+        ),
+    ],
+)
+def test_skip_enclosure(symbols: list[BaseSymbol], expected: list[BaseSymbol]):
+    assert (
+        list(
+            skip_enclosure(
+                symbols=iter(symbols),
+                start_symbol=functools.partial(is_symbol_type, SymbolType.DEACTIVATE),
+                end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
+            )
+        )
+        == expected
+    )
