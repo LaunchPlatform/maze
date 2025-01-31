@@ -341,18 +341,45 @@ def test_build_models_exceed_quota():
                     bias=True,
                     out_features=100,
                 ),
-                SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
             ],
             [
                 [
                     SimpleSymbol(type=SymbolType.RELU),
+                    SimpleSymbol(type=SymbolType.BRANCH_START),
                     LinearSymbol(
                         bias=True,
                         out_features=100,
                     ),
+                    SimpleSymbol(type=SymbolType.BRANCH_STOP),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 ]
+            ],
+        ),
+        (
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+                LinearSymbol(
+                    bias=True,
+                    out_features=100,
+                ),
+                SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+            ],
+            [
+                [
+                    SimpleSymbol(type=SymbolType.RELU),
+                ],
+                [
+                    LinearSymbol(
+                        bias=True,
+                        out_features=100,
+                    ),
+                    SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                    SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                ],
             ],
         ),
     ],

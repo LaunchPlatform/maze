@@ -75,13 +75,18 @@ def break_branch_segments(
     for symbol in symbols:
         if is_symbol_type(symbol, SymbolType.BRANCH_START):
             nest_level += 1
+            current_segment.append(symbol)
         elif is_symbol_type(symbol, SymbolType.BRANCH_STOP):
             nest_level -= 1
+            # In case of more stops than start
+            if nest_level < 0:
+                nest_level = 0
+            current_segment.append(symbol)
         elif is_symbol_type(symbol, SymbolType.BRANCH_SEGMENT_MARKER):
-            if current_segment:
+            if current_segment and nest_level == 0:
                 yield current_segment
             current_segment = []
-        elif nest_level == 0:
+        else:
             current_segment.append(symbol)
     if current_segment:
         yield current_segment
