@@ -73,9 +73,18 @@ def break_branch_segments(
     current_segment = []
     nest_level = 0
     for symbol in symbols:
-        if isinstance():
-            pass
-        current_segment.append()
+        if is_symbol_type(symbol, SymbolType.BRANCH_START):
+            nest_level += 1
+        elif is_symbol_type(symbol, SymbolType.BRANCH_STOP):
+            nest_level -= 1
+        elif is_symbol_type(symbol, SymbolType.BRANCH_SEGMENT_MARKER):
+            if current_segment:
+                yield current_segment
+            current_segment = []
+        elif nest_level == 0:
+            current_segment.append(symbol)
+    if current_segment:
+        yield current_segment
 
 
 def _do_build_models(
