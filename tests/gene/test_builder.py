@@ -13,7 +13,7 @@ from maze.gene.symbols import SymbolType
 def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
     module_type = type(module)
     match module_type:
-        case nn.ReLU | nn.LeakyReLU | nn.Tanh:
+        case nn.ReLU | nn.LeakyReLU | nn.Tanh | nn.Flatten:
             return module_type, {}
         case nn.Linear:
             return module_type, dict(
@@ -21,6 +21,8 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 out_features=module.out_features,
                 bias=module.bias is not None,
             )
+        case _:
+            raise ValueError(f"Unexpected module type {module_type}")
 
 
 @pytest.mark.parametrize(
@@ -52,22 +54,36 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             [LinearSymbol(bias=False, out_features=123)],
             (123,),
             28 * 28 * 123,
+            [
+                nn.Flatten(),
+                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
+            ],
+        ),
+        (
+            (28 * 28,),
+            [LinearSymbol(bias=False, out_features=123)],
+            (123,),
+            28 * 28 * 123,
             [nn.Linear(bias=False, in_features=28 * 28, out_features=123)],
         ),
-        # (
-        #     [
-        #         RepeatStartSymbol(times=3),
-        #         LinearSymbol(
-        #             bias=False,
-        #             out_features=123,
-        #         ),
-        #     ],
-        #     [
-        #         nn.LazyLinear(bias=False, out_features=123),
-        #         nn.LazyLinear(bias=False, out_features=123),
-        #         nn.LazyLinear(bias=False, out_features=123),
-        #     ],
-        # ),
+        (
+            (28, 28),
+            [
+                RepeatStartSymbol(times=3),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+            ],
+            (123,),
+            28 * 28 * 123 + 123 * 123 + 123 * 123,
+            [
+                nn.Flatten(),
+                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
+                nn.Linear(bias=False, in_features=123, out_features=123),
+                nn.Linear(bias=False, in_features=123, out_features=123),
+            ],
+        ),
         # (
         #     [
         #         RepeatStartSymbol(times=3),

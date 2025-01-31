@@ -71,7 +71,13 @@ def _do_build_models(
                     and s.type == SymbolType.REPEAT_END,
                 )
                 for _ in range(times):
-                    modules.extend(_do_build_models(symbols=iter(repeating_symbols)))
+                    modules.extend(
+                        _do_build_models(
+                            symbols=iter(repeating_symbols),
+                            model=model,
+                            operation_budget=operation_budget,
+                        )
+                    )
             case LinearSymbol(bias, out_features):
                 if len(model.output_shape) > 1:
                     modules.append(nn.Flatten())
