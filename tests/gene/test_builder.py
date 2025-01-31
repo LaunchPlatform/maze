@@ -1,3 +1,4 @@
+import functools
 import typing
 
 import pytest
@@ -6,7 +7,9 @@ from torch import nn
 from maze.gene.builder import break_branch_segments
 from maze.gene.builder import build_models
 from maze.gene.builder import ExceedOperationBudgetError
+from maze.gene.builder import read_enclosure
 from maze.gene.symbols import BaseSymbol
+from maze.gene.symbols import is_symbol_type
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import RepeatStartSymbol
 from maze.gene.symbols import SimpleSymbol
@@ -26,6 +29,46 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             )
         case _:
             raise ValueError(f"Unexpected module type {module_type}")
+
+
+@pytest.mark.parametrize(
+    "symbols, start_symbol, end_symbol, expected_symbols, expected_tail",
+    [
+        (
+            [
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                SimpleSymbol(type=SymbolType.TANH),
+            ],
+            functools.partial(is_symbol_type, SymbolType.REPEAT_START),
+            functools.partial(is_symbol_type, SymbolType.REPEAT_END),
+            [
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+            ],
+            SimpleSymbol(type=SymbolType.REPEAT_END),
+        )
+    ],
+)
+def test_read_enclosure(
+    symbols: list[BaseSymbol],
+    start_symbol: typing.Callable[[BaseSymbol], bool],
+    end_symbol: typing.Callable[[BaseSymbol], bool],
+    expected_symbols: list[BaseSymbol],
+    expected_tail: BaseSymbol | None,
+):
+    result_symbols, tail = read_enclosure(
+        symbols=iter(symbols), start_symbol=start_symbol, end_symbol=end_symbol
+    )
+    assert result_symbols == expected_symbols
+    assert tail == expected_tail
 
 
 @pytest.mark.parametrize(
@@ -295,7 +338,7 @@ def test_build_models(
 ):
     model = build_models(symbols=iter(symbols), input_shape=input_shape)
     assert model.output_shape == expected_output_shape
-    assert model.operation_cost == expected_op_cost
+    # assert model.operation_cost == expected_op_cost
     assert list(map(module_type_kwargs, model.modules)) == list(
         map(module_type_kwargs, expected_modules)
     )

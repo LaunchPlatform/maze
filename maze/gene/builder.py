@@ -102,8 +102,10 @@ def _do_build_models(
     model = Model(modules=[], output_shape=input_shape)
 
     def check_op_budget():
+        if operation_budget is None:
+            return
         total_operation_cost = starting_operation_cost + model.operation_cost
-        if operation_budget is not None and total_operation_cost > operation_budget:
+        if total_operation_cost > operation_budget:
             raise ExceedOperationBudgetError(
                 f"The current operation cost {total_operation_cost:,} already exceeds operation budget {operation_budget:,}"
             )
@@ -132,7 +134,7 @@ def _do_build_models(
                     )
                     model.operation_cost += repeating_model.operation_cost
                     # TODO: maybe we should estimate the cost and check with budget to stop the building process
-                    #       earlier if it's going to exceed the limit any way
+                    #       earlier if it's going to exceed the limit any way.
                     check_op_budget()
                     model.output_shape = repeating_model.output_shape
                     model.modules.extend(repeating_model.modules)
