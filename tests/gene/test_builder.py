@@ -103,27 +103,31 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 nn.Linear(bias=True, in_features=456, out_features=456),
             ],
         ),
-        # (
-        #     [
-        #         SimpleSymbol(type=SymbolType.RELU),
-        #         RepeatStartSymbol(times=2),
-        #         LinearSymbol(
-        #             bias=True,
-        #             out_features=789,
-        #         ),
-        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
-        #         SimpleSymbol(type=SymbolType.REPEAT_END),
-        #         SimpleSymbol(type=SymbolType.TANH),
-        #     ],
-        #     [
-        #         nn.ReLU(),
-        #         nn.LazyLinear(bias=True, out_features=789),
-        #         nn.LeakyReLU(),
-        #         nn.LazyLinear(bias=True, out_features=789),
-        #         nn.LeakyReLU(),
-        #         nn.Tanh(),
-        #     ],
-        # ),
+        (
+            (28, 28),
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                RepeatStartSymbol(times=2),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.REPEAT_END),
+                SimpleSymbol(type=SymbolType.TANH),
+            ],
+            (789,),
+            (28 * 28) + (28 * 28 * 789) + 789 + 789 + (789 * 789) + 789 + 789 + 789,
+            [
+                nn.ReLU(),
+                nn.Flatten(),
+                nn.Linear(bias=True, in_features=28 * 28, out_features=789),
+                nn.LeakyReLU(),
+                nn.Linear(bias=True, in_features=789, out_features=789),
+                nn.LeakyReLU(),
+                nn.Tanh(),
+            ],
+        ),
         # pytest.param(
         #     [
         #         SimpleSymbol(type=SymbolType.RELU),
