@@ -89,10 +89,13 @@ def _do_build_models(
                         pass
                     case SymbolType.RELU:
                         modules.append(nn.ReLU())
+                        context.operation_cost += math.prod(context.output_shape)
                     case SymbolType.LEAKY_RELU:
                         modules.append(nn.LeakyReLU())
+                        context.operation_cost += math.prod(context.output_shape)
                     case SymbolType.TANH:
                         modules.append(nn.Tanh())
+                        context.operation_cost += math.prod(context.output_shape)
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
     return modules
