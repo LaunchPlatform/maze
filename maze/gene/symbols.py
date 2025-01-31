@@ -30,6 +30,8 @@ class SymbolType(enum.Enum):
     # Add Tanh
     TANH = "TANH"
     # Linear, take one arg (bias, output_features), 1 bit and 16 bits
+    # TODO: alternative idea - make the size as yet another freq symbol table plus a huffman tree to encode
+    #       the size as binary code.
     LINEAR = "LINEAR"
 
 
