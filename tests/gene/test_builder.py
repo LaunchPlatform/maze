@@ -179,57 +179,65 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             ],
             id="nested-repeat",
         ),
-        # pytest.param(
-        #     [
-        #         SimpleSymbol(type=SymbolType.RELU),
-        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
-        #         LinearSymbol(
-        #             bias=True,
-        #             out_features=789,
-        #         ),
-        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
-        #         SimpleSymbol(type=SymbolType.ACTIVATE),
-        #         LinearSymbol(
-        #             bias=False,
-        #             out_features=123,
-        #         ),
-        #         SimpleSymbol(type=SymbolType.TANH),
-        #     ],
-        #     [
-        #         nn.ReLU(),
-        #         nn.LazyLinear(bias=False, out_features=123),
-        #         nn.Tanh(),
-        #     ],
-        #     id="simple-deactivate",
-        # ),
-        # pytest.param(
-        #     [
-        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
-        #         SimpleSymbol(type=SymbolType.ACTIVATE),
-        #         SimpleSymbol(type=SymbolType.RELU),
-        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
-        #         SimpleSymbol(type=SymbolType.DEACTIVATE),
-        #         LinearSymbol(
-        #             bias=True,
-        #             out_features=789,
-        #         ),
-        #         SimpleSymbol(type=SymbolType.LEAKY_RELU),
-        #         SimpleSymbol(type=SymbolType.ACTIVATE),
-        #         LinearSymbol(
-        #             bias=False,
-        #             out_features=123,
-        #         ),
-        #         SimpleSymbol(type=SymbolType.ACTIVATE),
-        #         SimpleSymbol(type=SymbolType.TANH),
-        #         SimpleSymbol(type=SymbolType.ACTIVATE),
-        #     ],
-        #     [
-        #         nn.ReLU(),
-        #         nn.LazyLinear(bias=False, out_features=123),
-        #         nn.Tanh(),
-        #     ],
-        #     id="repeating-deactivate",
-        # ),
+        pytest.param(
+            (28, 28),
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+                SimpleSymbol(type=SymbolType.TANH),
+            ],
+            (123,),
+            (28 * 28) + (28 * 28 * 123) + 123,
+            [
+                nn.ReLU(),
+                nn.Flatten(),
+                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
+                nn.Tanh(),
+            ],
+            id="simple-deactivate",
+        ),
+        pytest.param(
+            (28, 28),
+            [
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                SimpleSymbol(type=SymbolType.DEACTIVATE),
+                LinearSymbol(
+                    bias=True,
+                    out_features=789,
+                ),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                ),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+                SimpleSymbol(type=SymbolType.TANH),
+                SimpleSymbol(type=SymbolType.ACTIVATE),
+            ],
+            (123,),
+            (28 * 28) + (28 * 28 * 123) + 123,
+            [
+                nn.ReLU(),
+                nn.Flatten(),
+                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
+                nn.Tanh(),
+            ],
+            id="repeating-deactivate",
+        ),
         # pytest.param(
         #     [
         #         SimpleSymbol(type=SymbolType.RELU),
