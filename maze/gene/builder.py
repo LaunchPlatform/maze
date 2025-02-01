@@ -125,6 +125,7 @@ def _do_build_models(
     input_shape: typing.Tuple[int, ...],
     starting_cost: ModelCost = None,
     budget: ModelCost | None = None,
+    dry_run: bool = False,
 ) -> Model:
     model = Model(modules=[], output_shape=input_shape)
     starting_cost = starting_cost or ModelCost()
@@ -165,6 +166,7 @@ def _do_build_models(
                         input_shape=model.output_shape,
                         starting_cost=starting_cost + model.cost,
                         budget=budget,
+                        dry_run=dry_run,
                     )
                     model.cost.operation += repeating_model.cost.operation
                     # TODO: maybe we should estimate the cost and check with budget to stop the building process
@@ -185,13 +187,14 @@ def _do_build_models(
                 )
                 check_op_budget()
 
-                model.modules.append(
-                    nn.Linear(
-                        bias=bias,
-                        in_features=in_features,
-                        out_features=out_features,
+                if not dry_run:
+                    model.modules.append(
+                        nn.Linear(
+                            bias=bias,
+                            in_features=in_features,
+                            out_features=out_features,
+                        )
                     )
-                )
                 model.output_shape = (out_features,)
             case SimpleSymbol(symbol_type):
                 match symbol_type:
@@ -211,6 +214,7 @@ def _do_build_models(
                                 input_shape=model.output_shape,
                                 starting_cost=starting_cost + model.cost,
                                 budget=budget,
+                                dry_run=dry_run,
                             )
                             for segment_symbols in break_branch_segments(
                                 iter(branch_symbols)
@@ -227,29 +231,35 @@ def _do_build_models(
                             # TODO: make it possible to output different shape with a different joint mode,
                             #       such as addition or stack
                             if len(segment.output_shape) != 1:
-                                segment_modules.append(nn.Flatten())
+                                if not dry_run:
+                                    segment_modules.append(nn.Flatten())
                                 size = math.prod(segment.output_shape)
                                 new_output_size += size
                                 segment.output_shape = (size,)
-                            branch_modules.append(nn.Sequential(*segment.modules))
+                            if not dry_run:
+                                branch_modules.append(nn.Sequential(*segment.modules))
 
-                        model.modules.append(
-                            Joint(
-                                branch_modules=branch_modules,
-                                # TODO: provide other joint mode like addition or stack as well
+                        if not dry_run:
+                            model.modules.append(
+                                Joint(
+                                    branch_modules=branch_modules,
+                                    # TODO: provide other joint mode like addition or stack as well
+                                )
                             )
-                        )
                         model.output_shape = (new_output_size,)
                     case SymbolType.RELU:
-                        model.modules.append(nn.ReLU())
+                        if not dry_run:
+                            model.modules.append(nn.ReLU())
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.LEAKY_RELU:
-                        model.modules.append(nn.LeakyReLU())
+                        if not dry_run:
+                            model.modules.append(nn.LeakyReLU())
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.TANH:
-                        model.modules.append(nn.Tanh())
+                        if not dry_run:
+                            model.modules.append(nn.Tanh())
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
             case _:
@@ -262,12 +272,24 @@ def build_models(
     input_shape: typing.Tuple[int, ...],
     budget: ModelCost | None = None,
 ) -> Model:
-    symbols_iter = filter(
-        lambda s: not is_symbol_type(SymbolType.ACTIVATE, s),
-        skip_enclosure(
-            symbols,
-            start_symbol=functools.partial(is_symbol_type, SymbolType.DEACTIVATE),
-            end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
-        ),
+    filtered_symbols = list(
+        filter(
+            lambda s: not is_symbol_type(SymbolType.ACTIVATE, s),
+            skip_enclosure(
+                symbols,
+                start_symbol=functools.partial(is_symbol_type, SymbolType.DEACTIVATE),
+                end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
+            ),
+        )
     )
-    return _do_build_models(symbols_iter, input_shape=input_shape, budget=budget)
+    # build models is very expensive with pytorch, let's dry run first to raise any exceed budget error first before
+    # actually doing it
+    for dry_run in (True, False):
+        result = _do_build_models(
+            iter(filtered_symbols),
+            input_shape=input_shape,
+            budget=budget,
+            dry_run=dry_run,
+        )
+        if not dry_run:
+            return result
