@@ -33,12 +33,12 @@ class SymbolType(enum.Enum):
     # TODO: alternative idea - make the size as yet another freq symbol table plus a huffman tree to encode
     #       the size as binary code.
     LINEAR = "LINEAR"
-    # Conv1d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
-    CONV1D = "CONV1D"
-    # Conv2d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
-    CONV2D = "CONV2D"
-    # Conv3d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
-    CONV3D = "CONV3D"
+    # # Conv1d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
+    # CONV1D = "CONV1D"
+    # # Conv2d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
+    # CONV2D = "CONV2D"
+    # # Conv3d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
+    # CONV3D = "CONV3D"
 
 
 class BaseSymbol:
