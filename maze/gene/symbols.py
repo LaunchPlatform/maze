@@ -29,6 +29,8 @@ class SymbolType(enum.Enum):
     LEAKY_RELU = "LEAKY_RELU"
     # Add Tanh
     TANH = "TANH"
+    # Add Softmax
+    SOFTMAX = "SOFTMAX"
     # Linear, take one arg (bias, output_features), 1 bit and 12 bits
     # TODO: alternative idea - make the size as yet another freq symbol table plus a huffman tree to encode
     #       the size as binary code.

@@ -278,6 +278,11 @@ def _do_build_models(
                             model.modules.append(nn.Tanh())
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
+                    case SymbolType.SOFTMAX:
+                        if not dry_run:
+                            model.modules.append(nn.Softmax())
+                        model.cost.operation += math.prod(model.output_shape)
+                        check_op_budget()
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
     return model
