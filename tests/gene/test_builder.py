@@ -21,7 +21,7 @@ from maze.gene.symbols import SymbolType
 def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
     module_type = type(module)
     match module_type:
-        case nn.ReLU | nn.LeakyReLU | nn.Tanh | nn.Flatten:
+        case nn.ReLU | nn.LeakyReLU | nn.Tanh | nn.Flatten | nn.Softmax:
             return module_type, {}
         case nn.Linear:
             return module_type, dict(
