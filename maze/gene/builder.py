@@ -241,18 +241,18 @@ def _do_build_models(
                             new_output_size = 0
                             for segment in segment_models:
                                 segment_modules = segment.modules
+                                seg_output_size = math.prod(segment.output_shape)
+                                new_output_size += seg_output_size
                                 # TODO: make it possible to output different shape with a different joint mode,
                                 #       such as addition or stack
                                 if len(segment.output_shape) != 1:
                                     if not dry_run:
                                         segment_modules.append(nn.Flatten(0))
 
-                                    size = math.prod(segment.output_shape)
-                                    new_output_size += size
-                                    segment.output_shape = (size,)
+                                    segment.output_shape = (seg_output_size,)
                                 if not dry_run:
                                     branch_modules.append(
-                                        nn.Sequential(*segment.modules)
+                                        nn.Sequential(*segment_modules)
                                     )
 
                             if not dry_run:

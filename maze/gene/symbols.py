@@ -88,7 +88,7 @@ def parse_symbols(
                 output_features = consume_int(bits=bits_iter, bit_len=12)
                 yield LinearSymbol(
                     bias=bias,
-                    out_features=output_features,
+                    out_features=1 + output_features,
                 )
             else:
                 yield SimpleSymbol(type=symbol)
