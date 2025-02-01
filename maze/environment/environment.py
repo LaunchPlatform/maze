@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class Environment:
     def __init__(self, budget: ModelCost | None = None):
         self.budget = (
-            budget if budget is None else ModelCost(operation=100_000_000, build=100)
+            budget if budget is None else ModelCost(operation=100_000_000, build=1_000)
         )
 
     def build_models(self, input_shape: typing.Tuple[int, ...], agent: Agent):
