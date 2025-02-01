@@ -29,6 +29,10 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 out_features=module.out_features,
                 bias=module.bias is not None,
             )
+        case nn.AdaptiveAvgPool1d | nn.AdaptiveMaxPool1d:
+            return module_type, dict(
+                output_size=module.output_size,
+            )
         case _:
             raise ValueError(f"Unexpected module type {module_type}")
 

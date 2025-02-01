@@ -37,6 +37,8 @@ class SymbolType(enum.Enum):
     LINEAR = "LINEAR"
     # Add AdaptiveMaxPool1d with 12 bits output size
     ADAPTIVE_MAXPOOL1D = "ADAPTIVE_MAXPOOL1D"
+    # Add AdaptiveAvgPool1d with 12 bits output size
+    ADAPTIVE_AVGPOOL1D = "ADAPTIVE_AVGPOOL1D"
     # # Conv1d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
     # CONV1D = "CONV1D"
     # # Conv2d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
@@ -70,6 +72,11 @@ class AdaptiveMaxPool1DSymbol(BaseSymbol):
     out_features: int
 
 
+@dataclasses.dataclass(frozen=True)
+class AdaptiveAvgPool1DSymbol(BaseSymbol):
+    out_features: int
+
+
 def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
     if symbol_type == SymbolType.LINEAR and isinstance(symbol, LinearSymbol):
         return True
@@ -79,6 +86,10 @@ def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
         return True
     elif symbol_type == SymbolType.ADAPTIVE_MAXPOOL1D and isinstance(
         symbol, AdaptiveMaxPool1DSymbol
+    ):
+        return True
+    elif symbol_type == SymbolType.ADAPTIVE_AVGPOOL1D and isinstance(
+        symbol, AdaptiveAvgPool1DSymbol
     ):
         return True
     elif isinstance(symbol, SimpleSymbol):
