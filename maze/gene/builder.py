@@ -169,6 +169,7 @@ def _do_build_models(
                         dry_run=dry_run,
                     )
                     model.cost.operation += repeating_model.cost.operation
+                    model.cost.build += repeating_model.cost.build
                     # TODO: maybe we should estimate the cost and check with budget to stop the building process
                     #       earlier if it's going to exceed the limit any way.
                     check_op_budget()
@@ -222,6 +223,7 @@ def _do_build_models(
                         ]
                         for segment_model in segment_models:
                             model.cost.operation += segment_model.cost.operation
+                            model.cost.build += segment_model.cost.build
                             check_op_budget()
 
                         branch_modules = []
