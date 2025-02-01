@@ -14,7 +14,7 @@ class SymbolType(enum.Enum):
     # marker for different segment of branch
     BRANCH_SEGMENT_MARKER = "BRANCH_SEGMENT_MARKER"
     BRANCH_STOP = "BRANCH_STOP"
-    # repeat the following gene until REPEAT_END, takes 8 bits argument for the repeating times
+    # repeat the following gene until REPEAT_END, takes 4 bits argument for the repeating times
     REPEAT_START = "REPEAT_START"
     REPEAT_END = "REPEAT_END"
     # activate the following gene
@@ -29,7 +29,7 @@ class SymbolType(enum.Enum):
     LEAKY_RELU = "LEAKY_RELU"
     # Add Tanh
     TANH = "TANH"
-    # Linear, take one arg (bias, output_features), 1 bit and 16 bits
+    # Linear, take one arg (bias, output_features), 1 bit and 12 bits
     # TODO: alternative idea - make the size as yet another freq symbol table plus a huffman tree to encode
     #       the size as binary code.
     LINEAR = "LINEAR"
@@ -81,11 +81,11 @@ def parse_symbols(
         try:
             symbol = next_symbol(bits=bits_iter, root=root)
             if symbol == SymbolType.REPEAT_START:
-                times = consume_int(bits=bits_iter, bit_len=8)
+                times = consume_int(bits=bits_iter, bit_len=4)
                 yield RepeatStartSymbol(times=times)
             elif symbol == SymbolType.LINEAR:
                 bias = bool(next(bits_iter))
-                output_features = consume_int(bits=bits_iter, bit_len=16)
+                output_features = consume_int(bits=bits_iter, bit_len=12)
                 yield LinearSymbol(
                     bias=bias,
                     out_features=output_features,
