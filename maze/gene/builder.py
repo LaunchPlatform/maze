@@ -225,30 +225,38 @@ def _do_build_models(
                             model.cost.operation += segment_model.cost.operation
                             model.cost.build += segment_model.cost.build
                             check_op_budget()
-
-                        branch_modules = []
-                        new_output_size = 0
-                        for segment in segment_models:
-                            segment_modules = segment.modules
-                            # TODO: make it possible to output different shape with a different joint mode,
-                            #       such as addition or stack
-                            if len(segment.output_shape) != 1:
-                                if not dry_run:
-                                    segment_modules.append(nn.Flatten())
-                                size = math.prod(segment.output_shape)
-                                new_output_size += size
-                                segment.output_shape = (size,)
+                        if len(segment_models) == 1:
+                            # special case, only one branch seg exists
+                            segment_model = segment_models[0]
                             if not dry_run:
-                                branch_modules.append(nn.Sequential(*segment.modules))
+                                model.modules.extend(segment_model.modules)
+                            model.output_shape = segment_model.output_shape
+                        else:
+                            branch_modules = []
+                            new_output_size = 0
+                            for segment in segment_models:
+                                segment_modules = segment.modules
+                                # TODO: make it possible to output different shape with a different joint mode,
+                                #       such as addition or stack
+                                if len(segment.output_shape) != 1:
+                                    if not dry_run:
+                                        segment_modules.append(nn.Flatten())
+                                    size = math.prod(segment.output_shape)
+                                    new_output_size += size
+                                    segment.output_shape = (size,)
+                                if not dry_run:
+                                    branch_modules.append(
+                                        nn.Sequential(*segment.modules)
+                                    )
 
-                        if not dry_run:
-                            model.modules.append(
-                                Joint(
-                                    branch_modules=branch_modules,
-                                    # TODO: provide other joint mode like addition or stack as well
+                            if not dry_run:
+                                model.modules.append(
+                                    Joint(
+                                        branch_modules=branch_modules,
+                                        # TODO: provide other joint mode like addition or stack as well
+                                    )
                                 )
-                            )
-                        model.output_shape = (new_output_size,)
+                            model.output_shape = (new_output_size,)
                     case SymbolType.RELU:
                         if not dry_run:
                             model.modules.append(nn.ReLU())
