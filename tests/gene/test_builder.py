@@ -7,6 +7,7 @@ from torch import nn
 from maze.gene.builder import break_branch_segments
 from maze.gene.builder import build_models
 from maze.gene.builder import ExceedOperationBudgetError
+from maze.gene.builder import ModelCost
 from maze.gene.builder import read_enclosure
 from maze.gene.builder import skip_enclosure
 from maze.gene.symbols import BaseSymbol
@@ -339,7 +340,7 @@ def test_build_models(
 ):
     model = build_models(symbols=iter(symbols), input_shape=input_shape)
     assert model.output_shape == expected_output_shape
-    assert model.operation_cost == expected_op_cost
+    assert model.cost.operation == expected_op_cost
     assert list(map(module_type_kwargs, model.modules)) == list(
         map(module_type_kwargs, expected_modules)
     )
@@ -357,7 +358,7 @@ def test_build_models_exceed_quota():
             ]
         ),
         input_shape=(28, 28),
-        operation_budget=operation_budget,
+        budget=ModelCost(operation=operation_budget),
     )
     with pytest.raises(ExceedOperationBudgetError):
         build_models(
@@ -370,7 +371,7 @@ def test_build_models_exceed_quota():
                 ]
             ),
             input_shape=(28, 28),
-            operation_budget=operation_budget - 1,
+            budget=ModelCost(operation=operation_budget - 1),
         )
 
 

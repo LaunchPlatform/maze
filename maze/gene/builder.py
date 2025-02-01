@@ -22,12 +22,28 @@ class ExceedOperationBudgetError(BuildError):
     pass
 
 
+class ExceedBuildBudgetError(BuildError):
+    pass
+
+
+@dataclasses.dataclass
+class ModelCost:
+    operation: int = 0
+    build: int = 0
+
+    def __add__(self, other: typing.Self) -> typing.Self:
+        return ModelCost(
+            operation=self.operation + other.operation,
+            build=self.build + other.build,
+        )
+
+
 @dataclasses.dataclass
 class Model:
     modules: list[nn.Module]
     # the output shape of the current model
     output_shape: typing.Tuple[int, ...]
-    operation_cost: int = 0
+    cost: ModelCost = dataclasses.field(default_factory=ModelCost)
 
 
 class Joint(nn.Module):
@@ -84,17 +100,17 @@ def break_branch_segments(
     current_segment = []
     nest_level = 0
     for symbol in symbols:
-        if is_symbol_type(symbol, SymbolType.BRANCH_START):
+        if is_symbol_type(SymbolType.BRANCH_START, symbol):
             nest_level += 1
             current_segment.append(symbol)
-        elif is_symbol_type(symbol, SymbolType.BRANCH_STOP):
+        elif is_symbol_type(SymbolType.BRANCH_STOP, symbol):
             nest_level -= 1
             # In case of more stops than start
             if nest_level < 0:
                 nest_level = 0
             current_segment.append(symbol)
         elif (
-            is_symbol_type(symbol, SymbolType.BRANCH_SEGMENT_MARKER) and nest_level == 0
+            is_symbol_type(SymbolType.BRANCH_SEGMENT_MARKER, symbol) and nest_level == 0
         ):
             yield current_segment
             current_segment = []
@@ -107,18 +123,19 @@ def break_branch_segments(
 def _do_build_models(
     symbols: typing.Iterator[BaseSymbol],
     input_shape: typing.Tuple[int, ...],
-    starting_operation_cost: int = 0,
-    operation_budget: int | None = None,
+    starting_cost: ModelCost = None,
+    budget: ModelCost | None = None,
 ) -> Model:
     model = Model(modules=[], output_shape=input_shape)
+    starting_cost = starting_cost or ModelCost()
 
     def check_op_budget():
-        if operation_budget is None:
+        if budget is None or budget.operation == 0:
             return
-        total_operation_cost = starting_operation_cost + model.operation_cost
-        if total_operation_cost > operation_budget:
+        total_operation_cost = starting_cost.operation + model.cost.operation
+        if total_operation_cost > budget.operation:
             raise ExceedOperationBudgetError(
-                f"The current operation cost {total_operation_cost:,} already exceeds operation budget {operation_budget:,}"
+                f"The current operation cost {total_operation_cost:,} already exceeds operation budget {budget.operation:,}"
             )
 
     while True:
@@ -126,6 +143,13 @@ def _do_build_models(
             symbol = next(symbols)
         except StopIteration:
             break
+        model.cost.build += 1
+        if budget is not None and budget.build != 0:
+            total_build_cost = starting_cost.build + model.cost.build
+            if total_build_cost > budget.build:
+                raise ExceedBuildBudgetError(
+                    f"The current operation cost {total_build_cost:,} already exceeds build budget {budget.build:,}"
+                )
         match symbol:
             case RepeatStartSymbol(times):
                 repeating_symbols, _ = read_enclosure(
@@ -139,11 +163,10 @@ def _do_build_models(
                     repeating_model = _do_build_models(
                         symbols=iter(repeating_symbols),
                         input_shape=model.output_shape,
-                        starting_operation_cost=starting_operation_cost
-                        + model.operation_cost,
-                        operation_budget=operation_budget,
+                        starting_cost=starting_cost + model.cost,
+                        budget=budget,
                     )
-                    model.operation_cost += repeating_model.operation_cost
+                    model.cost.operation += repeating_model.cost.operation
                     # TODO: maybe we should estimate the cost and check with budget to stop the building process
                     #       earlier if it's going to exceed the limit any way.
                     check_op_budget()
@@ -157,7 +180,7 @@ def _do_build_models(
                     in_features = model.output_shape[0]
                 else:
                     raise ValueError("Unexpected output shape")
-                model.operation_cost += in_features * out_features + (
+                model.cost.operation += in_features * out_features + (
                     out_features if bias else 0
                 )
                 check_op_budget()
@@ -186,16 +209,15 @@ def _do_build_models(
                             _do_build_models(
                                 symbols=iter(segment_symbols),
                                 input_shape=model.output_shape,
-                                starting_operation_cost=starting_operation_cost
-                                + model.operation_cost,
-                                operation_budget=operation_budget,
+                                starting_cost=starting_cost + model.cost,
+                                budget=budget,
                             )
                             for segment_symbols in break_branch_segments(
                                 iter(branch_symbols)
                             )
                         ]
                         for segment_model in segment_models:
-                            model.operation_cost += segment_model.operation_cost
+                            model.cost.operation += segment_model.cost.operation
                             check_op_budget()
 
                         branch_modules = []
@@ -220,15 +242,15 @@ def _do_build_models(
                         model.output_shape = (new_output_size,)
                     case SymbolType.RELU:
                         model.modules.append(nn.ReLU())
-                        model.operation_cost += math.prod(model.output_shape)
+                        model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.LEAKY_RELU:
                         model.modules.append(nn.LeakyReLU())
-                        model.operation_cost += math.prod(model.output_shape)
+                        model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.TANH:
                         model.modules.append(nn.Tanh())
-                        model.operation_cost += math.prod(model.output_shape)
+                        model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
@@ -238,7 +260,7 @@ def _do_build_models(
 def build_models(
     symbols: typing.Iterator[BaseSymbol],
     input_shape: typing.Tuple[int, ...],
-    operation_budget: int | None = None,
+    budget: ModelCost | None = None,
 ) -> Model:
     symbols_iter = filter(
         lambda s: not is_symbol_type(SymbolType.ACTIVATE, s),
@@ -248,6 +270,4 @@ def build_models(
             end_symbol=functools.partial(is_symbol_type, SymbolType.ACTIVATE),
         ),
     )
-    return _do_build_models(
-        symbols_iter, input_shape=input_shape, operation_budget=operation_budget
-    )
+    return _do_build_models(symbols_iter, input_shape=input_shape, budget=budget)
