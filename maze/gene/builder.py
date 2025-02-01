@@ -284,14 +284,9 @@ def build_models(
             ),
         )
     )
-    # build models is very expensive with pytorch, let's dry run first to raise any exceed budget error first before
-    # actually doing it
-    for dry_run in (True, False):
-        result = _do_build_models(
-            iter(filtered_symbols),
-            input_shape=input_shape,
-            budget=budget,
-            dry_run=dry_run,
-        )
-        if not dry_run:
-            return result
+    return _do_build_models(
+        iter(filtered_symbols),
+        input_shape=input_shape,
+        budget=budget,
+        dry_run=False,
+    )
