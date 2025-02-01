@@ -6,6 +6,7 @@ import typing
 import torch
 from torch import nn
 
+from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BaseSymbol
 from .symbols import is_symbol_type
 from .symbols import LinearSymbol
@@ -56,6 +57,15 @@ class Joint(nn.Module):
     def forward(self, x):
         # TODO: provide other ways of joining branches
         return torch.cat(list((module(x) for module in self.branch_modules)))
+
+
+class Reshape(nn.Module):
+    def __init__(self, *args):
+        super(Reshape, self).__init__()
+        self.shape = args
+
+    def forward(self, x):
+        return x.view(*self.shape)
 
 
 def read_enclosure(
@@ -179,7 +189,8 @@ def _do_build_models(
                     model.modules.extend(repeating_model.modules)
             case LinearSymbol(bias, out_features):
                 if len(model.output_shape) > 1:
-                    model.modules.append(nn.Flatten(0))
+                    if not dry_run:
+                        model.modules.append(nn.Flatten(0))
                     in_features = math.prod(model.output_shape)
                 elif len(model.output_shape) == 1:
                     in_features = model.output_shape[0]
@@ -199,6 +210,16 @@ def _do_build_models(
                         )
                     )
                 model.output_shape = (out_features,)
+            case AdaptiveMaxPool1DSymbol(out_features):
+                in_features = math.prod(model.output_shape)
+                if not dry_run:
+                    model.modules.append(Reshape(1, in_features))
+                    model.modules.append(nn.AdaptiveMaxPool1d(out_features))
+                    model.modules.append(nn.Flatten(0))
+                model.cost.operation += in_features
+                model.output_shape = (out_features,)
+                check_op_budget()
+
             case SimpleSymbol(symbol_type):
                 match symbol_type:
                     case SymbolType.BRANCH_START:

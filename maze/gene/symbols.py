@@ -35,6 +35,8 @@ class SymbolType(enum.Enum):
     # TODO: alternative idea - make the size as yet another freq symbol table plus a huffman tree to encode
     #       the size as binary code.
     LINEAR = "LINEAR"
+    # Add AdaptiveMaxPool1d with 12 bits output size
+    ADAPTIVE_MAXPOOL1D = "ADAPTIVE_MAXPOOL1D"
     # # Conv1d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
     # CONV1D = "CONV1D"
     # # Conv2d, take out_channels(8bits), kernel_size(8bits), stride(3bits), padding(3bits), dilation=(3bits)
@@ -63,11 +65,20 @@ class LinearSymbol(BaseSymbol):
     out_features: int
 
 
+@dataclasses.dataclass(frozen=True)
+class AdaptiveMaxPool1DSymbol(BaseSymbol):
+    out_features: int
+
+
 def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
     if symbol_type == SymbolType.LINEAR and isinstance(symbol, LinearSymbol):
         return True
     elif symbol_type == SymbolType.REPEAT_START and isinstance(
         symbol, RepeatStartSymbol
+    ):
+        return True
+    elif symbol_type == SymbolType.ADAPTIVE_MAXPOOL1D and isinstance(
+        symbol, AdaptiveMaxPool1DSymbol
     ):
         return True
     elif isinstance(symbol, SimpleSymbol):
@@ -90,6 +101,11 @@ def parse_symbols(
                 output_features = consume_int(bits=bits_iter, bit_len=12)
                 yield LinearSymbol(
                     bias=bias,
+                    out_features=1 + output_features,
+                )
+            elif symbol == SymbolType.ADAPTIVE_MAXPOOL1D:
+                output_features = consume_int(bits=bits_iter, bit_len=12)
+                yield AdaptiveMaxPool1DSymbol(
                     out_features=1 + output_features,
                 )
             else:
