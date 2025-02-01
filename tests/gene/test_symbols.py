@@ -49,7 +49,7 @@ from maze.gene.utils import gen_random_symbol_freq_table
             ),
             [
                 SimpleSymbol(type=SymbolType.RELU),
-                LinearSymbol(bias=False, out_features=26696),
+                LinearSymbol(bias=False, out_features=2120),
             ],
         ),
     ],
