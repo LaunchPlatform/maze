@@ -99,6 +99,13 @@ def test_read_enclosure(
         ),
         (
             (28, 28),
+            [SimpleSymbol(type=SymbolType.SOFTMAX)],
+            (28, 28),
+            28 * 28,
+            [nn.Softmax()],
+        ),
+        (
+            (28, 28),
             [LinearSymbol(bias=False, out_features=123)],
             (123,),
             28 * 28 * 123,
