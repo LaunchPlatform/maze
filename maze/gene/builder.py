@@ -3,6 +3,7 @@ import functools
 import math
 import typing
 
+import torch
 from torch import nn
 
 from .symbols import BaseSymbol
@@ -27,6 +28,16 @@ class Model:
     # the output shape of the current model
     output_shape: typing.Tuple[int, ...]
     operation_cost: int = 0
+
+
+class Joint(nn.Module):
+    def __init__(self, branch_modules: list[nn.Module]):
+        super().__init__()
+        self.branch_modules = branch_modules
+
+    def forward(self, x):
+        # TODO: provide other ways of joining branches
+        return torch.cat(list((module(x) for module in self.branch_modules)))
 
 
 def read_enclosure(
@@ -187,8 +198,26 @@ def _do_build_models(
                             model.operation_cost += segment_model.operation_cost
                             check_op_budget()
 
-                        # TODO: join modules
-                        pass
+                        branch_modules = []
+                        new_output_size = 0
+                        for segment in segment_models:
+                            segment_modules = segment.modules
+                            # TODO: make it possible to output different shape with a different joint mode,
+                            #       such as addition or stack
+                            if len(segment.output_shape) != 1:
+                                segment_modules.append(nn.Flatten())
+                                size = math.prod(segment.output_shape)
+                                new_output_size += size
+                                segment.output_shape = (size,)
+                            branch_modules.append(nn.Sequential(*segment.modules))
+
+                        model.modules.append(
+                            Joint(
+                                branch_modules=branch_modules,
+                                # TODO: provide other joint mode like addition or stack as well
+                            )
+                        )
+                        model.output_shape = (new_output_size,)
                     case SymbolType.RELU:
                         model.modules.append(nn.ReLU())
                         model.operation_cost += math.prod(model.output_shape)
