@@ -50,6 +50,8 @@ class Joint(nn.Module):
     def __init__(self, branch_modules: list[nn.Module]):
         super().__init__()
         self.branch_modules = branch_modules
+        for i, module in enumerate(branch_modules):
+            self.register_module(str(i), module)
 
     def forward(self, x):
         # TODO: provide other ways of joining branches
@@ -177,7 +179,7 @@ def _do_build_models(
                     model.modules.extend(repeating_model.modules)
             case LinearSymbol(bias, out_features):
                 if len(model.output_shape) > 1:
-                    model.modules.append(nn.Flatten())
+                    model.modules.append(nn.Flatten(0))
                     in_features = math.prod(model.output_shape)
                 elif len(model.output_shape) == 1:
                     in_features = model.output_shape[0]
@@ -231,6 +233,9 @@ def _do_build_models(
                             if not dry_run:
                                 model.modules.extend(segment_model.modules)
                             model.output_shape = segment_model.output_shape
+                        elif len(segment_models) == 0:
+                            # nvm, nothing in the segment
+                            pass
                         else:
                             branch_modules = []
                             new_output_size = 0
@@ -240,7 +245,8 @@ def _do_build_models(
                                 #       such as addition or stack
                                 if len(segment.output_shape) != 1:
                                     if not dry_run:
-                                        segment_modules.append(nn.Flatten())
+                                        segment_modules.append(nn.Flatten(0))
+
                                     size = math.prod(segment.output_shape)
                                     new_output_size += size
                                     segment.output_shape = (size,)
