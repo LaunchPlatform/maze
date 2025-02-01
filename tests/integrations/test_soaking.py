@@ -2,6 +2,7 @@ import logging
 import os
 import random
 
+import pytest
 import torch
 from torch import nn
 
@@ -18,6 +19,7 @@ from maze.gene.utils import gen_random_symbol_freq_table
 logger = logging.getLogger(__name__)
 
 
+@pytest.mark.skip(reason="too expensive, suppose to run this manually")
 def test_random_models():
     for _ in range(10000):
         freq_table = gen_random_symbol_freq_table(
