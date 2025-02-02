@@ -11,6 +11,7 @@ torch = "^2.5.1"
 sqlalchemy = "^2.0.37"
 fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
+pydantic-settings = "^2.7.1"
 
 
 [tool.poetry.group.dev.dependencies]
