@@ -37,7 +37,19 @@ def run_agent(
         logger.info("Avatar %s exceed build budget", avatar.id)
         avatar.status = models.AvatarStatus.OUT_OF_BUILD_BUDGET
         return
-    if not len(list(vehicle.torch_model.parameters())):
+    if (
+        avatar.agent.build_cost is None
+        or avatar.agent.op_cost is None
+        or avatar.agent.parameters_count is None
+    ):
+        avatar.agent.build_cost = vehicle.model.cost.build
+        avatar.agent.op_cost = vehicle.model.cost.operation
+        avatar.agent.parameters_count = len(list(vehicle.torch_model.parameters()))
+    if not avatar.agent.parameters_count:
+        logger.warning(
+            "Avatar %s has no parameters, agents without parameters are not supported for now"
+        )
+        avatar.status = models.AvatarStatus.NO_PARAMETERS
         return
     # TODO: epochs from agent
     epochs = 100
