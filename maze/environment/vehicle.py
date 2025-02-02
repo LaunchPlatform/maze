@@ -56,9 +56,16 @@ class Vehicle:
 
     def train(self, data_loader: DataLoader):
         # TODO: optimizer parameters or which one to use should also be decided by the agent instead
-        optimizer = torch.optim.SGD(
-            self.torch_model.parameters(), lr=1e-3, momentum=0.9
-        )
+        try:
+            optimizer = torch.optim.SGD(
+                self.torch_model.parameters(), lr=1e-3, momentum=0.9
+            )
+        except ValueError:
+            # TODO: in the future, we may have weight & bias baked into the gene, maybe it makes sense to have a model
+            #       without parameters?
+            # TODO: or maybe raise error is still a bitter approach given that a model like this doesn't need training
+            logger.warning("No parameters, this model doesn't need for training")
+            return
         size = len(data_loader.dataset)
         self.torch_model.train()
         for batch, (X, y) in enumerate(data_loader):
