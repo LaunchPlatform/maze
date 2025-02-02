@@ -21,7 +21,7 @@ class Zone(Base):
     )
     environment_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("envrionment.id"),
+        ForeignKey("environment.id"),
         nullable=False,
     )
     index: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -29,6 +29,11 @@ class Zone(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
+    environment: Mapped["Environment"] = relationship(
+        "Environment",
+        back_populates="zones",
+        uselist=False,
+    )
     avatars: Mapped[list["Avatar"]] = relationship(
         "Avatar",
         back_populates="zone",

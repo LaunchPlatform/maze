@@ -7,6 +7,7 @@ from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import relationship
 
 from ..db.base import Base
 from .helpers import make_repr_attrs
@@ -19,6 +20,11 @@ class Environment(Base):
     slug: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
+
+    zones: Mapped["Zone"] = relationship(
+        "Zone",
+        back_populates="agent",
     )
 
     def __repr__(self) -> str:

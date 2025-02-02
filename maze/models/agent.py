@@ -39,6 +39,10 @@ class Agent(Base):
         "Mutation",
         back_populates="agent",
     )
+    avatars: Mapped["Avatar"] = relationship(
+        "Avatar",
+        back_populates="agent",
+    )
     # children which pointing lhs parent to this agent
     rhs_children: Mapped[list["Agent"]] = relationship(
         "Agent",
