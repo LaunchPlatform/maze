@@ -51,7 +51,7 @@ class Vehicle:
         )
         self.torch_model = nn.Sequential(*self.model.modules).to(self.device)
 
-    def train(self, data_loader: DataLoader):
+    def train(self, data_loader: DataLoader) -> list[float]:
         # TODO: optimizer parameters or which one to use should also be decided by the agent instead
         try:
             optimizer = torch.optim.SGD(
@@ -62,8 +62,9 @@ class Vehicle:
             #       without parameters?
             # TODO: or maybe raise error is still a bitter approach given that a model like this doesn't need training
             logger.warning("No parameters, this model doesn't need for training")
-            return
+            return []
         size = len(data_loader.dataset)
+        loss_report = []
         self.torch_model.train()
         for batch, (X, y) in enumerate(data_loader):
             X, y = X.to(self.device), y.to(self.device)
@@ -78,11 +79,14 @@ class Vehicle:
             optimizer.step()
             optimizer.zero_grad()
 
+            loss_value = loss.item()
+            loss_report.append(loss_value)
             if batch % 100 == 0:
-                loss, current = loss.item(), (batch + 1) * len(X)
-                logger.info(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+                current = (batch + 1) * len(X)
+                logger.info(f"loss: {loss_value:>7f}  [{current:>5d}/{size:>5d}]")
+        return loss_report
 
-    def test(self, data_loader: DataLoader):
+    def test(self, data_loader: DataLoader) -> typing.Tuple[int, int]:
         size = len(data_loader.dataset)
         num_batches = len(data_loader)
         self.torch_model.eval()
@@ -98,3 +102,4 @@ class Vehicle:
         logger.info(
             f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n"
         )
+        return correct, size
