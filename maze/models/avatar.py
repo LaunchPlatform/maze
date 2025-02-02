@@ -1,7 +1,9 @@
 import datetime
+import enum
 import uuid
 
 from sqlalchemy import DateTime
+from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
@@ -12,6 +14,15 @@ from sqlalchemy.orm import relationship
 
 from ..db.base import Base
 from .helpers import make_repr_attrs
+
+
+@enum.unique
+class AvatarStatus(enum.Enum):
+    ALIVE = "ALIVE"
+    OUT_OF_OP_BUDGET = "OUT_OF_OP_BUDGET"
+    OUT_OF_BUILD_BUDGET = "OUT_OF_BUILD_BUDGET"
+    OUT_OF_CREDIT = "OUT_OF_CREDIT"
+    DEAD = "DEAD"
 
 
 class Avatar(Base):
@@ -28,7 +39,7 @@ class Avatar(Base):
         ForeignKey("zone.id"),
         nullable=False,
     )
-
+    status: Mapped[AvatarStatus] = mapped_column(Enum(AvatarStatus), nullable=False)
     credit: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
