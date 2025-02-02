@@ -54,3 +54,7 @@ class Zone(Base):
             ("index", self.index),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
+
+    @property
+    def display_name(self) -> str:
+        return f"{self.environment.slug}[{self.index}]"

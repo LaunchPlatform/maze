@@ -55,6 +55,13 @@ def run_agent(
         return
     epochs = min(
         avatar.agent.life_span,
+        avatar.zone.environment.life_span_limit,
+    )
+    logger.info(
+        "Running avatar %s in zone %s with %s epochs",
+        avatar.id,
+        avatar.zone.display_name(),
+        epochs,
     )
     for t in range(epochs):
         vehicle.train(train_dataloader)
