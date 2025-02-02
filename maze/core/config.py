@@ -7,6 +7,10 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    POSTGRES_SERVER: str = "localhost"
+    POSTGRES_USER: str = "maze"
+    POSTGRES_PASSWORD: str = ""
+    POSTGRES_DB: str = "maze"
     DATABASE_URL: typing.Optional[PostgresDsn] = None
 
     @field_validator("DATABASE_URL", mode="before")

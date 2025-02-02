@@ -1,0 +1,14 @@
+services:
+  psql:
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: ""
+      POSTGRES_USER: "maze"
+      POSTGRES_DB: "maze"
+    image: "postgres:17.2"
+    ports:
+    - "5432:5432"
+    volumes:
+    - psqldata:/var/lib/postgresql/data
+volumes:
+  psqldata:

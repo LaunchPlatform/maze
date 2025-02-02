@@ -13,6 +13,7 @@ fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
 pydantic-settings = "^2.7.1"
 alembic = "^1.14.1"
+psycopg2-binary = "^2.9.10"
 
 
 [tool.poetry.group.dev.dependencies]
