@@ -1,11 +1,8 @@
 import logging
-import math
 import typing
 
 import torch
 from torch import nn
-from torch.nn import functional
-from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
 from ..gene.builder import build_models
