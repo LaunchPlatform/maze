@@ -36,8 +36,8 @@ class Zone(Base):
 
     __table_args__ = (
         UniqueConstraint(
-            ("environment_id", "index"),
-            "name",
+            "environment_id",
+            "index",
             name="idx_zone_environment_id_index_unique",
         ),
     )
