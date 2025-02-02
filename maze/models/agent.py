@@ -1,10 +1,12 @@
 import datetime
 import uuid
 
+from sqlalchemy import ARRAY
 from sqlalchemy import BigInteger
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
+from sqlalchemy import Integer
 from sqlalchemy import LargeBinary
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID
@@ -30,6 +32,7 @@ class Agent(Base):
         ForeignKey("agent.id"),
         nullable=True,
     )
+    input_shape: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     gene: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     symbol_table: Mapped[dict] = mapped_column(JSONB, nullable=False)
     op_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)

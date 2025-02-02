@@ -23,7 +23,9 @@ def run_agent(
     symbol_table = construct_symbol_table(avatar.agent.symbol_table)
     vehicle = Vehicle(
         agent=AgentData(
-            gene=avatar.agent.gene, symbol_table=symbol_table, input_shape=(28, 28)
+            gene=avatar.agent.gene,
+            symbol_table=symbol_table,
+            input_shape=tuple(avatar.agent.input_shape),
         ),
         loss_fn=nn.CrossEntropyLoss(),
     )
