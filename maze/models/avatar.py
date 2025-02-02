@@ -1,7 +1,7 @@
-import enum
+import datetime
 import uuid
 
-from sqlalchemy import Enum
+from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
@@ -14,15 +14,7 @@ from ..db.base import Base
 from .helpers import make_repr_attrs
 
 
-@enum.unique
-class MutationType(enum.Enum):
-    DELETION = "DELETION"
-    INVERSION = "INVERSION"
-    DUPLICATION = "DUPLICATION"
-    FLIT_BIT = "FLIT_BIT"
-
-
-class Mutation(Base):
+class Avatar(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()
     )
@@ -31,14 +23,25 @@ class Mutation(Base):
         ForeignKey("agent.id"),
         nullable=False,
     )
-    type: Mapped[MutationType] = mapped_column(Enum(MutationType), nullable=False)
-    order: Mapped[int] = mapped_column(Integer, nullable=False)
-    position: Mapped[int] = mapped_column(Integer, nullable=False)
-    length: Mapped[int] = mapped_column(Integer, nullable=False)
+    zone_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("zone.id"),
+        nullable=False,
+    )
+
+    credit: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
 
     agent: Mapped["Agent"] = relationship(
         "Agent",
-        back_populates="mutations",
+        back_populates="avatars",
+        uselist=False,
+    )
+    zone: Mapped["Zone"] = relationship(
+        "Zone",
+        back_populates="avatars",
         uselist=False,
     )
 
@@ -46,9 +49,6 @@ class Mutation(Base):
         items = [
             ("id", self.id),
             ("agent_id", self.agent_id),
-            ("type", self.type),
-            ("order", self.order),
-            ("position", self.position),
-            ("length", self.length),
+            ("zone_id", self.zone_id),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
