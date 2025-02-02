@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: 7b8b59843a02
+Revision ID: 9434360826ad
 Revises:
-Create Date: 2025-02-02 10:50:44.185439
+Create Date: 2025-02-02 13:27:59.937346
 
 """
 from typing import Sequence
@@ -13,9 +13,8 @@ from sqlalchemy.dialects import postgresql
 
 from alembic import op
 
-
 # revision identifiers, used by Alembic.
-revision: str = "7b8b59843a02"
+revision: str = "9434360826ad"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,10 +29,14 @@ def upgrade() -> None:
         ),
         sa.Column("lhs_parent_id", sa.UUID(), nullable=True),
         sa.Column("rhs_parent_id", sa.UUID(), nullable=True),
+        sa.Column("input_shape", sa.ARRAY(sa.Integer()), nullable=False),
         sa.Column("gene", sa.LargeBinary(), nullable=False),
         sa.Column(
             "symbol_table", postgresql.JSONB(astext_type=sa.Text()), nullable=False
         ),
+        sa.Column("op_cost", sa.BigInteger(), nullable=True),
+        sa.Column("build_cost", sa.BigInteger(), nullable=True),
+        sa.Column("parameters_count", sa.BigInteger(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["lhs_parent_id"],
@@ -101,6 +104,19 @@ def upgrade() -> None:
         ),
         sa.Column("agent_id", sa.UUID(), nullable=False),
         sa.Column("zone_id", sa.UUID(), nullable=False),
+        sa.Column(
+            "status",
+            sa.Enum(
+                "ALIVE",
+                "OUT_OF_OP_BUDGET",
+                "OUT_OF_BUILD_BUDGET",
+                "OUT_OF_CREDIT",
+                "NO_PARAMETERS",
+                "DEAD",
+                name="avatarstatus",
+            ),
+            nullable=False,
+        ),
         sa.Column("credit", sa.Integer(), server_default="0", nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
