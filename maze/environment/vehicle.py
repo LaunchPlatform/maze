@@ -1,8 +1,10 @@
 import logging
+import math
 import typing
 
 import torch
 from torch import nn
+from torch.nn import functional
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
@@ -29,16 +31,12 @@ class Vehicle:
     def __init__(
         self,
         agent: Agent,
-        data_loader: DataLoader,
         loss_fn: typing.Callable,
-        optimizer: Optimizer,
         device: str | None = None,
         budget: ModelCost | None = None,
     ):
         self.agent = agent
-        self.data_loader = data_loader
         self.loss_fn = loss_fn
-        self.optimizer = optimizer
         self.device = device if device is not None else detect_device()
         self.budget = (
             budget if budget is None else ModelCost(operation=100_000_000, build=1_000)
@@ -56,32 +54,50 @@ class Vehicle:
         )
         self.torch_model = nn.Sequential(*self.model.modules)
 
-    def train(self):
-        size = len(self.data_loader.dataset)
+    def train(self, data_loader: DataLoader):
+        # TODO: optimizer parameters or which one to use should also be decided by the agent instead
+        optimizer = torch.optim.SGD(
+            self.torch_model.parameters(), lr=1e-3, momentum=0.9
+        )
+        size = len(data_loader.dataset)
         self.torch_model.train()
-        for batch, (X, y) in enumerate(self.data_loader):
+        for batch, (X, y) in enumerate(data_loader):
             X, y = X.to(self.device), y.to(self.device)
 
             # Compute prediction error
-            pred = self.torch_model.model(X)
-            loss = self.loss_fn(pred, y)
+            pred = self.torch_model(X)
+            pred_value = pred
+            # if pred_value.shape() != y.shape():
+            #     # shape is different, but number of dimension is the same, let's pad and slice
+            #     if len(pred_value.shape()) == len(y.shape()):
+            #         dimensions_diffs = list(map(lambda item: item[1] - item[0], zip(pred_value.shape(), y.shape())))
+            #     # the output of model could be anything, let's reshape it to fit the label data
+            #     flatten_pred = torch.flatten(pred_value)
+            #     label_size = math.prod(y.shape())
+            #     if flatten_pred.size(0) > label_size:
+            #         pass
+            #     elif flatten_pred.size(0) < label_size:
+            #         pred_value = functional.pad(flatten_pred, )
+            #     else:
+            #         pass
+            loss = self.loss_fn(pred_value, y)
 
             # Backpropagation
             loss.backward()
-            self.optimizer.step()
-            self.optimizer.zero_grad()
+            optimizer.step()
+            optimizer.zero_grad()
 
             if batch % 100 == 0:
                 loss, current = loss.item(), (batch + 1) * len(X)
                 logger.info(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
-    def test(self):
-        size = len(self.data_loader.dataset)
-        num_batches = len(self.data_loader)
+    def test(self, data_loader: DataLoader):
+        size = len(data_loader.dataset)
+        num_batches = len(data_loader)
         self.torch_model.eval()
         test_loss, correct = 0, 0
         with torch.no_grad():
-            for X, y in self.data_loader:
+            for X, y in data_loader:
                 X, y = X.to(self.device), y.to(self.device)
                 pred = self.torch_model(X)
                 test_loss += self.loss_fn(pred, y).item()
