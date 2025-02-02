@@ -50,5 +50,6 @@ class Avatar(Base):
             ("id", self.id),
             ("agent_id", self.agent_id),
             ("zone_id", self.zone_id),
+            ("credit", self.credit),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
