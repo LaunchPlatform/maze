@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import DateTime
 from sqlalchemy import func
+from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
