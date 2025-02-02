@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from sqlalchemy import BigInteger
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
@@ -31,6 +32,9 @@ class Agent(Base):
     )
     gene: Mapped[bytes] = mapped_column(LargeBinary, nullable=False)
     symbol_table: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    op_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    build_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    parameters_count: Mapped[int] = mapped_column(BigInteger, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
