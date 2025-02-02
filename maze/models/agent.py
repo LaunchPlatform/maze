@@ -12,6 +12,7 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from ..db.base import Base
+from .helpers import make_repr_attrs
 
 
 class Agent(Base):
@@ -34,6 +35,10 @@ class Agent(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
+    mutations: Mapped["Mutation"] = relationship(
+        "Mutation",
+        back_populates="agent",
+    )
     # children which pointing lhs parent to this agent
     rhs_children: Mapped[list["Agent"]] = relationship(
         "Agent",
@@ -46,7 +51,6 @@ class Agent(Base):
         foreign_keys=[rhs_parent_id],
         back_populates="rhs_parent",
     )
-
     lhs_parent: Mapped["Agent"] = relationship(
         "Agent",
         remote_side=[id],
@@ -59,3 +63,13 @@ class Agent(Base):
         foreign_keys=[rhs_parent_id],
         uselist=False,
     )
+
+    def __repr__(self) -> str:
+        items = [
+            ("id", self.id),
+            ("lhs_parent_id", self.lhs_parent_id),
+            ("rhs_parent_id", self.rhs_parent_id),
+            ("gene", repr(self.gene)),
+            ("symbol_table", self.symbol_table),
+        ]
+        return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
