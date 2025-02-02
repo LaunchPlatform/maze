@@ -53,8 +53,9 @@ def run_agent(
         )
         avatar.status = models.AvatarStatus.NO_PARAMETERS
         return
-    # TODO: epochs from agent
-    epochs = 100
+    epochs = min(
+        avatar.agent.life_span,
+    )
     for t in range(epochs):
         vehicle.train(train_dataloader)
         vehicle.test(test_dataloader)

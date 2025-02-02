@@ -19,6 +19,7 @@ class Environment(Base):
         UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()
     )
     slug: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    life_span_limit: Mapped[int] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
