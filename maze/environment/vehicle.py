@@ -52,7 +52,7 @@ class Vehicle:
             input_shape=self.agent.input_shape,
             budget=self.budget,
         )
-        self.torch_model = nn.Sequential(*self.model.modules)
+        self.torch_model = nn.Sequential(*self.model.modules).to(self.device)
 
     def train(self, data_loader: DataLoader):
         # TODO: optimizer parameters or which one to use should also be decided by the agent instead
@@ -67,19 +67,6 @@ class Vehicle:
             # Compute prediction error
             pred = self.torch_model(X)
             pred_value = pred
-            # if pred_value.shape() != y.shape():
-            #     # shape is different, but number of dimension is the same, let's pad and slice
-            #     if len(pred_value.shape()) == len(y.shape()):
-            #         dimensions_diffs = list(map(lambda item: item[1] - item[0], zip(pred_value.shape(), y.shape())))
-            #     # the output of model could be anything, let's reshape it to fit the label data
-            #     flatten_pred = torch.flatten(pred_value)
-            #     label_size = math.prod(y.shape())
-            #     if flatten_pred.size(0) > label_size:
-            #         pass
-            #     elif flatten_pred.size(0) < label_size:
-            #         pred_value = functional.pad(flatten_pred, )
-            #     else:
-            #         pass
             loss = self.loss_fn(pred_value, y)
 
             # Backpropagation
