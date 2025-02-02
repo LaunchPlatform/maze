@@ -11,7 +11,7 @@ from ..gene.builder import ModelCost
 from ..gene.huffman import build_huffman_tree
 from ..gene.symbols import parse_symbols
 from ..gene.utils import gen_bits
-from .agent import Agent
+from .agentdata import AgentData
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ def detect_device() -> str:
 class Vehicle:
     def __init__(
         self,
-        agent: Agent,
+        agent: AgentData,
         loss_fn: typing.Callable,
         device: str | None = None,
         budget: ModelCost | None = None,
