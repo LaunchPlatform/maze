@@ -25,6 +25,7 @@ class Environment(Base):
     zones: Mapped["Zone"] = relationship(
         "Zone",
         back_populates="agent",
+        order_by="Zone.index",
     )
 
     def __repr__(self) -> str:

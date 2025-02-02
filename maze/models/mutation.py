@@ -16,9 +16,9 @@ from .helpers import make_repr_attrs
 
 @enum.unique
 class MutationType(enum.Enum):
-    DELETION = "DELETION"
     INVERSION = "INVERSION"
     DUPLICATION = "DUPLICATION"
+    SHIFT = "SHIFT"
     FLIT_BIT = "FLIT_BIT"
 
 

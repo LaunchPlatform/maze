@@ -64,7 +64,7 @@ def upgrade() -> None:
         sa.Column(
             "type",
             sa.Enum(
-                "DELETION", "INVERSION", "DUPLICATION", "FLIT_BIT", name="mutationtype"
+                "INVERSION", "DUPLICATION", "SHIFT", "FLIT_BIT", name="mutationtype"
             ),
             nullable=False,
         ),
