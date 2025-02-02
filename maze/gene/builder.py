@@ -56,7 +56,10 @@ class Joint(nn.Module):
 
     def forward(self, x):
         # TODO: provide other ways of joining branches
-        return torch.cat(list((module(x) for module in self.branch_modules)))
+        return torch.cat(
+            list((module(x) for module in self.branch_modules)),
+            dim=1,
+        )
 
 
 class Reshape(nn.Module):
@@ -65,7 +68,7 @@ class Reshape(nn.Module):
         self.shape = args
 
     def forward(self, x):
-        return x.view(*self.shape)
+        return x.view(x.size(0), *self.shape)
 
 
 def read_enclosure(
@@ -190,7 +193,7 @@ def _do_build_models(
             case LinearSymbol(bias, out_features):
                 if len(model.output_shape) > 1:
                     if not dry_run:
-                        model.modules.append(nn.Flatten(0))
+                        model.modules.append(nn.Flatten())
                     in_features = math.prod(model.output_shape)
                 elif len(model.output_shape) == 1:
                     in_features = model.output_shape[0]
@@ -215,7 +218,7 @@ def _do_build_models(
                 if not dry_run:
                     model.modules.append(Reshape(1, in_features))
                     model.modules.append(nn.AdaptiveMaxPool1d(out_features))
-                    model.modules.append(nn.Flatten(0))
+                    model.modules.append(nn.Flatten())
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
                 check_op_budget()
@@ -268,7 +271,7 @@ def _do_build_models(
                                 #       such as addition or stack
                                 if len(segment.output_shape) != 1:
                                     if not dry_run:
-                                        segment_modules.append(nn.Flatten(0))
+                                        segment_modules.append(nn.Flatten())
 
                                     segment.output_shape = (seg_output_size,)
                                 if not dry_run:
