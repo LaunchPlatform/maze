@@ -32,6 +32,7 @@ class Mutation(Base):
         nullable=False,
     )
     type: Mapped[MutationType] = mapped_column(Enum(MutationType), nullable=False)
+    order: Mapped[int] = mapped_column(Integer, nullable=False)
     position: Mapped[int] = mapped_column(Integer, nullable=False)
     length: Mapped[int] = mapped_column(Integer, nullable=False)
 
@@ -46,6 +47,7 @@ class Mutation(Base):
             ("id", self.id),
             ("agent_id", self.agent_id),
             ("type", self.type),
+            ("order", self.order),
             ("position", repr(self.position)),
             ("length", self.length),
         ]
