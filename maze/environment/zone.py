@@ -77,9 +77,8 @@ def run_agent(
             train_data_size=train_data_size,
             test_correct_count=correct_count,
             test_total_count=total_count,
-            cost=avatar.agent.op_cost,
-            # TODO: fixme
-            income=0,
+            cost=avatar.agent.op_cost + avatar.zone.environment.basic_op_cost,
+            income=avatar.zone.environment.reward * (correct_count / total_count),
         )
         avatar.epoches.append(epoch)
 
