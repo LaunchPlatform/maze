@@ -36,6 +36,13 @@ def run_agent(
     )
     try:
         vehicle.build_models()
+        logger.info(
+            "Built avatar %s model with build_cost=%s, op_cost=%s, parameters_count=%s",
+            avatar.id,
+            vehicle.model.cost.build,
+            vehicle.model.cost.operation,
+            len(list(vehicle.torch_model.parameters())),
+        )
     except ExceedOperationBudgetError:
         logger.info("Avatar %s exceed op budget", avatar.id)
         avatar.status = models.AvatarStatus.OUT_OF_OP_BUDGET
@@ -87,6 +94,16 @@ def run_agent(
         db.add(epoch)
 
         remaining_credit += epoch.income - epoch.cost
+        logger.info(
+            "Avatar %s epoch %s, accuracy=%s/%s, income=%s, cost=%s, remaining_credit=%s",
+            avatar.id,
+            epoch.test_correct_count,
+            epoch.test_total_count,
+            epoch.income,
+            epoch.cost,
+            remaining_credit,
+        )
+
         if remaining_credit < 0:
             break
 
@@ -99,5 +116,6 @@ def run_agent(
     # Am I a good agent?
     # Yes! You're a good agent.
     avatar.status = models.AvatarStatus.DEAD
+    logger.info("Avatar %s is dead", avatar.id)
 
     # TODO: save the final model weight?
