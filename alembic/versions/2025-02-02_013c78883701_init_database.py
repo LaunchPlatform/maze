@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: 9434360826ad
+Revision ID: 013c78883701
 Revises:
-Create Date: 2025-02-02 13:27:59.937346
+Create Date: 2025-02-02 20:40:34.939263
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "9434360826ad"
+revision: str = "013c78883701"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -34,6 +34,7 @@ def upgrade() -> None:
         sa.Column(
             "symbol_table", postgresql.JSONB(astext_type=sa.Text()), nullable=False
         ),
+        sa.Column("life_span", sa.Integer(), nullable=True),
         sa.Column("op_cost", sa.BigInteger(), nullable=True),
         sa.Column("build_cost", sa.BigInteger(), nullable=True),
         sa.Column("parameters_count", sa.BigInteger(), nullable=True),
@@ -54,9 +55,35 @@ def upgrade() -> None:
             "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
         sa.Column("slug", sa.String(), nullable=False),
+        sa.Column("life_span_limit", sa.Integer(), nullable=True),
+        sa.Column("basic_op_cost", sa.Integer(), nullable=True),
+        sa.Column("reward", sa.Integer(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("slug"),
+    )
+    op.create_table(
+        "epoch",
+        sa.Column(
+            "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
+        sa.Column("agent_id", sa.UUID(), nullable=False),
+        sa.Column("index", sa.Integer(), nullable=False),
+        sa.Column("train_loss", sa.ARRAY(sa.Integer()), nullable=False),
+        sa.Column("train_progress", sa.ARRAY(sa.Integer()), nullable=False),
+        sa.Column("train_data_size", sa.Integer(), nullable=False),
+        sa.Column("test_correct_count", sa.Integer(), nullable=False),
+        sa.Column("test_total_count", sa.Integer(), nullable=False),
+        sa.Column("cost", sa.Integer(), nullable=False),
+        sa.Column("income", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["agent_id"],
+            ["agent.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint(
+            "agent_id", "index", name="idx_epoch_agent_id_index_unique"
+        ),
     )
     op.create_table(
         "mutation",
@@ -137,6 +164,7 @@ def downgrade() -> None:
     op.drop_table("avatar")
     op.drop_table("zone")
     op.drop_table("mutation")
+    op.drop_table("epoch")
     op.drop_table("environment")
     op.drop_table("agent")
     # ### end Alembic commands ###
