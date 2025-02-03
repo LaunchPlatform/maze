@@ -1,5 +1,7 @@
 import logging
 
+from sqlalchemy.orm import object_session
+from sqlalchemy.orm import Session
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -20,6 +22,7 @@ def construct_symbol_table(symbol_table: dict[str, int]) -> dict[SymbolType, int
 def run_agent(
     avatar: models.Avatar, train_dataloader: DataLoader, test_dataloader: DataLoader
 ):
+    db: Session = object_session(avatar)
     if avatar.status != models.AvatarStatus.ALIVE:
         raise ValueError(f"Invalid avatar status {avatar.status}")
     symbol_table = construct_symbol_table(avatar.agent.symbol_table)
@@ -62,7 +65,7 @@ def run_agent(
     logger.info(
         "Running avatar %s in zone %s with %s epochs",
         avatar.id,
-        avatar.zone.display_name(),
+        avatar.zone.display_name,
         epochs,
     )
     remaining_credit = avatar.credit
@@ -71,6 +74,7 @@ def run_agent(
         train_data_size = len(train_dataloader.dataset)
         correct_count, total_count = vehicle.test(test_dataloader)
         epoch = models.Epoch(
+            avatar=avatar,
             index=index,
             train_loss=list(map(lambda item: item[0], train_values)),
             train_progress=list(map(lambda item: item[1], train_values)),
@@ -80,7 +84,7 @@ def run_agent(
             cost=avatar.agent.op_cost + avatar.zone.environment.basic_op_cost,
             income=int(avatar.zone.environment.reward * (correct_count / total_count)),
         )
-        avatar.epoches.append(epoch)
+        db.add(epoch)
 
         remaining_credit += epoch.income - epoch.cost
         if remaining_credit < 0:
