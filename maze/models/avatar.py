@@ -7,6 +7,7 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -23,6 +24,7 @@ class AvatarStatus(enum.Enum):
     OUT_OF_BUILD_BUDGET = "OUT_OF_BUILD_BUDGET"
     OUT_OF_CREDIT = "OUT_OF_CREDIT"
     NO_PARAMETERS = "NO_PARAMETERS"
+    ERROR = "ERROR"
     DEAD = "DEAD"
 
 
@@ -42,6 +44,7 @@ class Avatar(Base):
     )
     status: Mapped[AvatarStatus] = mapped_column(Enum(AvatarStatus), nullable=False)
     credit: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+    error: Mapped[String] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
