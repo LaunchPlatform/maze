@@ -81,3 +81,5 @@ def run_agent(
     # Am I a good agent?
     # Yes! You're a good agent.
     avatar.status = models.AvatarStatus.DEAD
+
+    # TODO: save the final model weight?
