@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: 7e1a67f8a33e
+Revision ID: b130933626f9
 Revises:
-Create Date: 2025-02-02 20:53:44.626954
+Create Date: 2025-02-02 22:06:10.011071
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "7e1a67f8a33e"
+revision: str = "b130933626f9"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -141,13 +141,14 @@ def upgrade() -> None:
         ),
         sa.Column("avatar_id", sa.UUID(), nullable=False),
         sa.Column("index", sa.Integer(), nullable=False),
-        sa.Column("train_loss", sa.ARRAY(sa.Integer()), nullable=False),
+        sa.Column("train_loss", sa.ARRAY(sa.Float()), nullable=False),
         sa.Column("train_progress", sa.ARRAY(sa.Integer()), nullable=False),
         sa.Column("train_data_size", sa.Integer(), nullable=False),
         sa.Column("test_correct_count", sa.Integer(), nullable=False),
         sa.Column("test_total_count", sa.Integer(), nullable=False),
         sa.Column("cost", sa.Integer(), nullable=False),
         sa.Column("income", sa.Integer(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["avatar_id"],
             ["avatar.id"],
