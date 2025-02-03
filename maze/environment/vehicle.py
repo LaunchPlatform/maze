@@ -105,5 +105,10 @@ class Vehicle:
         return correct, size
 
     def export_onnx(self):
-        torch_input = torch.randn(1, *self.agent.input_shape)
-        return torch.onnx.dynamo_export(self.torch_model, torch_input)
+        torch_input = torch.randn(1, *self.agent.input_shape).to(self.device)
+        return torch.onnx.export(
+            self.torch_model,
+            torch_input,
+            input_names=["input"],
+            output_names=["output"],
+        )
