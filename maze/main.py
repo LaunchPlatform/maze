@@ -40,7 +40,7 @@ def init_env(db: Session):
         return
     env01 = models.Environment(
         slug="bootstrap01",
-        life_span_limit=10,
+        life_span_limit=100,
         basic_op_cost=10_000,
         reward=10_000_000,
     )
