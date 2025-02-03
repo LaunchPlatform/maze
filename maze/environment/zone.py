@@ -76,13 +76,13 @@ def run_agent(
         epochs,
     )
     remaining_credit = avatar.credit
-    for index in range(epochs):
+    for epoch_idx in range(epochs):
         train_values = list(vehicle.train(train_dataloader))
         train_data_size = len(train_dataloader.dataset)
         correct_count, total_count = vehicle.test(test_dataloader)
         epoch = models.Epoch(
             avatar=avatar,
-            index=index,
+            index=epoch_idx,
             train_loss=list(map(lambda item: item[0], train_values)),
             train_progress=list(map(lambda item: item[1], train_values)),
             train_data_size=train_data_size,
@@ -97,6 +97,7 @@ def run_agent(
         logger.info(
             "Avatar %s epoch %s, accuracy=%s/%s, income=%s, cost=%s, remaining_credit=%s",
             avatar.id,
+            epoch_idx,
             epoch.test_correct_count,
             epoch.test_total_count,
             epoch.income,

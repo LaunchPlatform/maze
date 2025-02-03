@@ -1,6 +1,7 @@
 import uuid
 
 from sqlalchemy import ARRAY
+from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
@@ -24,8 +25,8 @@ class Epoch(Base):
         nullable=False,
     )
     index: Mapped[int] = mapped_column(Integer, nullable=False)
-    train_loss: Mapped[list[float]] = mapped_column(ARRAY(Integer), nullable=False)
-    train_progress: Mapped[list[float]] = mapped_column(ARRAY(Integer), nullable=False)
+    train_loss: Mapped[list[float]] = mapped_column(ARRAY(Float), nullable=False)
+    train_progress: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     train_data_size: Mapped[int] = mapped_column(Integer, nullable=False)
     test_correct_count: Mapped[int] = mapped_column(Integer, nullable=False)
     test_total_count: Mapped[int] = mapped_column(Integer, nullable=False)
