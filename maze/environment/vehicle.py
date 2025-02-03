@@ -51,7 +51,9 @@ class Vehicle:
         )
         self.torch_model = nn.Sequential(*self.model.modules).to(self.device)
 
-    def train(self, data_loader: DataLoader) -> typing.Generator[float, None, None]:
+    def train(
+        self, data_loader: DataLoader
+    ) -> typing.Generator[typing.Tuple[float, int], None, None]:
         # TODO: optimizer parameters or which one to use should also be decided by the agent instead
         try:
             optimizer = torch.optim.SGD(
@@ -79,10 +81,10 @@ class Vehicle:
             optimizer.zero_grad()
 
             loss_value = loss.item()
+            current = (batch + 1) * len(X)
             if batch % 100 == 0:
-                current = (batch + 1) * len(X)
                 logger.info(f"loss: {loss_value:>7f}  [{current:>5d}/{size:>5d}]")
-            yield loss_value
+            yield loss_value, current
 
     def test(self, data_loader: DataLoader) -> typing.Tuple[int, int]:
         size = len(data_loader.dataset)

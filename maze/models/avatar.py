@@ -56,6 +56,10 @@ class Avatar(Base):
         back_populates="avatars",
         uselist=False,
     )
+    epoches: Mapped["Epoch"] = relationship(
+        "Epoch",
+        back_populates="avatar",
+    )
 
     def __repr__(self) -> str:
         items = [

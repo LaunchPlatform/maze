@@ -63,9 +63,20 @@ def run_agent(
         avatar.zone.display_name(),
         epochs,
     )
-    for t in range(epochs):
-        loss_values = list(vehicle.train(train_dataloader))
+    for index in range(epochs):
+        train_values = list(vehicle.train(train_dataloader))
+        train_data_size = len(train_dataloader.dataset)
         correct_count, total_count = vehicle.test(test_dataloader)
+        avatar.epoches.append(
+            models.Epoch(
+                index=index,
+                train_loss=list(map(lambda item: item[0], train_values)),
+                train_progress=list(map(lambda item: item[1], train_values)),
+                train_data_size=train_data_size,
+                test_correct_count=correct_count,
+                test_total_count=total_count,
+            )
+        )
         # TODO: earn some credit
 
         avatar.credit -= avatar.agent.op_cost
