@@ -76,11 +76,12 @@ def run_agent(
             test_correct_count=correct_count,
             test_total_count=total_count,
             cost=avatar.agent.op_cost,
+            # TODO: fixme
+            income=0,
         )
         avatar.epoches.append(epoch)
-        # TODO: earn some credit
 
-        remaining_credit -= epoch.cost
+        remaining_credit += epoch.income - epoch.cost
         if remaining_credit < 0:
             break
 
