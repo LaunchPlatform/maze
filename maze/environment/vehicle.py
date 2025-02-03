@@ -9,12 +9,7 @@ from ..gene.builder import build_models
 from ..gene.builder import Model
 from ..gene.builder import ModelCost
 from ..gene.huffman import build_huffman_tree
-from ..gene.symbols import AdaptiveMaxPool1DSymbol
-from ..gene.symbols import LinearSymbol
 from ..gene.symbols import parse_symbols
-from ..gene.symbols import RepeatStartSymbol
-from ..gene.symbols import SimpleSymbol
-from ..gene.symbols import SymbolType
 from ..gene.utils import gen_bits
 from .agentdata import AgentData
 
@@ -49,18 +44,6 @@ class Vehicle:
     def build_models(self):
         tree = build_huffman_tree(self.agent.symbol_table)
         symbols = list(parse_symbols(bits=gen_bits(self.agent.gene), root=tree))
-        # XXX: finding out why this is good
-        symbols = [
-            # XXX: turns out AdaptiveMaxPool1DSymbol duplicate the same pixel value (upscale) end up making
-            #      more neurons attaching to the same pixel
-            AdaptiveMaxPool1DSymbol(out_features=10_000),
-            LinearSymbol(bias=True, out_features=1960),
-            SimpleSymbol(type=SymbolType.LEAKY_RELU),
-            LinearSymbol(bias=False, out_features=3595),
-            AdaptiveMaxPool1DSymbol(out_features=1211),
-            AdaptiveMaxPool1DSymbol(out_features=3506),
-            LinearSymbol(bias=False, out_features=3256),
-        ]
         self.model = build_models(
             symbols=iter(symbols),
             input_shape=self.agent.input_shape,
