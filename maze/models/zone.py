@@ -25,6 +25,7 @@ class Zone(Base):
         nullable=False,
     )
     index: Mapped[int] = mapped_column(Integer, nullable=False)
+    agent_slots: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
@@ -52,6 +53,7 @@ class Zone(Base):
             ("id", self.id),
             ("environment_id", self.environment_id),
             ("index", self.index),
+            ("agent_slots", self.agent_slots),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
 

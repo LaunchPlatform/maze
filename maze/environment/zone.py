@@ -78,7 +78,7 @@ def run_agent(
             test_correct_count=correct_count,
             test_total_count=total_count,
             cost=avatar.agent.op_cost + avatar.zone.environment.basic_op_cost,
-            income=avatar.zone.environment.reward * (correct_count / total_count),
+            income=int(avatar.zone.environment.reward * (correct_count / total_count)),
         )
         avatar.epoches.append(epoch)
 
