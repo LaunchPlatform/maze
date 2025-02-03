@@ -9,7 +9,12 @@ from ..gene.builder import build_models
 from ..gene.builder import Model
 from ..gene.builder import ModelCost
 from ..gene.huffman import build_huffman_tree
+from ..gene.symbols import AdaptiveMaxPool1DSymbol
+from ..gene.symbols import LinearSymbol
 from ..gene.symbols import parse_symbols
+from ..gene.symbols import RepeatStartSymbol
+from ..gene.symbols import SimpleSymbol
+from ..gene.symbols import SymbolType
 from ..gene.utils import gen_bits
 from .agentdata import AgentData
 
@@ -44,6 +49,44 @@ class Vehicle:
     def build_models(self):
         tree = build_huffman_tree(self.agent.symbol_table)
         symbols = list(parse_symbols(bits=gen_bits(self.agent.gene), root=tree))
+        # XXX: finding out why this is good
+        symbols = [
+            SimpleSymbol(type=SymbolType.BRANCH_STOP),
+            AdaptiveMaxPool1DSymbol(out_features=3369),
+            SimpleSymbol(type=SymbolType.REPEAT_END),
+            LinearSymbol(bias=True, out_features=1960),
+            SimpleSymbol(type=SymbolType.RELU),
+            SimpleSymbol(type=SymbolType.RELU),
+            SimpleSymbol(type=SymbolType.BRANCH_START),
+            SimpleSymbol(type=SymbolType.REPEAT_END),
+            LinearSymbol(bias=False, out_features=3595),
+            AdaptiveMaxPool1DSymbol(out_features=1211),
+            AdaptiveMaxPool1DSymbol(out_features=4000),
+            SimpleSymbol(type=SymbolType.DEACTIVATE),
+            SimpleSymbol(type=SymbolType.DEACTIVATE),
+            RepeatStartSymbol(times=2),
+            SimpleSymbol(type=SymbolType.SOFTMAX),
+            SimpleSymbol(type=SymbolType.DEACTIVATE),
+            SimpleSymbol(type=SymbolType.TANH),
+            SimpleSymbol(type=SymbolType.ACTIVATE),
+            AdaptiveMaxPool1DSymbol(out_features=3506),
+            LinearSymbol(bias=False, out_features=3256),
+            SimpleSymbol(type=SymbolType.REPEAT_END),
+            SimpleSymbol(type=SymbolType.ACTIVATE),
+            SimpleSymbol(type=SymbolType.BRANCH_START),
+            SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+            SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+            SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+            SimpleSymbol(type=SymbolType.ACTIVATE),
+            SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+            SimpleSymbol(type=SymbolType.REPEAT_END),
+            SimpleSymbol(type=SymbolType.ADAPTIVE_AVGPOOL1D),
+            SimpleSymbol(type=SymbolType.LEAKY_RELU),
+            SimpleSymbol(type=SymbolType.ADAPTIVE_AVGPOOL1D),
+            SimpleSymbol(type=SymbolType.BRANCH_START),
+            SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+            SimpleSymbol(type=SymbolType.DEACTIVATE),
+        ]
         self.model = build_models(
             symbols=iter(symbols),
             input_shape=self.agent.input_shape,
