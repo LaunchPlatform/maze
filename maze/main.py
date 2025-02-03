@@ -91,6 +91,22 @@ def main():
     with Session() as db:
         init_env(db)
         init_agents(db)
+        while True:
+            avatar = (
+                db.query(models.Avatar)
+                .join(models.Zone)
+                .filter(models.Avatar.status == models.AvatarStatus.ALIVE)
+                .order_by(models.Zone.index)
+            ).first()
+            if avatar is None:
+                break
+            run_agent(
+                avatar=avatar,
+                train_dataloader=train_dataloader,
+                test_dataloader=test_dataloader,
+            )
+            db.commit()
+    logger.info("All done")
 
 
 if __name__ == "__main__":
