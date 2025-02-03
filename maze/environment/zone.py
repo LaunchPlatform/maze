@@ -68,10 +68,13 @@ def run_agent(
     ):
         avatar.agent.build_cost = vehicle.model.cost.build
         avatar.agent.op_cost = vehicle.model.cost.operation
-        avatar.agent.parameters_count = len(list(vehicle.torch_model.parameters()))
+        avatar.agent.parameters_count = sum(
+            p.numel() for p in vehicle.torch_model.parameters()
+        )
     if not avatar.agent.parameters_count:
         logger.warning(
-            "Avatar %s has no parameters, agents without parameters are not supported for now"
+            "Avatar %s has no parameters, agents without parameters are not supported for now",
+            avatar.id,
         )
         avatar.status = models.AvatarStatus.NO_PARAMETERS
         return
