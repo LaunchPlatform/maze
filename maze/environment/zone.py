@@ -80,47 +80,54 @@ def run_agent(
         epochs,
     )
     remaining_credit = avatar.credit
-    for epoch_idx in range(epochs):
-        train_values = list(vehicle.train(train_dataloader))
-        train_data_size = len(train_dataloader.dataset)
-        correct_count, total_count = vehicle.test(test_dataloader)
-        epoch = models.Epoch(
-            avatar=avatar,
-            index=epoch_idx,
-            train_loss=list(map(lambda item: item[0], train_values)),
-            train_progress=list(map(lambda item: item[1], train_values)),
-            train_data_size=train_data_size,
-            test_correct_count=correct_count,
-            test_total_count=total_count,
-            cost=avatar.agent.op_cost + avatar.zone.environment.basic_op_cost,
-            income=int(avatar.zone.environment.reward * (correct_count / total_count)),
-        )
-        db.add(epoch)
+    try:
+        for epoch_idx in range(epochs):
+            train_values = list(vehicle.train(train_dataloader))
+            train_data_size = len(train_dataloader.dataset)
+            correct_count, total_count = vehicle.test(test_dataloader)
+            epoch = models.Epoch(
+                avatar=avatar,
+                index=epoch_idx,
+                train_loss=list(map(lambda item: item[0], train_values)),
+                train_progress=list(map(lambda item: item[1], train_values)),
+                train_data_size=train_data_size,
+                test_correct_count=correct_count,
+                test_total_count=total_count,
+                cost=avatar.agent.op_cost + avatar.zone.environment.basic_op_cost,
+                income=int(
+                    avatar.zone.environment.reward * (correct_count / total_count)
+                ),
+            )
+            db.add(epoch)
 
-        remaining_credit += epoch.income - epoch.cost
-        logger.info(
-            "Avatar %s epoch %s, accuracy=%s/%s, income=%s, cost=%s, remaining_credit=%s",
-            avatar.id,
-            epoch_idx,
-            format_number(epoch.test_correct_count),
-            format_number(epoch.test_total_count),
-            format_number(epoch.income),
-            format_number(epoch.cost),
-            format_number(remaining_credit),
-        )
+            remaining_credit += epoch.income - epoch.cost
+            logger.info(
+                "Avatar %s epoch %s, accuracy=%s/%s, income=%s, cost=%s, remaining_credit=%s",
+                avatar.id,
+                epoch_idx,
+                format_number(epoch.test_correct_count),
+                format_number(epoch.test_total_count),
+                format_number(epoch.income),
+                format_number(epoch.cost),
+                format_number(remaining_credit),
+            )
+
+            if remaining_credit < 0:
+                break
 
         if remaining_credit < 0:
-            break
+            avatar.credit = 0
+            avatar.status = models.AvatarStatus.OUT_OF_CREDIT
+            logger.info("Avatar %s runs out of credit", avatar.id)
+            return
 
-    if remaining_credit < 0:
-        avatar.credit = 0
-        avatar.status = models.AvatarStatus.OUT_OF_CREDIT
-        logger.info("Avatar %s runs out of credit", avatar.id)
-        return
+        # Am I a good agent?
+        # Yes! You're a good agent.
+        avatar.status = models.AvatarStatus.DEAD
+        logger.info("Avatar %s is dead", avatar.id)
 
-    # Am I a good agent?
-    # Yes! You're a good agent.
-    avatar.status = models.AvatarStatus.DEAD
-    logger.info("Avatar %s is dead", avatar.id)
-
-    # TODO: save the final model weight?
+        # TODO: save the final model weight?
+    except Exception as exp:
+        logger.info("Avatar %s encounter unexpected error", avatar.id, exc_info=True)
+        avatar.status = models.AvatarStatus.ERROR
+        avatar.error = str(exp)
