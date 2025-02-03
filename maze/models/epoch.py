@@ -1,6 +1,8 @@
+import datetime
 import uuid
 
 from sqlalchemy import ARRAY
+from sqlalchemy import DateTime
 from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
@@ -32,6 +34,9 @@ class Epoch(Base):
     test_total_count: Mapped[int] = mapped_column(Integer, nullable=False)
     cost: Mapped[int] = mapped_column(Integer, nullable=False)
     income: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.datetime.utcnow
+    )
 
     avatar: Mapped["Avatar"] = relationship(
         "Avatar",
