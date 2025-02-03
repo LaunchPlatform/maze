@@ -18,9 +18,9 @@ class Epoch(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()
     )
-    agent_id: Mapped[uuid.UUID] = mapped_column(
+    avatar_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("agent.id"),
+        ForeignKey("avatar.id"),
         nullable=False,
     )
     index: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -39,16 +39,16 @@ class Epoch(Base):
     )
     __table_args__ = (
         UniqueConstraint(
-            "agent_id",
+            "avatar_id",
             "index",
-            name="idx_epoch_agent_id_index_unique",
+            name="idx_epoch_avatar_id_index_unique",
         ),
     )
 
     def __repr__(self) -> str:
         items = [
             ("id", self.id),
-            ("agent_id", self.agent_id),
+            ("avatar_id", self.avatar_id),
             ("index", self.index),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"

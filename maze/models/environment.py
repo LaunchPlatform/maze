@@ -28,7 +28,7 @@ class Environment(Base):
 
     zones: Mapped["Zone"] = relationship(
         "Zone",
-        back_populates="agent",
+        back_populates="environment",
         order_by="Zone.index",
     )
 
