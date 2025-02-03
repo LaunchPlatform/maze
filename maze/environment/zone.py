@@ -63,27 +63,28 @@ def run_agent(
         avatar.zone.display_name(),
         epochs,
     )
+    remaining_credit = avatar.credit
     for index in range(epochs):
         train_values = list(vehicle.train(train_dataloader))
         train_data_size = len(train_dataloader.dataset)
         correct_count, total_count = vehicle.test(test_dataloader)
-        avatar.epoches.append(
-            models.Epoch(
-                index=index,
-                train_loss=list(map(lambda item: item[0], train_values)),
-                train_progress=list(map(lambda item: item[1], train_values)),
-                train_data_size=train_data_size,
-                test_correct_count=correct_count,
-                test_total_count=total_count,
-            )
+        epoch = models.Epoch(
+            index=index,
+            train_loss=list(map(lambda item: item[0], train_values)),
+            train_progress=list(map(lambda item: item[1], train_values)),
+            train_data_size=train_data_size,
+            test_correct_count=correct_count,
+            test_total_count=total_count,
+            cost=avatar.agent.op_cost,
         )
+        avatar.epoches.append(epoch)
         # TODO: earn some credit
 
-        avatar.credit -= avatar.agent.op_cost
-        if avatar.credit < 0:
+        remaining_credit -= epoch.cost
+        if remaining_credit < 0:
             break
 
-    if avatar.credit < 0:
+    if remaining_credit < 0:
         avatar.credit = 0
         avatar.status = models.AvatarStatus.OUT_OF_CREDIT
         logger.info("Avatar %s runs out of credit", avatar.id)

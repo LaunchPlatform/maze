@@ -29,6 +29,7 @@ class Epoch(Base):
     train_data_size: Mapped[int] = mapped_column(Integer, nullable=False)
     test_correct_count: Mapped[int] = mapped_column(Integer, nullable=False)
     test_total_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    cost: Mapped[int] = mapped_column(Integer, nullable=False)
 
     avatar: Mapped["Avatar"] = relationship(
         "Avatar",
