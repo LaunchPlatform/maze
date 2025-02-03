@@ -45,12 +45,13 @@ def run_agent(
     )
     try:
         vehicle.build_models()
+        parameter_count = sum(p.numel() for p in vehicle.torch_model.parameters())
         logger.info(
             "Built avatar %s model with build_cost=%s, op_cost=%s, parameters_count=%s",
             avatar.id,
             format_number(vehicle.model.cost.build),
             format_number(vehicle.model.cost.operation),
-            format_number(len(list(vehicle.torch_model.parameters()))),
+            format_number(parameter_count),
         )
         logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
     except ExceedOperationBudgetError:
@@ -68,9 +69,7 @@ def run_agent(
     ):
         avatar.agent.build_cost = vehicle.model.cost.build
         avatar.agent.op_cost = vehicle.model.cost.operation
-        avatar.agent.parameters_count = sum(
-            p.numel() for p in vehicle.torch_model.parameters()
-        )
+        avatar.agent.parameters_count = parameter_count
     if not avatar.agent.parameters_count:
         logger.warning(
             "Avatar %s has no parameters, agents without parameters are not supported for now",
