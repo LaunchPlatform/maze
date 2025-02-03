@@ -15,6 +15,10 @@ from .vehicle import Vehicle
 logger = logging.getLogger(__name__)
 
 
+def format_number(value: int) -> str:
+    return f"{value:,}"
+
+
 def construct_symbol_table(symbol_table: dict[str, int]) -> dict[SymbolType, int]:
     return {SymbolType(key): value for key, value in symbol_table.items()}
 
@@ -39,9 +43,9 @@ def run_agent(
         logger.info(
             "Built avatar %s model with build_cost=%s, op_cost=%s, parameters_count=%s",
             avatar.id,
-            vehicle.model.cost.build,
-            vehicle.model.cost.operation,
-            len(list(vehicle.torch_model.parameters())),
+            format_number(vehicle.model.cost.build),
+            format_number(vehicle.model.cost.operation),
+            format_number(len(list(vehicle.torch_model.parameters()))),
         )
     except ExceedOperationBudgetError:
         logger.info("Avatar %s exceed op budget", avatar.id)
@@ -98,11 +102,11 @@ def run_agent(
             "Avatar %s epoch %s, accuracy=%s/%s, income=%s, cost=%s, remaining_credit=%s",
             avatar.id,
             epoch_idx,
-            epoch.test_correct_count,
-            epoch.test_total_count,
-            epoch.income,
-            epoch.cost,
-            remaining_credit,
+            format_number(epoch.test_correct_count),
+            format_number(epoch.test_total_count),
+            format_number(epoch.income),
+            format_number(epoch.cost),
+            format_number(remaining_credit),
         )
 
         if remaining_credit < 0:
