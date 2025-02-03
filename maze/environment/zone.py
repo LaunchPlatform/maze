@@ -124,7 +124,6 @@ def run_agent(
                 break
 
         if remaining_credit < 0:
-            avatar.credit = 0
             avatar.status = models.AvatarStatus.OUT_OF_CREDIT
             logger.info("Avatar %s runs out of credit", avatar.id)
             return
