@@ -11,7 +11,7 @@ from maze.gene.symbols import parse_symbols
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_bits
-from maze.gene.utils import gen_random_symbol_freq_table
+from maze.gene.utils import gen_random_symbol_table
 
 
 @pytest.mark.parametrize(
@@ -60,7 +60,7 @@ def test_parse_symbols(data: bytes, tree: TreeNode, expected: list[BaseSymbol]):
 
 def test_parse_symbols_random_gene():
     for _ in range(10000):
-        freq_table = gen_random_symbol_freq_table(
+        freq_table = gen_random_symbol_table(
             symbols=list(SymbolType), random_range=(1, 1024)
         )
         tree = build_huffman_tree(freq_table)

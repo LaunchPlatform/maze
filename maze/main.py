@@ -1,4 +1,6 @@
 import logging
+import os
+import random
 
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -7,6 +9,8 @@ from torchvision.transforms import ToTensor
 from . import models
 from .db.session import Session
 from .environment.zone import run_agent
+from maze.gene.symbols import SymbolType
+from maze.gene.utils import gen_random_symbol_table
 
 logging.basicConfig(level=logging.INFO)
 
@@ -29,62 +33,53 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
-def init_env():
-    pass
-
-
-with Session() as db:
-    # env01 = models.Environment(
-    #     slug="bootstrap01",
-    #     life_span_limit=300,
-    #     basic_op_cost=10_000,
-    #     reward=100_000_000,
-    # )
-    # db.add(env01)
-    # db.flush()
-    # for i in range(100):
-    #     zone = models.Zone(
-    #         environment=env01,
-    #         index=i,
-    #         agent_slots=10_000,
-    #     )
-    #     db.add(zone)
-    # db.commit()
-    # zone = db.query(models.Zone).filter_by(index=0).one()
-    # agent = models.Agent(
-    #     symbol_table={
-    #         "BRANCH_START": 765,
-    #         "BRANCH_SEGMENT_MARKER": 419,
-    #         "BRANCH_STOP": 52,
-    #         "REPEAT_START": 384,
-    #         "REPEAT_END": 455,
-    #         "ACTIVATE": 797,
-    #         "DEACTIVATE": 939,
-    #         "RELU": 965,
-    #         "LEAKY_RELU": 293,
-    #         "TANH": 179,
-    #         "SOFTMAX": 209,
-    #         "LINEAR": 343,
-    #         "ADAPTIVE_MAXPOOL1D": 397,
-    #         "ADAPTIVE_AVGPOOL1D": 483,
-    #     },
-    #     input_shape=[28, 28],
-    #     gene=b"\x99\xa2t\xe1\xd3\xfbYH\xc1U\x97\xf4\xf37\x91\xb4\xdc\x1a\xdb\xe8\x96\xcb\x8c\x08G54c",
-    #     life_span=50,
-    # )
-    # avatar = models.Avatar(
-    #     agent=agent,
-    #     zone=zone,
-    #     status=models.AvatarStatus.ALIVE,
-    #     credit=1_000_000_000,
-    # )
-    # db.add(avatar)
-    # db.commit()
-
-    avatar = db.query(models.Avatar).one()
-    run_agent(
-        avatar=avatar,
-        train_dataloader=train_dataloader,
-        test_dataloader=test_dataloader,
+def init_env(db: Session):
+    env01 = db.query(models.Environment).filter_by(slug="bootstrap01").one_or_none()
+    if env01 is not None:
+        return
+    env01 = models.Environment(
+        slug="bootstrap01",
+        life_span_limit=100,
+        basic_op_cost=10_000,
+        reward=100_000_000,
     )
+    db.add(env01)
+    db.flush()
+    for i in range(100):
+        zone = models.Zone(
+            environment=env01,
+            index=i,
+            agent_slots=10_000,
+        )
+        db.add(zone)
     db.commit()
+
+
+def main():
+    with Session() as db:
+        init_env(db)
+        env01 = db.query(models.Environment).filter_by(slug="bootstrap01").one()
+        for zone in env01.zones:
+            for _ in range(zone.agent_slots):
+                agent = models.Agent(
+                    symbol_table=gen_random_symbol_table(
+                        symbols=list(map(lambda s: s.value, SymbolType)),
+                        random_range=(1, 1024),
+                    ),
+                    input_shape=[28, 28],
+                    gene=os.urandom(random.randint(5, 100)),
+                    life_span=50,
+                )
+                avatar = models.Avatar(
+                    agent=agent,
+                    zone=zone,
+                    status=models.AvatarStatus.ALIVE,
+                    credit=1_000_000_000,
+                )
+                db.add(avatar)
+            db.commit()
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    main()

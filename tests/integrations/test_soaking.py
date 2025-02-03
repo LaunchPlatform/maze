@@ -14,7 +14,7 @@ from maze.gene.huffman import build_huffman_tree
 from maze.gene.symbols import parse_symbols
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_bits
-from maze.gene.utils import gen_random_symbol_freq_table
+from maze.gene.utils import gen_random_symbol_table
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 @pytest.mark.skip(reason="too expensive, suppose to run this manually")
 def test_random_models():
     for _ in range(10000):
-        freq_table = gen_random_symbol_freq_table(
+        freq_table = gen_random_symbol_table(
             symbols=list(SymbolType), random_range=(1, 1024)
         )
         logger.info("Symbol table: %r", freq_table)
