@@ -40,9 +40,9 @@ def init_env(db: Session):
         return
     env01 = models.Environment(
         slug="bootstrap01",
-        life_span_limit=100,
+        life_span_limit=10,
         basic_op_cost=10_000,
-        reward=100_000_000,
+        reward=10_000_000,
     )
     db.add(env01)
     db.flush()
@@ -81,7 +81,7 @@ def init_agents(db: Session):
                 agent=agent,
                 zone=zone,
                 status=models.AvatarStatus.ALIVE,
-                credit=1_000_000_000,
+                credit=20_000_000,
             )
             db.add(avatar)
         db.commit()
