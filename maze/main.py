@@ -12,7 +12,7 @@ from .environment.zone import run_agent
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_random_symbol_table
 
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 training_data = datasets.MNIST(
     root="data",
@@ -36,6 +36,7 @@ test_dataloader = DataLoader(test_data, batch_size=batch_size)
 def init_env(db: Session):
     env01 = db.query(models.Environment).filter_by(slug="bootstrap01").one_or_none()
     if env01 is not None:
+        logger.info("Environment created, skip")
         return
     env01 = models.Environment(
         slug="bootstrap01",
@@ -57,8 +58,13 @@ def init_env(db: Session):
 
 def init_agents(db: Session):
     env01 = db.query(models.Environment).filter_by(slug="bootstrap01").one()
-    any_avatar = db.query(models.Avatar).filter_by(environment=env01).first_or_none()
+    any_avatar = (
+        db.query(models.Avatar)
+        .join(models.Zone)
+        .filter(models.Zone.environment == env01)
+    ).first()
     if any_avatar is not None:
+        logger.info("Agents and avatars are already created, skip")
         return
     for zone in env01.zones:
         for _ in range(zone.agent_slots):
