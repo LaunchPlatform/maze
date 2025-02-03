@@ -20,6 +20,8 @@ def construct_symbol_table(symbol_table: dict[str, int]) -> dict[SymbolType, int
 def run_agent(
     avatar: models.Avatar, train_dataloader: DataLoader, test_dataloader: DataLoader
 ):
+    if avatar.status != models.AvatarStatus.ALIVE:
+        raise ValueError(f"Invalid avatar status {avatar.status}")
     symbol_table = construct_symbol_table(avatar.agent.symbol_table)
     vehicle = Vehicle(
         agent=AgentData(
