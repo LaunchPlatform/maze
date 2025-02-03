@@ -64,8 +64,9 @@ def run_agent(
         epochs,
     )
     for t in range(epochs):
-        vehicle.train(train_dataloader)
-        vehicle.test(test_dataloader)
+        for loss in vehicle.train(train_dataloader):
+            pass
+        correct_count, total_count = vehicle.test(test_dataloader)
         # TODO: substract operation cost
         # TODO: check remaining credit
         # TODO: kill agent early if they are out of credit
