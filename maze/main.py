@@ -40,17 +40,17 @@ def init_env(db: Session):
         return
     env01 = models.Environment(
         slug="bootstrap01",
-        life_span_limit=100,
+        life_span_limit=10,
         basic_op_cost=10_000,
         reward=10_000_000,
     )
     db.add(env01)
     db.flush()
-    for i in range(100):
+    for i in range(10):
         zone = models.Zone(
             environment=env01,
             index=i,
-            agent_slots=10_000,
+            agent_slots=10,
         )
         db.add(zone)
     db.commit()
