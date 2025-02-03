@@ -26,7 +26,7 @@ class Environment(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
-    zones: Mapped["Zone"] = relationship(
+    zones: Mapped[list["Zone"]] = relationship(
         "Zone",
         back_populates="environment",
         order_by="Zone.index",
