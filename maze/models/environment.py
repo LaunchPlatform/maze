@@ -22,6 +22,8 @@ class Environment(Base):
     life_span_limit: Mapped[int] = mapped_column(Integer, nullable=True)
     basic_op_cost: Mapped[int] = mapped_column(Integer, nullable=True)
     reward: Mapped[int] = mapped_column(Integer, nullable=True)
+    op_budget: Mapped[int] = mapped_column(Integer, nullable=True)
+    build_budget: Mapped[int] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )

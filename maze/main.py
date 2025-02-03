@@ -43,6 +43,8 @@ def init_env(db: Session):
         life_span_limit=10,
         basic_op_cost=10_000,
         reward=10_000_000,
+        op_budget=100_000_000,
+        build_budget=1_000,
     )
     db.add(env01)
     db.flush()

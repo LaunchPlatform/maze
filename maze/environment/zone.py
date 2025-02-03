@@ -8,6 +8,7 @@ from torch.utils.data import DataLoader
 from .. import models
 from ..gene.builder import ExceedBuildBudgetError
 from ..gene.builder import ExceedOperationBudgetError
+from ..gene.builder import ModelCost
 from ..gene.symbols import SymbolType
 from .agentdata import AgentData
 from .vehicle import Vehicle
@@ -37,6 +38,10 @@ def run_agent(
             input_shape=tuple(avatar.agent.input_shape),
         ),
         loss_fn=nn.CrossEntropyLoss(),
+        budget=ModelCost(
+            operation=avatar.zone.environment.op_budget or 0,
+            build=avatar.zone.environment.build_budget or 0,
+        ),
     )
     try:
         vehicle.build_models()
@@ -47,6 +52,7 @@ def run_agent(
             format_number(vehicle.model.cost.operation),
             format_number(len(list(vehicle.torch_model.parameters()))),
         )
+        logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
     except ExceedOperationBudgetError:
         logger.info("Avatar %s exceed op budget", avatar.id)
         avatar.status = models.AvatarStatus.OUT_OF_OP_BUDGET

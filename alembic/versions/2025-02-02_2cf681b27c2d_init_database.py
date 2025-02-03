@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: ec2b989c8092
+Revision ID: 2cf681b27c2d
 Revises:
-Create Date: 2025-02-02 22:09:09.156573
+Create Date: 2025-02-02 23:14:57.597363
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "ec2b989c8092"
+revision: str = "2cf681b27c2d"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -58,6 +58,8 @@ def upgrade() -> None:
         sa.Column("life_span_limit", sa.Integer(), nullable=True),
         sa.Column("basic_op_cost", sa.Integer(), nullable=True),
         sa.Column("reward", sa.Integer(), nullable=True),
+        sa.Column("op_budget", sa.Integer(), nullable=True),
+        sa.Column("build_budget", sa.Integer(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("slug"),
