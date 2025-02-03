@@ -77,3 +77,7 @@ def run_agent(
         avatar.status = models.AvatarStatus.OUT_OF_CREDIT
         logger.info("Avatar %s runs out of credit", avatar.id)
         return
+
+    # Am I a good agent?
+    # Yes! You're a good agent.
+    avatar.status = models.AvatarStatus.DEAD
