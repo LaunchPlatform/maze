@@ -64,9 +64,16 @@ def run_agent(
         epochs,
     )
     for t in range(epochs):
-        for loss in vehicle.train(train_dataloader):
-            pass
+        loss_values = list(vehicle.train(train_dataloader))
         correct_count, total_count = vehicle.test(test_dataloader)
-        # TODO: substract operation cost
-        # TODO: check remaining credit
-        # TODO: kill agent early if they are out of credit
+        # TODO: earn some credit
+
+        avatar.credit -= avatar.agent.op_cost
+        if avatar.credit < 0:
+            break
+
+    if avatar.credit < 0:
+        avatar.credit = 0
+        avatar.status = models.AvatarStatus.OUT_OF_CREDIT
+        logger.info("Avatar %s runs out of credit", avatar.id)
+        return
