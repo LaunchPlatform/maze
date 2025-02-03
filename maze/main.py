@@ -55,29 +55,36 @@ def init_env(db: Session):
     db.commit()
 
 
+def init_agents(db: Session):
+    env01 = db.query(models.Environment).filter_by(slug="bootstrap01").one()
+    any_avatar = db.query(models.Avatar).filter_by(environment=env01).first_or_none()
+    if any_avatar is not None:
+        return
+    for zone in env01.zones:
+        for _ in range(zone.agent_slots):
+            agent = models.Agent(
+                symbol_table=gen_random_symbol_table(
+                    symbols=list(map(lambda s: s.value, SymbolType)),
+                    random_range=(1, 1024),
+                ),
+                input_shape=[28, 28],
+                gene=os.urandom(random.randint(5, 100)),
+                life_span=50,
+            )
+            avatar = models.Avatar(
+                agent=agent,
+                zone=zone,
+                status=models.AvatarStatus.ALIVE,
+                credit=1_000_000_000,
+            )
+            db.add(avatar)
+        db.commit()
+
+
 def main():
     with Session() as db:
         init_env(db)
-        env01 = db.query(models.Environment).filter_by(slug="bootstrap01").one()
-        for zone in env01.zones:
-            for _ in range(zone.agent_slots):
-                agent = models.Agent(
-                    symbol_table=gen_random_symbol_table(
-                        symbols=list(map(lambda s: s.value, SymbolType)),
-                        random_range=(1, 1024),
-                    ),
-                    input_shape=[28, 28],
-                    gene=os.urandom(random.randint(5, 100)),
-                    life_span=50,
-                )
-                avatar = models.Avatar(
-                    agent=agent,
-                    zone=zone,
-                    status=models.AvatarStatus.ALIVE,
-                    credit=1_000_000_000,
-                )
-                db.add(avatar)
-            db.commit()
+        init_agents(db)
 
 
 if __name__ == "__main__":
