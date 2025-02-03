@@ -103,3 +103,7 @@ class Vehicle:
             f"Test Error: \n Accuracy: {(100 * correct_rate):>0.1f}%, Avg loss: {test_loss:>8f} \n"
         )
         return correct, size
+
+    def export_onnx(self):
+        torch_input = torch.randn(1, *self.agent.input_shape)
+        return torch.onnx.dynamo_export(self.torch_model, torch_input)
