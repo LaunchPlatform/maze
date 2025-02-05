@@ -82,8 +82,8 @@ def eval_agent(
 
         if remaining_credit is not None and epoch_report.income is not None:
             remaining_credit += epoch_report.income - epoch_report.cost
-        if remaining_credit is not None and remaining_credit < 0:
-            raise OutOfCreditError("Agent runs out of credit")
+            if remaining_credit < 0:
+                raise OutOfCreditError("Agent runs out of credit")
 
 
 def run_agent(
