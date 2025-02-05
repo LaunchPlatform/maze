@@ -1,4 +1,6 @@
+import dataclasses
 import logging
+import typing
 
 from sqlalchemy.orm import object_session
 from sqlalchemy.orm import Session
@@ -19,12 +21,69 @@ from .vehicle import Vehicle
 logger = logging.getLogger(__name__)
 
 
+class ZoneError(RuntimeError):
+    pass
+
+
+class OutOfCreditError(ZoneError):
+    pass
+
+
+@dataclasses.dataclass
+class EpochReport:
+    index: int
+    train_loss: list[float]
+    train_progress: list[int]
+    train_data_size: int
+    test_correct_count: int
+    test_total_count: int
+    cost: int
+    income: int | None
+
+
 def format_number(value: int) -> str:
     return f"{value:,}"
 
 
 def construct_symbol_table(symbol_table: dict[str, int]) -> dict[SymbolType, int]:
     return {SymbolType(key): value for key, value in symbol_table.items()}
+
+
+def eval_agent(
+    vehicle: Vehicle,
+    train_dataloader: DataLoader,
+    test_dataloader: DataLoader,
+    epochs: int,
+    op_cost: int = 0,
+    basic_op_cost: int = 0,
+    credit: int | None = None,
+    calculate_income: typing.Callable | None = None,
+):
+    remaining_credit = credit
+    for epoch_idx in range(epochs):
+        train_values = list(vehicle.train(train_dataloader))
+        train_data_size = len(train_dataloader.dataset)
+        correct_count, total_count = vehicle.test(test_dataloader)
+        epoch_report = EpochReport(
+            index=epoch_idx,
+            train_loss=list(map(lambda item: item[0], train_values)),
+            train_progress=list(map(lambda item: item[1], train_values)),
+            train_data_size=train_data_size,
+            test_correct_count=correct_count,
+            test_total_count=total_count,
+            cost=op_cost + basic_op_cost,
+            income=(
+                calculate_income(correct_count=correct_count, total_count=total_count)
+                if calculate_income is not None
+                else None
+            ),
+        )
+        yield epoch_report
+
+        if remaining_credit is not None and epoch_report.income is not None:
+            remaining_credit += epoch_report.income - epoch_report.cost
+        if remaining_credit is not None and remaining_credit < 0:
+            raise OutOfCreditError("Agent runs out of credit")
 
 
 def run_agent(
