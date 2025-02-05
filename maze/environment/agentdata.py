@@ -1,11 +1,10 @@
 import dataclasses
 import typing
 
-from ..gene.symbols import SymbolType
+from ..gene.symbols import BaseSymbol
 
 
 @dataclasses.dataclass
 class AgentData:
-    gene: bytes
-    symbol_table: dict[SymbolType, int]
+    symbols: list[BaseSymbol]
     input_shape: typing.Tuple[int, ...]

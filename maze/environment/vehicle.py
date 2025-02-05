@@ -8,9 +8,6 @@ from torch.utils.data import DataLoader
 from ..gene.builder import build_models
 from ..gene.builder import Model
 from ..gene.builder import ModelCost
-from ..gene.huffman import build_huffman_tree
-from ..gene.symbols import parse_symbols
-from ..gene.utils import gen_bits
 from .agentdata import AgentData
 
 logger = logging.getLogger(__name__)
@@ -42,10 +39,8 @@ class Vehicle:
         self.torch_model: nn.Module | None = None
 
     def build_models(self):
-        tree = build_huffman_tree(self.agent.symbol_table)
-        symbols = list(parse_symbols(bits=gen_bits(self.agent.gene), root=tree))
         self.model = build_models(
-            symbols=iter(symbols),
+            symbols=iter(self.agent.symbols),
             input_shape=self.agent.input_shape,
             budget=self.budget,
         )
