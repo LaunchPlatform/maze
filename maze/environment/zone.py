@@ -53,12 +53,11 @@ def eval_agent(
     vehicle: Vehicle,
     train_dataloader: DataLoader,
     test_dataloader: DataLoader,
-    epochs: int,
-    op_cost: int = 0,
+    epochs: int = 100,
     basic_op_cost: int = 0,
     credit: int | None = None,
     calculate_income: typing.Callable | None = None,
-):
+) -> typing.Generator[EpochReport, None, None]:
     remaining_credit = credit
     for epoch_idx in range(epochs):
         train_values = list(vehicle.train(train_dataloader))
@@ -71,7 +70,7 @@ def eval_agent(
             train_data_size=train_data_size,
             test_correct_count=correct_count,
             test_total_count=total_count,
-            cost=op_cost + basic_op_cost,
+            cost=vehicle.model.cost.operation + basic_op_cost,
             income=(
                 calculate_income(correct_count=correct_count, total_count=total_count)
                 if calculate_income is not None
@@ -95,6 +94,7 @@ def run_agent(
     symbol_table = construct_symbol_table(avatar.agent.symbol_table)
     tree = build_huffman_tree(symbol_table)
     symbols = list(parse_symbols(bits=gen_bits(avatar.agent.gene), root=tree))
+    print(symbols)
     vehicle = Vehicle(
         agent=AgentData(
             symbols=symbols,
