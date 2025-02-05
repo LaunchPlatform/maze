@@ -9,7 +9,10 @@ from .. import models
 from ..gene.builder import ExceedBuildBudgetError
 from ..gene.builder import ExceedOperationBudgetError
 from ..gene.builder import ModelCost
+from ..gene.huffman import build_huffman_tree
+from ..gene.symbols import parse_symbols
 from ..gene.symbols import SymbolType
+from ..gene.utils import gen_bits
 from .agentdata import AgentData
 from .vehicle import Vehicle
 
@@ -31,10 +34,11 @@ def run_agent(
     if avatar.status != models.AvatarStatus.ALIVE:
         raise ValueError(f"Invalid avatar status {avatar.status}")
     symbol_table = construct_symbol_table(avatar.agent.symbol_table)
+    tree = build_huffman_tree(symbol_table)
+    symbols = list(parse_symbols(bits=gen_bits(avatar.agent.gene), root=tree))
     vehicle = Vehicle(
         agent=AgentData(
-            gene=avatar.agent.gene,
-            symbol_table=symbol_table,
+            symbols=symbols,
             input_shape=tuple(avatar.agent.input_shape),
         ),
         loss_fn=nn.CrossEntropyLoss(),
