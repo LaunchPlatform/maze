@@ -8,7 +8,9 @@ from maze.gene.huffman import TreeNode
 from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import build_lookup_table
 from maze.gene.symbols import LinearSymbol
+from maze.gene.symbols import LookupTable
 from maze.gene.symbols import parse_symbols
+from maze.gene.symbols import random_lookup
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_bits
@@ -100,3 +102,26 @@ def test_build_lookup_table(
     symbol_table: dict[SymbolType, int], expected: list[tuple[int, SymbolType]]
 ):
     assert build_lookup_table(symbol_table) == expected
+
+
+@pytest.mark.parametrize(
+    "lookup_table, random_number, expected",
+    [
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            0,
+            SymbolType.LINEAR,
+        ),
+    ],
+)
+def test_random_lookup(
+    lookup_table: LookupTable, random_number: int, expected: SymbolType
+):
+    assert (
+        random_lookup(lookup_table=lookup_table, random_number=random_number)
+        == expected
+    )
