@@ -116,6 +116,51 @@ def test_build_lookup_table(
             0,
             SymbolType.LINEAR,
         ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            1,
+            SymbolType.RELU,
+        ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            2,
+            SymbolType.RELU,
+        ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            31,
+            SymbolType.RELU,
+        ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            32,
+            SymbolType.LEAKY_RELU,
+        ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            77,
+            SymbolType.LEAKY_RELU,
+        ),
     ],
 )
 def test_random_lookup(

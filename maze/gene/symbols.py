@@ -2,7 +2,7 @@ import dataclasses
 import enum
 import itertools
 import typing
-from itertools import accumulate
+from bisect import bisect_right
 
 from .huffman import next_symbol
 from .huffman import TreeNode
@@ -53,6 +53,9 @@ class BaseSymbol:
     pass
 
 
+LookupTable = list[tuple[int, SymbolType]]
+
+
 @dataclasses.dataclass(frozen=True)
 class SimpleSymbol(BaseSymbol):
     type: SymbolType
@@ -101,7 +104,7 @@ def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
 
 def build_lookup_table(
     symbol_table: dict[SymbolType, int],
-) -> list[tuple[int, SymbolType]]:
+) -> LookupTable:
     """Build table for looking up quickly when rolling a dice to decide which symbol to pick based on the frequency
     table.
 
@@ -109,6 +112,7 @@ def build_lookup_table(
     :return: a list of (accumulated_freq, symbol) for looking up quickly by rolling a random int under sum(all freq)
     """
     symbol_freq = list((freq, symbol) for symbol, freq in symbol_table.items())
+    # sorting actually not needed, but do it anyway to make it more deterministic
     symbol_freq.sort()
     return list(
         zip(
@@ -116,6 +120,11 @@ def build_lookup_table(
             (symbol for _, symbol in symbol_freq),
         )
     )
+
+
+def random_lookup(lookup_table: LookupTable, random_number: int) -> SymbolType:
+    index = bisect_right(lookup_table, random_number, key=lambda item: item[0])
+    return lookup_table[index][-1]
 
 
 def parse_symbols(
