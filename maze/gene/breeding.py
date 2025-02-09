@@ -88,11 +88,11 @@ def merge_parameter_symbol(lhs: BaseSymbol, rhs: BaseSymbol, jiter_config: Jiter
         return merge_repeat(lhs, rhs, times_jiter=jiter_config.repeat_times)
     elif isinstance(lhs, AdaptiveMaxPool1DSymbol):
         return merge_adaptive_max_pool1d(
-            lhs, rhs, times_jiter=jiter_config.adaptive_max_pool1d_out_features
+            lhs, rhs, out_features_jiter=jiter_config.adaptive_max_pool1d_out_features
         )
     elif isinstance(lhs, AdaptiveAvgPool1DSymbol):
         return merge_adaptive_avg_pool1d(
-            lhs, rhs, times_jiter=jiter_config.adaptive_avg_pool1d_out_features
+            lhs, rhs, out_features_jiter=jiter_config.adaptive_avg_pool1d_out_features
         )
     raise ValueError(f"Unexpected symbol type {type(lhs)}")
 
