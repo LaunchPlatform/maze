@@ -12,15 +12,15 @@ from maze.gene.builder import ModelCost
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import SymbolType
-from maze.gene.utils import gen_random_symbol_table
+from maze.gene.utils import gen_symbol_table
 
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.skip(reason="too expensive, suppose to run this manually")
+# @pytest.mark.skip(reason="too expensive, suppose to run this manually")
 def test_random_models():
     for _ in range(10000):
-        symbol_table = gen_random_symbol_table(
+        symbol_table = gen_symbol_table(
             symbols=list(SymbolType), random_range=(1, 1024)
         )
         logger.info("Symbol table: %r", symbol_table)

@@ -5,10 +5,6 @@ import random
 import typing
 from bisect import bisect_right
 
-from .huffman import next_symbol
-from .huffman import TreeNode
-from .utils import consume_int
-
 
 @enum.unique
 class SymbolType(enum.Enum):
@@ -189,31 +185,3 @@ def generate_gene(
     lookup_table = build_lookup_table(symbol_table)
     for _ in range(length):
         yield generate_random_symbol(lookup_table=lookup_table, param_range=param_range)
-
-
-def parse_symbols(
-    bits: typing.Sequence[int], root: TreeNode
-) -> typing.Generator[BaseSymbol, None, None]:
-    bits_iter = iter(bits)
-    while True:
-        try:
-            symbol = next_symbol(bits=bits_iter, root=root)
-            if symbol == SymbolType.REPEAT_START:
-                times = consume_int(bits=bits_iter, bit_len=4)
-                yield RepeatStartSymbol(times=times)
-            elif symbol == SymbolType.LINEAR:
-                bias = bool(next(bits_iter))
-                output_features = consume_int(bits=bits_iter, bit_len=12)
-                yield LinearSymbol(
-                    bias=bias,
-                    out_features=1 + output_features,
-                )
-            elif symbol == SymbolType.ADAPTIVE_MAXPOOL1D:
-                output_features = consume_int(bits=bits_iter, bit_len=12)
-                yield AdaptiveMaxPool1DSymbol(
-                    out_features=1 + output_features,
-                )
-            else:
-                yield SimpleSymbol(type=symbol)
-        except StopIteration:
-            break
