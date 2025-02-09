@@ -17,7 +17,7 @@ from maze.gene.utils import gen_symbol_table
 logger = logging.getLogger(__name__)
 
 
-# @pytest.mark.skip(reason="too expensive, suppose to run this manually")
+@pytest.mark.skip(reason="too expensive, suppose to run this manually")
 def test_random_models():
     for _ in range(10000):
         symbol_table = gen_symbol_table(
