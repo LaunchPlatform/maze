@@ -40,7 +40,7 @@ def merge_repeat(
     lhs: RepeatStartSymbol, rhs: RepeatStartSymbol, times_jiter: int
 ) -> RepeatStartSymbol:
     return RepeatStartSymbol(
-        times=merge_int(lhs.times, rhs.times, jiter=times_jiter),
+        times=max(0, merge_int(lhs.times, rhs.times, jiter=times_jiter)),
     )
 
 
@@ -48,8 +48,8 @@ def merge_adaptive_max_pool1d(
     lhs: AdaptiveMaxPool1DSymbol, rhs: AdaptiveMaxPool1DSymbol, out_features_jiter: int
 ) -> AdaptiveMaxPool1DSymbol:
     return AdaptiveMaxPool1DSymbol(
-        out_features=merge_int(
-            lhs.out_features, rhs.out_features, jiter=out_features_jiter
+        out_features=max(
+            1, merge_int(lhs.out_features, rhs.out_features, jiter=out_features_jiter)
         )
     )
 
@@ -58,8 +58,8 @@ def merge_adaptive_avg_pool1d(
     lhs: AdaptiveAvgPool1DSymbol, rhs: AdaptiveAvgPool1DSymbol, out_features_jiter: int
 ) -> AdaptiveAvgPool1DSymbol:
     return AdaptiveAvgPool1DSymbol(
-        out_features=merge_int(
-            lhs.out_features, rhs.out_features, jiter=out_features_jiter
+        out_features=max(
+            1, merge_int(lhs.out_features, rhs.out_features, jiter=out_features_jiter)
         )
     )
 
@@ -69,8 +69,8 @@ def merge_liner(
 ) -> LinearSymbol:
     return LinearSymbol(
         bias=merge_bool(lhs.bias, rhs.bias),
-        out_features=merge_int(
-            lhs.out_features, rhs.out_features, jiter=out_features_jiter
+        out_features=max(
+            1, merge_int(lhs.out_features, rhs.out_features, jiter=out_features_jiter)
         ),
     )
 
