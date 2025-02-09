@@ -11,6 +11,7 @@ from maze.gene.builder import ExceedBuildBudgetError
 from maze.gene.builder import ExceedOperationBudgetError
 from maze.gene.builder import ModelCost
 from maze.gene.symbols import generate_gene
+from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_random_symbol_table
 
@@ -25,7 +26,13 @@ def test_random_models():
         )
         logger.info("Symbol table: %r", symbol_table)
         gene_length = random.randint(20, 100)
-        symbols = list(generate_gene(symbol_table=symbol_table, length=gene_length))
+        symbols = list(
+            generate_gene(
+                symbol_table=symbol_table,
+                length=gene_length,
+                param_range=SymbolParameterRange(),
+            )
+        )
         logger.info("Symbols: %r", symbols)
         try:
             model = build_models(
@@ -35,7 +42,7 @@ def test_random_models():
             )
             logger.info("Model: %r", model)
             seq = nn.Sequential(*model.modules)
-            res = seq(torch.randn((28, 28)))
+            res = seq(torch.randn((1, 28, 28)))
             logger.info("Result: %s", res)
         except ExceedOperationBudgetError:
             logger.warning("Exceed op budget")

@@ -136,7 +136,7 @@ def build_lookup_table(
     """
     symbol_freq = list((freq, symbol) for symbol, freq in symbol_table.items())
     # sorting actually not needed, but do it anyway to make it more deterministic
-    symbol_freq.sort()
+    symbol_freq.sort(key=lambda item: (item[0], item[1].value))
     return list(
         zip(
             itertools.accumulate(freq for freq, _ in symbol_freq),
