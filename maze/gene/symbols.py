@@ -94,7 +94,7 @@ class AdaptiveAvgPool1DSymbol(BaseSymbol):
 
 @dataclasses.dataclass(frozen=True)
 class SymbolParameterRange:
-    repeat_times: tuple[int, int] = (0, 3)
+    repeat_times: tuple[int, int] = (0, 10)
     linear_out_features: tuple[int, int] = (1, 8192)
     linear_bias: tuple[bool, ...] = (False, True)
     adaptive_max_pool1d_out_features: tuple[int, int] = (1, 8192)
@@ -154,6 +154,10 @@ def generate_random_symbol(
     symbol_type = random_lookup(lookup_table, random_number=random_number)
     if symbol_type in ALL_SIMPLE_TYPES:
         return SimpleSymbol(type=symbol_type)
+    elif symbol_type == SymbolType.REPEAT_START:
+        return RepeatStartSymbol(
+            times=random.randint(*param_range.repeat_times),
+        )
     elif symbol_type == SymbolType.LINEAR:
         return LinearSymbol(
             out_features=random.randint(*param_range.linear_out_features),
