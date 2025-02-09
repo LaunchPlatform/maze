@@ -3,6 +3,7 @@ from collections import Counter
 
 import pytest
 
+from maze.gene.breeding import JiterConfig
 from maze.gene.breeding import merge
 from maze.gene.breeding import merge_bool
 from maze.gene.breeding import merge_float
@@ -17,30 +18,53 @@ def cal_expected_stdev(start: int | float, end: int | float) -> float:
 
 
 @pytest.mark.parametrize(
-    "lhs, rhs, expected",
+    "lhs, rhs, jiter, expected",
     [
         (
             [SimpleSymbol(type=SymbolType.RELU)],
             [SimpleSymbol(type=SymbolType.RELU)],
+            None,
             [[SimpleSymbol(type=SymbolType.RELU)]],
         ),
         (
             [SimpleSymbol(type=SymbolType.RELU)],
             [],
+            None,
             [[SimpleSymbol(type=SymbolType.RELU)]],
         ),
         (
             [],
             [SimpleSymbol(type=SymbolType.RELU)],
+            None,
             [[SimpleSymbol(type=SymbolType.RELU)]],
+        ),
+        (
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.LEAKY_RELU),
+            ],
+            [SimpleSymbol(type=SymbolType.RELU), SimpleSymbol(type=SymbolType.SOFTMAX)],
+            None,
+            [
+                [SimpleSymbol(type=SymbolType.RELU)],
+                [
+                    SimpleSymbol(type=SymbolType.LEAKY_RELU),
+                    SimpleSymbol(type=SymbolType.SOFTMAX),
+                ],
+            ],
         ),
     ],
 )
 def test_merge(
-    lhs: list[BaseSymbol], rhs: list[BaseSymbol], expected: list[BaseSymbol]
+    lhs: list[BaseSymbol],
+    rhs: list[BaseSymbol],
+    jiter: JiterConfig | None,
+    expected: list[BaseSymbol],
 ):
+    if jiter is None:
+        jiter = JiterConfig()
     for _ in range(100):
-        output_symbols = list(merge(lhs, rhs))
+        output_symbols = list(merge(lhs, rhs, jiter_config=jiter))
         assert len(output_symbols) == len(expected)
         for symbol, expected_symbols in zip(output_symbols, expected):
             # TODO: handle parameter merging
