@@ -154,26 +154,30 @@ def generate_random_symbol(
     lookup_table: LookupTable, param_range: SymbolParameterRange
 ) -> BaseSymbol:
     upper_val = lookup_table[-1][0]
-    random_number = random.randint(0, upper_val)
+    random_number = random.randrange(0, upper_val)
     symbol_type = random_lookup(lookup_table, random_number=random_number)
     if symbol_type in ALL_SIMPLE_TYPES:
         return SimpleSymbol(type=symbol_type)
     elif symbol_type == SymbolType.REPEAT_START:
         return RepeatStartSymbol(
-            times=random.randint(*param_range.repeat_times),
+            times=random.randrange(*param_range.repeat_times),
         )
     elif symbol_type == SymbolType.LINEAR:
         return LinearSymbol(
-            out_features=random.randint(*param_range.linear_out_features),
+            out_features=random.randrange(*param_range.linear_out_features),
             bias=random.choice(param_range.linear_bias),
         )
     elif symbol_type == SymbolType.ADAPTIVE_MAXPOOL1D:
         return AdaptiveMaxPool1DSymbol(
-            out_features=random.randint(*param_range.adaptive_max_pool1d_out_features),
+            out_features=random.randrange(
+                *param_range.adaptive_max_pool1d_out_features
+            ),
         )
     elif symbol_type == SymbolType.ADAPTIVE_AVGPOOL1D:
         return AdaptiveAvgPool1DSymbol(
-            out_features=random.randint(*param_range.adaptive_avg_pool1d_out_features),
+            out_features=random.randrange(
+                *param_range.adaptive_avg_pool1d_out_features
+            ),
         )
     else:
         raise ValueError(f"Unexpected symbol type {symbol_type}")
