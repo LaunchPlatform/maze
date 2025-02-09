@@ -29,8 +29,9 @@ from maze.gene.symbols import SymbolType
 def test_merge(
     lhs: list[BaseSymbol], rhs: list[BaseSymbol], expected: list[BaseSymbol]
 ):
-    output_symbols = list(merge(lhs, rhs))
-    assert len(output_symbols) == len(expected)
-    for symbol, expected_symbols in zip(output_symbols, expected):
-        # TODO: handle parameter merging
-        assert symbol in expected_symbols
+    for _ in range(100):
+        output_symbols = list(merge(lhs, rhs))
+        assert len(output_symbols) == len(expected)
+        for symbol, expected_symbols in zip(output_symbols, expected):
+            # TODO: handle parameter merging
+            assert symbol in expected_symbols
