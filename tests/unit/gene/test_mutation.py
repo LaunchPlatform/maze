@@ -11,6 +11,11 @@ from maze.gene.mutation import MutationType
     "probabilities, length, expected",
     [
         (
+            {},
+            100,
+            {},
+        ),
+        (
             {
                 MutationType.DELETE: 1,
                 MutationType.DUPLICATE: 1,
@@ -36,10 +41,23 @@ from maze.gene.mutation import MutationType
                 MutationType.REVERSE: 10000 * 0.3,
             },
         ),
+        (
+            {
+                MutationType.DELETE: 0.1,
+                MutationType.DUPLICATE: 0.2,
+            },
+            100,
+            {
+                MutationType.DELETE: 100 * 0.1,
+                MutationType.DUPLICATE: 100 * 0.2,
+            },
+        ),
     ],
 )
 def test_decide_mutations(
-    probabilities: dict[MutationType, float], length: int, expected: list
+    probabilities: dict[MutationType, float],
+    length: int,
+    expected: dict,
 ):
     total_count = collections.defaultdict(int)
     trial_count = 10000
