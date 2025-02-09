@@ -3,11 +3,11 @@ from collections import Counter
 
 import pytest
 
-from maze.gene.breeding import JiterConfig
-from maze.gene.breeding import merge_bool
-from maze.gene.breeding import merge_float
-from maze.gene.breeding import merge_gene
-from maze.gene.breeding import merge_int
+from maze.gene.merge import JiterConfig
+from maze.gene.merge import merge_bool
+from maze.gene.merge import merge_float
+from maze.gene.merge import merge_gene
+from maze.gene.merge import merge_int
 from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import SymbolType
