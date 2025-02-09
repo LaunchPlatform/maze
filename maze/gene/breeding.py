@@ -12,7 +12,7 @@ from .symbols import SimpleSymbol
 
 @dataclasses.dataclass
 class JiterConfig:
-    repeat_times: int = 10
+    repeat_times: int = 3
     linear_out_features: int = 10
     adaptive_max_pool1d_out_features: int = 10
     adaptive_avg_pool1d_out_features: int = 10
