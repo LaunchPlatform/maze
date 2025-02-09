@@ -1,3 +1,4 @@
+import dataclasses
 import itertools
 import random
 
@@ -7,6 +8,14 @@ from .symbols import BaseSymbol
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
+
+
+@dataclasses.dataclass
+class JiterConfig:
+    repeat_times: int = 10
+    linear_out_features: int = 10
+    adaptive_max_pool1d_out_features: int = 10
+    adaptive_avg_pool1d_out_features: int = 10
 
 
 def merge_bool(lhs: bool, rhs: bool) -> bool:
@@ -66,7 +75,29 @@ def merge_liner(
     )
 
 
-def merge(lhs: list[BaseSymbol], rhs: list[BaseSymbol]):
+def merge_parameter_symbol(lhs: BaseSymbol, rhs: BaseSymbol, jiter_config: JiterConfig):
+    if type(lhs) is not type(rhs):
+        raise TypeError(
+            f"Expected lhs and rhs to be the same type but got {type(lhs)} and {type(rhs)} instead"
+        )
+    if isinstance(lhs, LinearSymbol):
+        return merge_liner(
+            lhs, rhs, out_features_jiter=jiter_config.linear_out_features
+        )
+    elif isinstance(lhs, RepeatStartSymbol):
+        return merge_repeat(lhs, rhs, times_jiter=jiter_config.repeat_times)
+    elif isinstance(lhs, AdaptiveMaxPool1DSymbol):
+        return merge_adaptive_max_pool1d(
+            lhs, rhs, times_jiter=jiter_config.adaptive_max_pool1d_out_features
+        )
+    elif isinstance(lhs, AdaptiveAvgPool1DSymbol):
+        return merge_adaptive_avg_pool1d(
+            lhs, rhs, times_jiter=jiter_config.adaptive_avg_pool1d_out_features
+        )
+    raise ValueError(f"Unexpected symbol type {type(lhs)}")
+
+
+def merge(lhs: list[BaseSymbol], rhs: list[BaseSymbol], jiter_config: JiterConfig):
     """Merge two symbol lists randomly"""
     for lhs_symbol, rhs_symbol in itertools.zip_longest(lhs, rhs):
         if lhs_symbol is None:
@@ -79,7 +110,8 @@ def merge(lhs: list[BaseSymbol], rhs: list[BaseSymbol]):
             if isinstance(lhs_symbol, SimpleSymbol):
                 yield lhs_symbol
             else:
-                # merge symbol with parameters
-                pass
+                yield merge_parameter_symbol(
+                    lhs_symbol, rhs_symbol, jiter_config=jiter_config
+                )
         else:
             yield random.choice((lhs_symbol, rhs_symbol))
