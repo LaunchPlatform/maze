@@ -1,7 +1,10 @@
+import dataclasses
 import enum
 import random
 
 from numpy.random import binomial
+
+from .symbols import BaseSymbol
 
 
 @enum.unique
@@ -9,6 +12,12 @@ class MutationType(enum.Enum):
     DELETE = "DELETE"
     DUPLICATE = "DUPLICATE"
     REVERSE = "REVERSE"
+
+
+@dataclasses.dataclass
+class MutationRecord:
+    position: int
+    length: int
 
 
 def decide_mutations(
@@ -21,3 +30,18 @@ def decide_mutations(
             mutations.extend([mutation_type] * occurrence)
     random.shuffle(mutations)
     return mutations
+
+
+def mutate_delete(
+    symbols: list[BaseSymbol], length_range: tuple[int, int]
+) -> tuple[MutationRecord, list[BaseSymbol]]:
+    pos = random.randrange(0, len(symbols))
+    length = random.randrange(*length_range)
+    return MutationRecord(position=pos, length=length), symbols[pos:] + symbols[
+        : pos + length
+    ]
+
+
+def mutate(symbols: list[BaseSymbol], mutations: list[MutationType]):
+    for mutation_type in mutations:
+        pass
