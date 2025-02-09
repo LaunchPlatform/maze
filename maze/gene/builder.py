@@ -6,6 +6,7 @@ import typing
 import torch
 from torch import nn
 
+from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BaseSymbol
 from .symbols import is_symbol_type
@@ -213,16 +214,26 @@ def _do_build_models(
                         )
                     )
                 model.output_shape = (out_features,)
-            case AdaptiveMaxPool1DSymbol(out_features):
+            case AdaptiveMaxPool1DSymbol(out_features) | AdaptiveAvgPool1DSymbol(
+                out_features
+            ):
                 in_features = math.prod(model.output_shape)
                 if not dry_run:
                     model.modules.append(Reshape(1, in_features))
-                    model.modules.append(nn.AdaptiveMaxPool1d(out_features))
+                    if is_symbol_type(
+                        symbol_type=SymbolType.ADAPTIVE_MAXPOOL1D, symbol=symbol
+                    ):
+                        model.modules.append(nn.AdaptiveMaxPool1d(out_features))
+                    elif is_symbol_type(
+                        symbol_type=SymbolType.ADAPTIVE_AVGPOOL1D, symbol=symbol
+                    ):
+                        model.modules.append(nn.AdaptiveAvgPool1d(out_features))
+                    else:
+                        raise ValueError("Unexpected symbol type")
                     model.modules.append(nn.Flatten())
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
                 check_op_budget()
-
             case SimpleSymbol(symbol_type):
                 match symbol_type:
                     case SymbolType.BRANCH_START:
