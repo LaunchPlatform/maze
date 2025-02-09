@@ -175,6 +175,14 @@ def generate_random_symbol(
         raise ValueError(f"Unexpected symbol type {symbol_type}")
 
 
+def generate_gene(
+    symbol_table: dict[SymbolType, int], param_range: SymbolParameterRange, count: int
+) -> typing.Generator[BaseSymbol, None, None]:
+    lookup_table = build_lookup_table(symbol_table)
+    for _ in range(count):
+        yield generate_random_symbol(lookup_table=lookup_table, param_range=param_range)
+
+
 def parse_symbols(
     bits: typing.Sequence[int], root: TreeNode
 ) -> typing.Generator[BaseSymbol, None, None]:
