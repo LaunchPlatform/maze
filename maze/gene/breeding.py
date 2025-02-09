@@ -97,7 +97,7 @@ def merge_parameter_symbol(lhs: BaseSymbol, rhs: BaseSymbol, jiter_config: Jiter
     raise ValueError(f"Unexpected symbol type {type(lhs)}")
 
 
-def merge(lhs: list[BaseSymbol], rhs: list[BaseSymbol], jiter_config: JiterConfig):
+def merge_gene(lhs: list[BaseSymbol], rhs: list[BaseSymbol], jiter_config: JiterConfig):
     """Merge two symbol lists randomly"""
     for lhs_symbol, rhs_symbol in itertools.zip_longest(lhs, rhs):
         if lhs_symbol is None:

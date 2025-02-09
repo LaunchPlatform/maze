@@ -4,9 +4,9 @@ from collections import Counter
 import pytest
 
 from maze.gene.breeding import JiterConfig
-from maze.gene.breeding import merge
 from maze.gene.breeding import merge_bool
 from maze.gene.breeding import merge_float
+from maze.gene.breeding import merge_gene
 from maze.gene.breeding import merge_int
 from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import SimpleSymbol
@@ -55,7 +55,7 @@ def cal_expected_stdev(start: int | float, end: int | float) -> float:
         ),
     ],
 )
-def test_merge(
+def test_merge_gene(
     lhs: list[BaseSymbol],
     rhs: list[BaseSymbol],
     jiter: JiterConfig | None,
@@ -64,7 +64,7 @@ def test_merge(
     if jiter is None:
         jiter = JiterConfig()
     for _ in range(100):
-        output_symbols = list(merge(lhs, rhs, jiter_config=jiter))
+        output_symbols = list(merge_gene(lhs, rhs, jiter_config=jiter))
         assert len(output_symbols) == len(expected)
         for symbol, expected_symbols in zip(output_symbols, expected):
             # TODO: handle parameter merging
