@@ -63,8 +63,9 @@ def test_merge_bool(lhs: bool, rhs: bool, expected: list[bool, ...]):
     if len(expected) > 1:
         counter = Counter(result_values)
         assert frozenset(counter.keys()) == frozenset(expected)
-        v0, v1 = list(counter.values())
-        assert (abs(v0 - v1) / total) < 0.01
+        assert statistics.stdev(list(map(int, result_values))) == pytest.approx(
+            0.5, 0.1
+        )
 
 
 @pytest.mark.parametrize(
