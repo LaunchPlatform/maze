@@ -33,6 +33,7 @@ def merge_float(lhs: float, rhs: float, jiter: float) -> float:
     jiter = jiter or 0.0
     start = min(lhs, rhs) - jiter
     stop = max(lhs, rhs) + jiter
+    # TODO: is uniform the right distribution to use?
     return random.uniform(start, stop)
 
 
