@@ -6,6 +6,7 @@ import pytest
 from maze.gene.huffman import build_huffman_tree
 from maze.gene.huffman import TreeNode
 from maze.gene.symbols import BaseSymbol
+from maze.gene.symbols import build_lookup_table
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import parse_symbols
 from maze.gene.symbols import SimpleSymbol
@@ -66,3 +67,24 @@ def test_parse_symbols_random_gene():
         tree = build_huffman_tree(freq_table)
         gene = os.urandom(random.randint(1, 2048))
         list(parse_symbols(bits=gen_bits(gene), root=tree))
+
+
+@pytest.mark.parametrize(
+    "symbol_table, expected",
+    [
+        (
+            {},
+            [],
+        ),
+        (
+            {
+                SymbolType.RELU: 37,
+            },
+            [(37, SymbolType.RELU)],
+        ),
+    ],
+)
+def test_build_lookup_table(
+    symbol_table: dict[SymbolType, int], expected: list[tuple[int, SymbolType]]
+):
+    assert build_lookup_table(symbol_table) == expected

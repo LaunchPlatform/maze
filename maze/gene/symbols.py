@@ -1,6 +1,8 @@
 import dataclasses
 import enum
+import itertools
 import typing
+from itertools import accumulate
 
 from .huffman import next_symbol
 from .huffman import TreeNode
@@ -95,6 +97,25 @@ def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
     elif isinstance(symbol, SimpleSymbol):
         return symbol.type == symbol_type
     return False
+
+
+def build_lookup_table(
+    symbol_table: dict[SymbolType, int],
+) -> list[tuple[int, SymbolType]]:
+    """Build table for looking up quickly when rolling a dice to decide which symbol to pick based on the frequency
+    table.
+
+    :param symbol_table: mapping symbols to frequency
+    :return: a list of (accumulated_freq, symbol) for looking up quickly by rolling a random int under sum(all freq)
+    """
+    symbol_freq = list((freq, symbol) for symbol, freq in symbol_table.items())
+    symbol_freq.sort()
+    return list(
+        zip(
+            itertools.accumulate(freq for freq, _ in symbol_freq),
+            (symbol for _, symbol in symbol_freq),
+        )
+    )
 
 
 def parse_symbols(

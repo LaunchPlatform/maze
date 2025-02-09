@@ -39,13 +39,23 @@ ax1.set_xlabel("Epoch")
 ax1.set_ylabel("Accuracy")
 ax1.plot(accuracy_vals)
 ax1.tick_params(axis="y")
+ax1.legend(
+    ["Random Accuracy", "Handcraft Accuracy", "MaxPoolUpscale Accuracy"],
+    loc="center right",
+    bbox_to_anchor=(0.5, 0.3, 0.5, 0.5),
+)
+
 
 ax2 = ax1.twinx()  # instantiate a second Axes that shares the same x-axis
 
 ax2.set_ylabel("Loss")  # we already handled the x-label with ax1
 ax2.plot(loss_vals, linestyle="--")
 ax2.tick_params(axis="y")
-ax2.legend(["Random", "Handcraft", "MaxPoolUpscale"])
+ax2.legend(
+    ["Random Loss", "Handcraft Loss", "MaxPoolUpscale Loss"],
+    loc="center right",
+    bbox_to_anchor=(0.5, 0.1, 0.5, 0.5),
+)
 
 fig.tight_layout()  # otherwise the right y-label is slightly clipped
 plt.show()
