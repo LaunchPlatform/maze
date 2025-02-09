@@ -82,6 +82,18 @@ def test_parse_symbols_random_gene():
             },
             [(37, SymbolType.RELU)],
         ),
+        (
+            {
+                SymbolType.LINEAR: 5,
+                SymbolType.RELU: 36,
+                SymbolType.LEAKY_RELU: 37,
+            },
+            [
+                (5, SymbolType.LINEAR),
+                (5 + 36, SymbolType.RELU),
+                (5 + 36 + 37, SymbolType.LEAKY_RELU),
+            ],
+        ),
     ],
 )
 def test_build_lookup_table(
