@@ -42,7 +42,7 @@ def test_decide_mutations(
     probabilities: dict[MutationType, float], length: int, expected: list
 ):
     total_count = collections.defaultdict(int)
-    trial_count = 1000
+    trial_count = 10000
     for _ in range(trial_count):
         result = decide_mutations(probabilities=probabilities, gene_length=length)
         counter = Counter(result)
@@ -50,4 +50,4 @@ def test_decide_mutations(
             total_count[key] += value
     for key, value in total_count.items():
         total_count[key] /= trial_count
-        assert total_count[key] == pytest.approx(expected[key], rel=10)
+        assert total_count[key] == pytest.approx(expected[key], rel=1)
