@@ -5,6 +5,7 @@ import pytest
 
 from maze.gene.breeding import merge
 from maze.gene.breeding import merge_bool
+from maze.gene.breeding import merge_float
 from maze.gene.breeding import merge_int
 from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import SimpleSymbol
@@ -71,6 +72,7 @@ def test_merge_bool(lhs: bool, rhs: bool, expected: list[bool, ...]):
     [
         (0, 99, 0, (0, 100), cal_expected_stdev(0, 99)),
         (99, 0, 0, (0, 100), cal_expected_stdev(0, 99)),
+        (10, 20, 5, (5, 26), cal_expected_stdev(5, 26)),
     ],
 )
 def test_merge_int(
@@ -87,4 +89,27 @@ def test_merge_int(
         assert value >= start and value < end
     counter = Counter(result_values)
     assert len(counter.keys()) == (end - start)
+    assert statistics.stdev(result_values) == pytest.approx(expected_stdev, 0.6)
+
+
+@pytest.mark.parametrize(
+    "lhs, rhs, jiter, expected_range, expected_stdev",
+    [
+        (12.34, 56.78, 0, (12.34, 56.78), cal_expected_stdev(12.34, 56.78)),
+        (56.78, 12.34, 0, (12.34, 56.78), cal_expected_stdev(12.34, 56.78)),
+        (12.34, 56.78, 2.34, (10.00, 59.12), cal_expected_stdev(10.00, 59.12)),
+    ],
+)
+def test_merge_float(
+    lhs: float,
+    rhs: float,
+    jiter: float,
+    expected_range: tuple[float, float],
+    expected_stdev: float,
+):
+    total = 100000
+    result_values = [merge_float(lhs, rhs, jiter=jiter) for _ in range(total)]
+    start, end = expected_range
+    for value in result_values:
+        assert value >= start and value < end
     assert statistics.stdev(result_values) == pytest.approx(expected_stdev, 0.6)
