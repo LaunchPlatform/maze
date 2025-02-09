@@ -1,8 +1,11 @@
 import itertools
 import random
 
+from .symbols import AdaptiveAvgPool1DSymbol
+from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BaseSymbol
 from .symbols import LinearSymbol
+from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
 
 
@@ -24,7 +27,37 @@ def merge_float(lhs: float, rhs: float, jiter: float) -> float:
     return random.uniform(start, stop)
 
 
-def merge_liner(lhs: LinearSymbol, rhs: LinearSymbol, out_features_jiter: int):
+def merge_repeat(
+    lhs: RepeatStartSymbol, rhs: RepeatStartSymbol, times_jiter: int
+) -> RepeatStartSymbol:
+    return RepeatStartSymbol(
+        times=merge_int(lhs.times, rhs.times, jiter=times_jiter),
+    )
+
+
+def merge_adaptive_max_pool1d(
+    lhs: AdaptiveMaxPool1DSymbol, rhs: AdaptiveMaxPool1DSymbol, out_features_jiter: int
+) -> AdaptiveMaxPool1DSymbol:
+    return AdaptiveMaxPool1DSymbol(
+        out_features=merge_int(
+            lhs.out_features, rhs.out_features, jiter=out_features_jiter
+        )
+    )
+
+
+def merge_adaptive_avg_pool1d(
+    lhs: AdaptiveAvgPool1DSymbol, rhs: AdaptiveAvgPool1DSymbol, out_features_jiter: int
+) -> AdaptiveAvgPool1DSymbol:
+    return AdaptiveAvgPool1DSymbol(
+        out_features=merge_int(
+            lhs.out_features, rhs.out_features, jiter=out_features_jiter
+        )
+    )
+
+
+def merge_liner(
+    lhs: LinearSymbol, rhs: LinearSymbol, out_features_jiter: int
+) -> LinearSymbol:
     return LinearSymbol(
         bias=merge_bool(lhs.bias, rhs.bias),
         out_features=merge_int(
