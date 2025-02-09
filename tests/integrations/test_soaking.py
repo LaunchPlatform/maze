@@ -1,7 +1,6 @@
 import logging
 import random
 
-import pytest
 import torch
 from torch import nn
 
@@ -17,9 +16,8 @@ from maze.gene.utils import gen_symbol_table
 logger = logging.getLogger(__name__)
 
 
-@pytest.mark.skip(reason="too expensive, suppose to run this manually")
 def test_random_models():
-    for _ in range(10000):
+    for _ in range(100):
         symbol_table = gen_symbol_table(
             symbols=list(SymbolType), random_range=(1, 1024)
         )
