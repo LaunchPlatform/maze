@@ -47,6 +47,10 @@ class Environment(BaseEnvironment):
             1,
         ][self.index]
 
+    # alt
+    def make_zones(self, index):
+        return [models.Zone(...), ...]
+
     def run_agent(self, avatar: models.Avatar):
         vehicle = Vehicle(
             agent=avatar.agent_data,
