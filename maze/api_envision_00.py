@@ -52,6 +52,9 @@ class Environment(LinearEnvironment):
     def make_zones(self, index: int):
         return [models.Zone(...), ...]
 
+    def initialize_agents(self, zone: models.Zone):
+        pass
+
     def run_agent(self, avatar: models.Avatar):
         vehicle = Vehicle(
             agent=avatar.agent_data,
