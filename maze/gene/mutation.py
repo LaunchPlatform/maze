@@ -66,6 +66,30 @@ def mutate_reverse(
     return MutationRecord(position=pos, length=length), prefix + reversing + suffix
 
 
-def mutate(symbols: list[BaseSymbol], mutations: list[MutationType]):
+def mutate(
+    symbols: list[BaseSymbol],
+    mutations: list[MutationType],
+    length_ranges: dict[MutationType, tuple[int, int]],
+) -> tuple[list[MutationRecord], list[BaseSymbol]]:
+    mutation_records = []
+    current_symbols = symbols[:]
     for mutation_type in mutations:
-        pass
+        match mutation_type:
+            case MutationType.DELETE:
+                record, current_symbols = mutate_delete(
+                    symbols, length_ranges[mutation_type]
+                )
+                mutation_records.append(record)
+            case MutationType.REVERSE:
+                record, current_symbols = mutate_reverse(
+                    symbols, length_ranges[mutation_type]
+                )
+                mutation_records.append(record)
+            case MutationType.DUPLICATE:
+                record, current_symbols = mutate_duplicate(
+                    symbols, length_ranges[mutation_type]
+                )
+                mutation_records.append(record)
+            case _:
+                raise ValueError(f"Unexpected mutation type {mutation_type}")
+    return mutation_records, current_symbols
