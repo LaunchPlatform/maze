@@ -33,6 +33,9 @@ class Environment(BaseEnvironment):
     # define how many of this env but with varius
     array = 6
 
+    def slug(self) -> str:
+        return f"mnist-{self.index}"
+
     def zone_count(self):
         # define how many zone for this env based on index
         return [
