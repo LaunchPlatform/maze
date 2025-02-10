@@ -61,6 +61,7 @@ class Environment(BaseEnvironment):
     def promote_agents(self, zone: models.Zone):
         db = object_session(zone)
         # Lock zone
+        # TODO: or maybe the frame work should lock zone for us?
         db.refresh(zone, with_for_update=True)
         # find good agents to promote
         # ...
