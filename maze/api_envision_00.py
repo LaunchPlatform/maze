@@ -6,7 +6,7 @@ from torchvision import datasets
 from torchvision.transforms import ToTensor
 
 from maze import models
-from maze.environment import BaseEnvironment
+from maze.environment import LinearEnvironment
 from maze.environment.vehicle import Vehicle
 from maze.environment.zone import eval_agent
 
@@ -29,14 +29,14 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
-class Environment(BaseEnvironment):
+class Environment(LinearEnvironment):
     # define how many of this env but with varius
-    array = 6
+    count = 6
 
-    def slug(self) -> str:
-        return f"mnist-{self.index}"
+    def slug(self, index: int) -> str:
+        return f"mnist-{index}"
 
-    def zone_count(self):
+    def zone_count(self, index: int):
         # define how many zone for this env based on index
         return [
             100,
@@ -48,7 +48,7 @@ class Environment(BaseEnvironment):
         ][self.index]
 
     # alt
-    def make_zones(self, index):
+    def make_zones(self, index: int):
         return [models.Zone(...), ...]
 
     def run_agent(self, avatar: models.Avatar):
