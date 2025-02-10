@@ -4,7 +4,13 @@ from collections import Counter
 import pytest
 
 from maze.gene.mutation import decide_mutations
+from maze.gene.mutation import mutate_delete
+from maze.gene.mutation import MutationRecord
 from maze.gene.mutation import MutationType
+from maze.gene.symbols import BaseSymbol
+from maze.gene.symbols import LinearSymbol
+from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import SymbolType
 
 
 @pytest.mark.parametrize(
@@ -69,3 +75,38 @@ def test_decide_mutations(
     for key, value in total_count.items():
         total_count[key] /= trial_count
         assert total_count[key] == pytest.approx(expected[key], rel=1)
+
+
+@pytest.mark.parametrize(
+    "symbols, length_range",
+    [
+        (
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+            ],
+            (1, 10),
+        ),
+        (
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                SimpleSymbol(type=SymbolType.SOFTMAX),
+                LinearSymbol(bias=True, out_features=1024),
+                SimpleSymbol(type=SymbolType.BRANCH_START),
+                SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
+                SimpleSymbol(type=SymbolType.BRANCH_STOP),
+            ],
+            (2, 5),
+        ),
+    ],
+)
+def test_mutate_delete(symbols: list[BaseSymbol], length_range: tuple[int, int]):
+    for _ in range(1000):
+        record, mutated_symbols = mutate_delete(
+            symbols=symbols, length_range=length_range
+        )
+        assert record.position >= 0 and record.position < len(symbols)
+        start, end = length_range
+        assert record.length >= start and record.length < end
+        deleting_end = min(len(symbols), record.position + record.length)
+        deleted_count = deleting_end - record.position
+        assert len(mutated_symbols) == len(symbols) - deleted_count

@@ -37,9 +37,9 @@ def mutate_delete(
 ) -> tuple[MutationRecord, list[BaseSymbol]]:
     pos = random.randrange(0, len(symbols))
     length = random.randrange(*length_range)
-    return MutationRecord(position=pos, length=length), symbols[pos:] + symbols[
-        : pos + length
-    ]
+    prefix = symbols[:pos]
+    suffix = symbols[pos + length :]
+    return MutationRecord(position=pos, length=length), prefix + suffix
 
 
 def mutate(symbols: list[BaseSymbol], mutations: list[MutationType]):
