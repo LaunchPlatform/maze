@@ -29,6 +29,20 @@ test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
 class Environment(BaseEnvironment):
+    # define how many of this env but with varius
+    array = 6
+
+    def zone_count(self):
+        # define how many zone for this env based on index
+        return [
+            100,
+            50,
+            25,
+            10,
+            5,
+            1,
+        ][self.index]
+
     def run_agent(self, avatar: models.Avatar):
         vehicle = Vehicle(
             agent=avatar.agent_data,
