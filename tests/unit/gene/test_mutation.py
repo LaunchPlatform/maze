@@ -1,5 +1,4 @@
 import collections
-from audioop import reverse
 from collections import Counter
 
 import pytest
