@@ -1,4 +1,5 @@
 # envisioning how the API should work, variant 00
+from sqlalchemy.orm import object_session
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -55,3 +56,11 @@ class Environment(BaseEnvironment):
             test_dataloader=test_dataloader,
         ):
             print(epoch)
+        # TODO: update avatar status here
+
+    def promote_agents(self, zone: models.Zone):
+        db = object_session(zone)
+        # Lock zone
+        db.refresh(zone, with_for_update=True)
+        # find good agents to promote
+        # ...
