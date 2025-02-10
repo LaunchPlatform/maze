@@ -32,6 +32,7 @@ test_dataloader = DataLoader(test_data, batch_size=batch_size)
 class Environment(LinearEnvironment):
     # define how many of this env but with varius
     count = 6
+    group = "mnist"
 
     def slug(self, index: int) -> str:
         return f"mnist-{index}"
