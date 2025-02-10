@@ -58,10 +58,23 @@ class Environment(BaseEnvironment):
             print(epoch)
         # TODO: update avatar status here
 
+    def breed_agents(self, zone: models.Zone):
+        db = object_session(zone)
+        # Lock zone
+        # TODO: or maybe the frame work should lock zone for us?
+        db.refresh(zone, with_for_update=True)
+        # TODO: find dead agents with good credits values,
+        # TODO: get remaining slots
+        # TODO: try to let agents "bid" for the slots
+        # TODO: child agent might be able to inherit the credits?
+
     def promote_agents(self, zone: models.Zone):
         db = object_session(zone)
         # Lock zone
         # TODO: or maybe the frame work should lock zone for us?
         db.refresh(zone, with_for_update=True)
+        if self.index == 5:
+            return
         # find good agents to promote
         # ...
+        # to next environment?
