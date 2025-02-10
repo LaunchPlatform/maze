@@ -55,6 +55,17 @@ def mutate_duplicate(
     ), prefix + duplicating + duplicating + suffix
 
 
+def mutate_reverse(
+    symbols: list[BaseSymbol], length_range: tuple[int, int]
+) -> tuple[MutationRecord, list[BaseSymbol]]:
+    pos = random.randrange(0, len(symbols))
+    length = random.randrange(*length_range)
+    prefix = symbols[:pos]
+    reversing = symbols[pos : pos + length][::-1]
+    suffix = symbols[pos + length :]
+    return MutationRecord(position=pos, length=length), prefix + reversing + suffix
+
+
 def mutate(symbols: list[BaseSymbol], mutations: list[MutationType]):
     for mutation_type in mutations:
         pass
