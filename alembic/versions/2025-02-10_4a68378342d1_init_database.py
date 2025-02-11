@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: 2cf681b27c2d
+Revision ID: 4a68378342d1
 Revises:
-Create Date: 2025-02-02 23:14:57.597363
+Create Date: 2025-02-10 20:26:17.836422
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "2cf681b27c2d"
+revision: str = "4a68378342d1"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -54,15 +54,13 @@ def upgrade() -> None:
         sa.Column(
             "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
-        sa.Column("slug", sa.String(), nullable=False),
-        sa.Column("life_span_limit", sa.Integer(), nullable=True),
-        sa.Column("basic_op_cost", sa.Integer(), nullable=True),
-        sa.Column("reward", sa.Integer(), nullable=True),
-        sa.Column("op_budget", sa.Integer(), nullable=True),
-        sa.Column("build_budget", sa.Integer(), nullable=True),
+        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("group", sa.String(), nullable=True),
+        sa.Column("type", sa.Enum("LINEAR", name="environmenttype"), nullable=False),
+        sa.Column("index", sa.Integer(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("slug"),
+        sa.UniqueConstraint("name"),
     )
     op.create_table(
         "mutation",
