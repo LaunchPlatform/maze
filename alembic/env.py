@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
-from maze import models
+from maze import models  # noqa
 from maze.core.config import settings
 from maze.db.base import Base
 
