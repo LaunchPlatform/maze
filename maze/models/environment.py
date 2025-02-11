@@ -26,6 +26,7 @@ class Environment(Base):
         UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()
     )
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    group: Mapped[str] = mapped_column(String, nullable=True)
     type: Mapped[EnvironmentType] = mapped_column(Enum(EnvironmentType), nullable=False)
     index: Mapped[int] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
@@ -41,6 +42,9 @@ class Environment(Base):
     def __repr__(self) -> str:
         items = [
             ("id", self.id),
+            ("type", self.type),
             ("name", self.name),
+            ("group", self.group),
+            ("index", self.index),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
