@@ -1,9 +1,63 @@
-import pytest
+import json
 
+import pytest
+from pydantic import TypeAdapter
+
+from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import build_lookup_table
+from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import LookupTable
 from maze.gene.symbols import random_lookup
+from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import Symbol
+from maze.gene.symbols import symbol_adapter
 from maze.gene.symbols import SymbolType
+
+
+@pytest.mark.parametrize(
+    "symbols, expected",
+    [
+        ([SimpleSymbol(type=SymbolType.RELU)], [dict(type=SymbolType.RELU)]),
+        (
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                LinearSymbol(bias=True, out_features=1234),
+            ],
+            [
+                dict(type=SymbolType.RELU),
+                dict(type=SymbolType.LINEAR, bias=True, out_features=1234),
+            ],
+        ),
+    ],
+)
+def test_serialization(symbols: list[Symbol], expected: list[dict]):
+    assert symbol_adapter.dump_python(symbols) == expected
+
+
+@pytest.mark.parametrize(
+    "json_objs, expected",
+    [
+        (
+            [
+                dict(type=SymbolType.RELU.value),
+            ],
+            [SimpleSymbol(type=SymbolType.RELU)],
+        ),
+        (
+            [
+                dict(type=SymbolType.RELU),
+                dict(type=SymbolType.LINEAR, bias=True, out_features=1234),
+            ],
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                LinearSymbol(bias=True, out_features=1234),
+            ],
+        ),
+    ],
+)
+def test_deserialization(json_objs: list[dict], expected: list[BaseSymbol]):
+    adapter = TypeAdapter(list[Symbol])
+    assert adapter.validate_python(json_objs) == expected
 
 
 @pytest.mark.parametrize(

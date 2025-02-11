@@ -6,6 +6,7 @@ import typing
 from bisect import bisect_right
 
 from pydantic import BaseModel
+from pydantic import TypeAdapter
 
 
 @enum.unique
@@ -91,6 +92,17 @@ class AdaptiveMaxPool1DSymbol(BaseSymbol):
 class AdaptiveAvgPool1DSymbol(BaseSymbol):
     type: typing.Literal[SymbolType.ADAPTIVE_AVGPOOL1D] = SymbolType.ADAPTIVE_AVGPOOL1D
     out_features: int
+
+
+Symbol = (
+    SimpleSymbol
+    | RepeatStartSymbol
+    | LinearSymbol
+    | AdaptiveMaxPool1DSymbol
+    | AdaptiveAvgPool1DSymbol
+)
+
+symbol_adapter = TypeAdapter(Symbol)
 
 
 @dataclasses.dataclass(frozen=True)
