@@ -11,10 +11,7 @@ from .. import models
 from ..gene.builder import ExceedBuildBudgetError
 from ..gene.builder import ExceedOperationBudgetError
 from ..gene.builder import ModelCost
-from ..gene.huffman import build_huffman_tree
-from ..gene.symbols import parse_symbols
 from ..gene.symbols import SymbolType
-from ..gene.utils import gen_bits
 from .agentdata import AgentData
 from .vehicle import Vehicle
 
