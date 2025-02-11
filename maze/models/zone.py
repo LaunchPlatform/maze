@@ -59,4 +59,4 @@ class Zone(Base):
 
     @property
     def display_name(self) -> str:
-        return f"{self.environment.slug}.zones[{self.index}]"
+        return f"{self.environment.name}.zones[{self.index}]"
