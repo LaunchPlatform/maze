@@ -42,8 +42,15 @@ class Avatar(Base):
         ForeignKey("zone.id"),
         nullable=False,
     )
-    status: Mapped[AvatarStatus] = mapped_column(Enum(AvatarStatus), nullable=False)
-    credit: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
+    status: Mapped[AvatarStatus] = mapped_column(
+        Enum(AvatarStatus),
+        default=AvatarStatus.ALIVE,
+        server_default="ALIVE",
+        nullable=False,
+    )
+    credit: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=0, server_default="0"
+    )
     error: Mapped[String] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow

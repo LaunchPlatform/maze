@@ -33,7 +33,7 @@ class Driver:
             "Initializing zones for template %s ...", self.template.__class__.__name__
         )
         with Session() as db:
-            for environment in self.template.environments():
+            for environment in self.template.environments(db):
                 for zone in environment.zones:
                     if zone.initialized:
                         logger.info(
@@ -56,10 +56,12 @@ class Driver:
                         "Initializing zone %s (id=%s) ...", zone.display_name, zone.id
                     )
                     self.template.initialize_zone(zone)
+                    zone.initialized = True
+                    db.add(zone)
+                    db.commit()
                     logger.info(
                         "Initialized zone %s (id=%s)", zone.display_name, zone.id
                     )
-                    db.commit()
         logger.info(
             "Initialized all zones for template %s", self.template.__class__.__name__
         )

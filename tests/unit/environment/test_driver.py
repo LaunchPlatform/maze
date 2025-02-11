@@ -1,4 +1,5 @@
 import pytest
+from sqlalchemy.orm import object_session
 from sqlalchemy.orm import Session
 
 from maze import models
@@ -20,6 +21,24 @@ def env_template() -> EnvironmentTemplate:
                 for zone_index in range(zone_count)
             ]
 
+        def initialize_zone(self, zone: models.Zone):
+            if zone.environment.index != 0:
+                return
+
+            db = object_session(zone)
+            agent = models.Agent(
+                gene=[],
+                symbol_table={},
+                input_shape=[28, 28],
+            )
+            db.add(agent)
+
+            avatar = models.Avatar(
+                agent=agent,
+                zone=zone,
+            )
+            db.add(avatar)
+
     return Sample()
 
 
@@ -35,3 +54,10 @@ def test_initialize_db(db: Session, env_template: EnvironmentTemplate):
         )
         expected_zone_count = expected_zone_counts[index]
         assert len(env.zones) == expected_zone_count
+
+
+def test_initialize_zones(db: Session, env_template: EnvironmentTemplate):
+    assert not env_template.is_initialized(db)
+    driver = Driver(env_template)
+    driver.initialize_db()
+    driver.initialize_zones()

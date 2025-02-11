@@ -64,8 +64,9 @@ class LinearEnvironment(EnvironmentTemplate):
             .filter(
                 models.Environment.name.in_(
                     [self.name(index) for index in range(self.count)]
-                ).order_by(models.Environment.index)
+                )
             )
+            .order_by(models.Environment.index)
             .all()
         )
 
