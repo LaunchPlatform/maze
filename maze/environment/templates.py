@@ -1,11 +1,32 @@
 from .. import models
 
 
-class LinearEnvironment:
+class EnvironmentTemplate:
+    def make_environments(self) -> list[models.Environment]:
+        """Called to make environments
+
+        :return: a list of environments
+        """
+        raise NotImplementedError
+
+
+class LinearEnvironment(EnvironmentTemplate):
     # count of environments in the linear environment series
     count: int
     # the group name of the series of environments, making it much easier to query and found
     group: str
+
+    def make_environments(self) -> list[models.Environment]:
+        return [
+            models.Environment(
+                type=models.EnvironmentType.LINEAR,
+                group=self.group,
+                index=index,
+                name=self.name(index),
+                zones=self.make_zones(index),
+            )
+            for index in range(self.count)
+        ]
 
     def name(self, index: int) -> str:
         """Called to make the name of the environment for the given index.
