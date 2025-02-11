@@ -6,6 +6,8 @@ from maze import models
 from maze.environment.driver import Driver
 from maze.environment.templates import EnvironmentTemplate
 from maze.environment.templates import LinearEnvironment
+from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import SymbolType
 
 
 @pytest.fixture
@@ -29,7 +31,7 @@ def env_template() -> EnvironmentTemplate:
 
             for _ in range(zone.agent_slots):
                 agent = models.Agent(
-                    gene=[],
+                    gene=[SimpleSymbol(type=SymbolType.RELU).model_dump(mode="json")],
                     symbol_table={},
                     input_shape=[28, 28],
                 )
