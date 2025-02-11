@@ -10,6 +10,9 @@ jobs:
     docker:
       - image: cimg/python:3.11.11
       - image: cimg/postgres:17.1
+        environment:
+          POSTGRES_USER: maze
+          POSTGRES_DB: maze
     steps:
       - checkout
       - python/install-packages:
