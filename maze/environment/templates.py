@@ -62,6 +62,13 @@ class LinearEnvironment(EnvironmentTemplate):
         """
         raise NotImplementedError
 
+    def initialize_zone(self, zone: models.Zone):
+        """Called to initialize zone, usually for populating it with initial random agents
+
+        :param zone: zone to initialize
+        """
+        raise NotImplementedError
+
     def run_avatar(self, avatar: models.Avatar):
         """Called to run an avatar (agent in a zone)
 

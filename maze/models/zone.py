@@ -1,6 +1,7 @@
 import datetime
 import uuid
 
+from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
@@ -26,6 +27,9 @@ class Zone(Base):
     )
     index: Mapped[int] = mapped_column(Integer, nullable=False)
     agent_slots: Mapped[int] = mapped_column(Integer, nullable=False)
+    initialized: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="f"
+    )
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
