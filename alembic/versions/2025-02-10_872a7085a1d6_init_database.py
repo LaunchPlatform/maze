@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: 4a68378342d1
+Revision ID: 872a7085a1d6
 Revises:
-Create Date: 2025-02-10 20:26:17.836422
+Create Date: 2025-02-10 23:49:46.085309
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "4a68378342d1"
+revision: str = "872a7085a1d6"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,7 +30,7 @@ def upgrade() -> None:
         sa.Column("lhs_parent_id", sa.UUID(), nullable=True),
         sa.Column("rhs_parent_id", sa.UUID(), nullable=True),
         sa.Column("input_shape", sa.ARRAY(sa.Integer()), nullable=False),
-        sa.Column("gene", sa.LargeBinary(), nullable=False),
+        sa.Column("gene", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column(
             "symbol_table", postgresql.JSONB(astext_type=sa.Text()), nullable=False
         ),
@@ -92,6 +92,7 @@ def upgrade() -> None:
         sa.Column("environment_id", sa.UUID(), nullable=False),
         sa.Column("index", sa.Integer(), nullable=False),
         sa.Column("agent_slots", sa.Integer(), nullable=False),
+        sa.Column("initialized", sa.Boolean(), server_default="f", nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["environment_id"],
@@ -121,6 +122,7 @@ def upgrade() -> None:
                 "DEAD",
                 name="avatarstatus",
             ),
+            server_default="ALIVE",
             nullable=False,
         ),
         sa.Column("credit", sa.Integer(), server_default="0", nullable=False),
