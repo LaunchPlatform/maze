@@ -30,3 +30,10 @@ def test_initialize_db(db: Session, env_template: EnvironmentTemplate):
     driver = Driver(env_template)
     driver.initialize_db()
     assert env_template.is_initialized(db)
+    expected_zone_counts = [100, 50, 25, 10, 1]
+    for index in range(env_template.count):
+        env = (
+            db.query(models.Environment).filter_by(name=env_template.name(index)).one()
+        )
+        expected_zone_count = expected_zone_counts[index]
+        assert len(env.zones) == expected_zone_count
