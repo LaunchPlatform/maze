@@ -5,6 +5,8 @@ import random
 import typing
 from bisect import bisect_right
 
+from pydantic import BaseModel
+
 
 @enum.unique
 class SymbolType(enum.Enum):
@@ -46,7 +48,7 @@ class SymbolType(enum.Enum):
     # CONV3D = "CONV3D"
 
 
-class BaseSymbol:
+class BaseSymbol(BaseModel):
     pass
 
 
@@ -66,29 +68,28 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
 LookupTable = list[tuple[int, SymbolType]]
 
 
-@dataclasses.dataclass(frozen=True)
 class SimpleSymbol(BaseSymbol):
     type: SymbolType
 
 
-@dataclasses.dataclass(frozen=True)
 class RepeatStartSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.REPEAT_START] = SymbolType.REPEAT_START
     times: int
 
 
-@dataclasses.dataclass(frozen=True)
 class LinearSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.LINEAR] = SymbolType.LINEAR
     bias: bool
     out_features: int
 
 
-@dataclasses.dataclass(frozen=True)
 class AdaptiveMaxPool1DSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.ADAPTIVE_MAXPOOL1D] = SymbolType.ADAPTIVE_MAXPOOL1D
     out_features: int
 
 
-@dataclasses.dataclass(frozen=True)
 class AdaptiveAvgPool1DSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.ADAPTIVE_AVGPOOL1D] = SymbolType.ADAPTIVE_AVGPOOL1D
     out_features: int
 
 

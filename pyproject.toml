@@ -17,6 +17,7 @@ psycopg2-binary = "^2.9.10"
 beanqueue = "^1.1.6"
 onnx = "^1.17.0"
 onnxscript = "^0.1.0"
+pydantic = "^2.10.6"
 
 
 [tool.poetry.group.dev.dependencies]
