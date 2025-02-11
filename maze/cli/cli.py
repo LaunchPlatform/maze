@@ -5,10 +5,10 @@ import click
 from rich.logging import Console
 from rich.logging import RichHandler
 
-from .environment import Environment
-from .environment import LOG_LEVEL_MAP
-from .environment import LogLevel
-from .environment import pass_env
+from .clienvironment import CliEnvironment
+from .clienvironment import LOG_LEVEL_MAP
+from .clienvironment import LogLevel
+from .clienvironment import pass_env
 
 
 @click.group(help="Command line tools for MAZE")
@@ -22,7 +22,7 @@ from .environment import pass_env
 )
 @click.version_option(prog_name="maze-ai", package_name="maze-ai")
 @pass_env
-def cli(env: Environment, log_level: str):
+def cli(env: CliEnvironment, log_level: str):
     env.log_level = LogLevel(log_level)
     FORMAT = "%(message)s"
     console = Console(stderr=True)

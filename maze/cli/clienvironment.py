@@ -24,9 +24,9 @@ LOG_LEVEL_MAP = {
 
 
 @dataclasses.dataclass
-class Environment:
+class CliEnvironment:
     log_level: LogLevel = LogLevel.INFO
     logger: logging.Logger = logging.getLogger("maze_cli")
 
 
-pass_env = click.make_pass_decorator(Environment, ensure=True)
+pass_env = click.make_pass_decorator(CliEnvironment, ensure=True)
