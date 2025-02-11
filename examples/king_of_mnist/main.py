@@ -40,5 +40,20 @@ class KingOfMnist(LinearEnvironment):
         ]
 
     def run_avatar(self, avatar: models.Avatar):
-        # TODO:
+        vehicle = Vehicle(
+            agent=avatar.agent_data,
+            loss_fn=nn.CrossEntropyLoss(),
+        )
+        vehicle.build_models()
+        for epoch in eval_agent(
+            vehicle=vehicle,
+            train_dataloader=train_dataloader,
+            test_dataloader=test_dataloader,
+        ):
+            print(epoch)
+
+    def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
+        pass
+
+    def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
         pass
