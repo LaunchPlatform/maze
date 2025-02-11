@@ -7,8 +7,12 @@ from maze.gene.symbols import LookupTable
 from maze.gene.symbols import random_lookup
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import Symbol
-from maze.gene.symbols import symbol_adapter
 from maze.gene.symbols import SymbolType
+
+
+@pytest.fixture
+def symbols_adapter() -> TypeAdapter:
+    return TypeAdapter(list[Symbol])
 
 
 @pytest.mark.parametrize(
@@ -27,8 +31,12 @@ from maze.gene.symbols import SymbolType
         ),
     ],
 )
-def test_serialization(symbols: list[Symbol], expected: list[dict]):
-    assert symbol_adapter.dump_python(symbols) == expected
+def test_serialization(
+    symbols_adapter: TypeAdapter[list[Symbol]],
+    symbols: list[Symbol],
+    expected: list[dict],
+):
+    assert symbols_adapter.dump_python(symbols) == expected
 
 
 @pytest.mark.parametrize(
@@ -52,9 +60,12 @@ def test_serialization(symbols: list[Symbol], expected: list[dict]):
         ),
     ],
 )
-def test_deserialization(json_objs: list[dict], expected: list[Symbol]):
-    adapter = TypeAdapter(list[Symbol])
-    assert adapter.validate_python(json_objs) == expected
+def test_deserialization(
+    symbols_adapter: TypeAdapter[list[Symbol]],
+    json_objs: list[dict],
+    expected: list[Symbol],
+):
+    assert symbols_adapter.validate_python(json_objs) == expected
 
 
 @pytest.mark.parametrize(
