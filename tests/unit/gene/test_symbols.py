@@ -1,9 +1,6 @@
-import json
-
 import pytest
 from pydantic import TypeAdapter
 
-from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import build_lookup_table
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import LookupTable
@@ -55,7 +52,7 @@ def test_serialization(symbols: list[Symbol], expected: list[dict]):
         ),
     ],
 )
-def test_deserialization(json_objs: list[dict], expected: list[BaseSymbol]):
+def test_deserialization(json_objs: list[dict], expected: list[Symbol]):
     adapter = TypeAdapter(list[Symbol])
     assert adapter.validate_python(json_objs) == expected
 

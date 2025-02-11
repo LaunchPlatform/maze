@@ -4,7 +4,7 @@ import random
 
 from numpy.random import binomial
 
-from .symbols import BaseSymbol
+from .symbols import Symbol
 
 
 @enum.unique
@@ -33,8 +33,8 @@ def decide_mutations(
 
 
 def mutate_delete(
-    symbols: list[BaseSymbol], length_range: tuple[int, int]
-) -> tuple[MutationRecord, list[BaseSymbol]]:
+    symbols: list[Symbol], length_range: tuple[int, int]
+) -> tuple[MutationRecord, list[Symbol]]:
     pos = random.randrange(0, len(symbols))
     length = random.randrange(*length_range)
     prefix = symbols[:pos]
@@ -43,8 +43,8 @@ def mutate_delete(
 
 
 def mutate_duplicate(
-    symbols: list[BaseSymbol], length_range: tuple[int, int]
-) -> tuple[MutationRecord, list[BaseSymbol]]:
+    symbols: list[Symbol], length_range: tuple[int, int]
+) -> tuple[MutationRecord, list[Symbol]]:
     pos = random.randrange(0, len(symbols))
     length = random.randrange(*length_range)
     prefix = symbols[:pos]
@@ -56,8 +56,8 @@ def mutate_duplicate(
 
 
 def mutate_reverse(
-    symbols: list[BaseSymbol], length_range: tuple[int, int]
-) -> tuple[MutationRecord, list[BaseSymbol]]:
+    symbols: list[Symbol], length_range: tuple[int, int]
+) -> tuple[MutationRecord, list[Symbol]]:
     pos = random.randrange(0, len(symbols))
     length = random.randrange(*length_range)
     prefix = symbols[:pos]
@@ -67,10 +67,10 @@ def mutate_reverse(
 
 
 def mutate(
-    symbols: list[BaseSymbol],
+    symbols: list[Symbol],
     mutations: list[MutationType],
     length_ranges: dict[MutationType, tuple[int, int]],
-) -> tuple[list[MutationRecord], list[BaseSymbol]]:
+) -> tuple[list[MutationRecord], list[Symbol]]:
     mutation_records = []
     current_symbols = symbols[:]
     for mutation_type in mutations:

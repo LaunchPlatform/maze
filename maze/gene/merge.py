@@ -4,10 +4,10 @@ import random
 
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
-from .symbols import BaseSymbol
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
+from .symbols import Symbol
 
 
 @dataclasses.dataclass
@@ -76,7 +76,7 @@ def merge_liner(
     )
 
 
-def merge_parameter_symbol(lhs: BaseSymbol, rhs: BaseSymbol, jiter_config: JiterConfig):
+def merge_parameter_symbol(lhs: Symbol, rhs: Symbol, jiter_config: JiterConfig):
     if type(lhs) is not type(rhs):
         raise TypeError(
             f"Expected lhs and rhs to be the same type but got {type(lhs)} and {type(rhs)} instead"
@@ -98,7 +98,7 @@ def merge_parameter_symbol(lhs: BaseSymbol, rhs: BaseSymbol, jiter_config: Jiter
     raise ValueError(f"Unexpected symbol type {type(lhs)}")
 
 
-def merge_gene(lhs: list[BaseSymbol], rhs: list[BaseSymbol], jiter_config: JiterConfig):
+def merge_gene(lhs: list[Symbol], rhs: list[Symbol], jiter_config: JiterConfig):
     """Merge two symbol lists randomly"""
     for lhs_symbol, rhs_symbol in itertools.zip_longest(lhs, rhs):
         if lhs_symbol is None:

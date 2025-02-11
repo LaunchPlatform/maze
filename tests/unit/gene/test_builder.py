@@ -10,11 +10,11 @@ from maze.gene.builder import ExceedOperationBudgetError
 from maze.gene.builder import ModelCost
 from maze.gene.builder import read_enclosure
 from maze.gene.builder import skip_enclosure
-from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import is_symbol_type
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import RepeatStartSymbol
 from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import Symbol
 from maze.gene.symbols import SymbolType
 
 
@@ -64,11 +64,11 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
     ],
 )
 def test_read_enclosure(
-    symbols: list[BaseSymbol],
-    start_symbol: typing.Callable[[BaseSymbol], bool],
-    end_symbol: typing.Callable[[BaseSymbol], bool],
-    expected_symbols: list[BaseSymbol],
-    expected_tail: BaseSymbol | None,
+    symbols: list[Symbol],
+    start_symbol: typing.Callable[[Symbol], bool],
+    end_symbol: typing.Callable[[Symbol], bool],
+    expected_symbols: list[Symbol],
+    expected_tail: Symbol | None,
 ):
     result_symbols, tail = read_enclosure(
         symbols=iter(symbols), start_symbol=start_symbol, end_symbol=end_symbol
@@ -466,9 +466,7 @@ def test_build_models_exceed_quota():
         ),
     ],
 )
-def test_break_branch_segments(
-    symbols: list[BaseSymbol], expected: list[list[BaseSymbol]]
-):
+def test_break_branch_segments(symbols: list[Symbol], expected: list[list[Symbol]]):
     assert list(break_branch_segments(iter(symbols))) == expected
 
 
@@ -502,7 +500,7 @@ def test_break_branch_segments(
         ),
     ],
 )
-def test_skip_enclosure(symbols: list[BaseSymbol], expected: list[BaseSymbol]):
+def test_skip_enclosure(symbols: list[Symbol], expected: list[Symbol]):
     assert (
         list(
             skip_enclosure(

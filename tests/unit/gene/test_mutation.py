@@ -8,9 +8,9 @@ from maze.gene.mutation import mutate_delete
 from maze.gene.mutation import mutate_duplicate
 from maze.gene.mutation import mutate_reverse
 from maze.gene.mutation import MutationType
-from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import Symbol
 from maze.gene.symbols import SymbolType
 
 
@@ -100,7 +100,7 @@ def test_decide_mutations(
         ),
     ],
 )
-def test_mutate_delete(symbols: list[BaseSymbol], length_range: tuple[int, int]):
+def test_mutate_delete(symbols: list[Symbol], length_range: tuple[int, int]):
     for _ in range(1000):
         record, mutated_symbols = mutate_delete(
             symbols=symbols, length_range=length_range
@@ -135,7 +135,7 @@ def test_mutate_delete(symbols: list[BaseSymbol], length_range: tuple[int, int])
         ),
     ],
 )
-def test_mutate_duplicate(symbols: list[BaseSymbol], length_range: tuple[int, int]):
+def test_mutate_duplicate(symbols: list[Symbol], length_range: tuple[int, int]):
     for _ in range(1000):
         record, mutated_symbols = mutate_duplicate(
             symbols=symbols, length_range=length_range
@@ -182,7 +182,7 @@ def test_mutate_duplicate(symbols: list[BaseSymbol], length_range: tuple[int, in
         ),
     ],
 )
-def test_mutate_reverse(symbols: list[BaseSymbol], length_range: tuple[int, int]):
+def test_mutate_reverse(symbols: list[Symbol], length_range: tuple[int, int]):
     for _ in range(1000):
         record, mutated_symbols = mutate_reverse(
             symbols=symbols, length_range=length_range

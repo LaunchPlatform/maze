@@ -8,11 +8,11 @@ from torch import nn
 
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
-from .symbols import BaseSymbol
 from .symbols import is_symbol_type
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
+from .symbols import Symbol
 from .symbols import SymbolType
 
 
@@ -73,11 +73,11 @@ class Reshape(nn.Module):
 
 
 def read_enclosure(
-    symbols: typing.Iterator[BaseSymbol],
-    start_symbol: typing.Callable[[BaseSymbol], bool],
-    end_symbol: typing.Callable[[BaseSymbol], bool],
-) -> tuple[list[BaseSymbol], BaseSymbol | None]:
-    result: list[BaseSymbol] = []
+    symbols: typing.Iterator[Symbol],
+    start_symbol: typing.Callable[[Symbol], bool],
+    end_symbol: typing.Callable[[Symbol], bool],
+) -> tuple[list[Symbol], Symbol | None]:
+    result: list[Symbol] = []
     nest_level = 0
     for symbol in symbols:
         if start_symbol(symbol):
@@ -91,10 +91,10 @@ def read_enclosure(
 
 
 def skip_enclosure(
-    symbols: typing.Iterator[BaseSymbol],
-    start_symbol: typing.Callable[[BaseSymbol], bool],
-    end_symbol: typing.Callable[[BaseSymbol], bool],
-) -> typing.Generator[BaseSymbol, None, None]:
+    symbols: typing.Iterator[Symbol],
+    start_symbol: typing.Callable[[Symbol], bool],
+    end_symbol: typing.Callable[[Symbol], bool],
+) -> typing.Generator[Symbol, None, None]:
     while True:
         try:
             symbol = next(symbols)
@@ -111,8 +111,8 @@ def skip_enclosure(
 
 
 def break_branch_segments(
-    symbols: typing.Iterator[BaseSymbol],
-) -> typing.Generator[list[BaseSymbol], None, None]:
+    symbols: typing.Iterator[Symbol],
+) -> typing.Generator[list[Symbol], None, None]:
     current_segment = []
     nest_level = 0
     for symbol in symbols:
@@ -137,7 +137,7 @@ def break_branch_segments(
 
 
 def _do_build_models(
-    symbols: typing.Iterator[BaseSymbol],
+    symbols: typing.Iterator[Symbol],
     input_shape: typing.Tuple[int, ...],
     starting_cost: ModelCost = None,
     budget: ModelCost | None = None,
@@ -325,7 +325,7 @@ def _do_build_models(
 
 
 def build_models(
-    symbols: typing.Iterator[BaseSymbol],
+    symbols: typing.Iterator[Symbol],
     input_shape: typing.Tuple[int, ...],
     budget: ModelCost | None = None,
 ) -> Model:

@@ -8,8 +8,8 @@ from maze.gene.merge import merge_bool
 from maze.gene.merge import merge_float
 from maze.gene.merge import merge_gene
 from maze.gene.merge import merge_int
-from maze.gene.symbols import BaseSymbol
 from maze.gene.symbols import SimpleSymbol
+from maze.gene.symbols import Symbol
 from maze.gene.symbols import SymbolType
 
 
@@ -56,10 +56,10 @@ def cal_expected_stdev(start: int | float, end: int | float) -> float:
     ],
 )
 def test_merge_gene(
-    lhs: list[BaseSymbol],
-    rhs: list[BaseSymbol],
+    lhs: list[Symbol],
+    rhs: list[Symbol],
     jiter: JiterConfig | None,
-    expected: list[BaseSymbol],
+    expected: list[Symbol],
 ):
     if jiter is None:
         jiter = JiterConfig()
