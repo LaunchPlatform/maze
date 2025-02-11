@@ -19,6 +19,20 @@ class EnvironmentTemplate:
         """
         raise NotImplementedError
 
+    def environments(self) -> list[models.Environment]:
+        """Called to return all environments
+
+        :return: a list of environments
+        """
+        raise NotImplementedError
+
+    def initialize_zone(self, zone: models.Zone):
+        """Called to initialize zone, usually for populating it with initial random agents
+
+        :param zone: zone to initialize
+        """
+        raise NotImplementedError
+
 
 class LinearEnvironment(EnvironmentTemplate):
     # count of environments in the linear environment series
@@ -44,6 +58,17 @@ class LinearEnvironment(EnvironmentTemplate):
             for index in range(self.count)
         ]
 
+    def environments(self, db: Session) -> list[models.Environment]:
+        return (
+            db.query(models.Environment)
+            .filter(
+                models.Environment.name.in_(
+                    [self.name(index) for index in range(self.count)]
+                ).order_by(models.Environment.index)
+            )
+            .all()
+        )
+
     def name(self, index: int) -> str:
         """Called to make the name of the environment for the given index.
         By default it would be "{class_name}[{index}]" if not overridden.
@@ -59,13 +84,6 @@ class LinearEnvironment(EnvironmentTemplate):
 
         :param index: index of the environment
         :return: a list of Zones
-        """
-        raise NotImplementedError
-
-    def initialize_zone(self, zone: models.Zone):
-        """Called to initialize zone, usually for populating it with initial random agents
-
-        :param zone: zone to initialize
         """
         raise NotImplementedError
 
