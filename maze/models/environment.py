@@ -1,7 +1,9 @@
 import datetime
+import enum
 import uuid
 
 from sqlalchemy import DateTime
+from sqlalchemy import Enum
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import String
@@ -14,16 +16,18 @@ from ..db.base import Base
 from .helpers import make_repr_attrs
 
 
+@enum.unique
+class EnvironmentType(enum.Enum):
+    LINEAR = "LINEAR"
+
+
 class Environment(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid()
     )
-    slug: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    life_span_limit: Mapped[int] = mapped_column(Integer, nullable=True)
-    basic_op_cost: Mapped[int] = mapped_column(Integer, nullable=True)
-    reward: Mapped[int] = mapped_column(Integer, nullable=True)
-    op_budget: Mapped[int] = mapped_column(Integer, nullable=True)
-    build_budget: Mapped[int] = mapped_column(Integer, nullable=True)
+    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    type: Mapped[EnvironmentType] = mapped_column(Enum(EnvironmentType), nullable=False)
+    index: Mapped[int] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
@@ -37,6 +41,6 @@ class Environment(Base):
     def __repr__(self) -> str:
         items = [
             ("id", self.id),
-            ("slug", self.slug),
+            ("name", self.name),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
