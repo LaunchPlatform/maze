@@ -9,7 +9,7 @@ jobs:
   test:
     docker:
       - image: cimg/python:3.11.11
-      - image: cimg/postgres:17.2.0
+      - image: cimg/postgres:17.1
     steps:
       - checkout
       - python/install-packages:
