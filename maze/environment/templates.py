@@ -8,12 +8,13 @@ class LinearEnvironment:
     group: str
 
     def name(self, index: int) -> str:
-        """Called to make the name of the environment for the given index
+        """Called to make the name of the environment for the given index.
+        By default it would be "{class_name}[{index}]" if not overridden.
 
         :param index: index of the environment
         :return: name of the environment
         """
-        raise NotImplementedError
+        return f"{self.__class__.__name__}[{index}]"
 
     def make_zones(self, index: int) -> list[models.Zone]:
         """Called to initialize the zones for then environment of the given index. Only called once when we initialize
