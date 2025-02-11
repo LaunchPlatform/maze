@@ -168,7 +168,7 @@ def _do_build_models(
                     f"The current operation cost {total_build_cost:,} already exceeds build budget {budget.build:,}"
                 )
         match symbol:
-            case RepeatStartSymbol(times):
+            case RepeatStartSymbol(times=times):
                 repeating_symbols, _ = read_enclosure(
                     symbols=symbols,
                     start_symbol=functools.partial(
@@ -191,7 +191,7 @@ def _do_build_models(
                     check_op_budget()
                     model.output_shape = repeating_model.output_shape
                     model.modules.extend(repeating_model.modules)
-            case LinearSymbol(bias, out_features):
+            case LinearSymbol(bias=bias, out_features=out_features):
                 if len(model.output_shape) > 1:
                     if not dry_run:
                         model.modules.append(nn.Flatten())
@@ -214,8 +214,9 @@ def _do_build_models(
                         )
                     )
                 model.output_shape = (out_features,)
-            case AdaptiveMaxPool1DSymbol(out_features) | AdaptiveAvgPool1DSymbol(
-                out_features
+            case (
+                AdaptiveMaxPool1DSymbol(out_features=out_features)
+                | AdaptiveAvgPool1DSymbol(out_features=out_features)
             ):
                 in_features = math.prod(model.output_shape)
                 if not dry_run:
@@ -234,7 +235,7 @@ def _do_build_models(
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
                 check_op_budget()
-            case SimpleSymbol(symbol_type):
+            case SimpleSymbol(type=symbol_type):
                 match symbol_type:
                     case SymbolType.BRANCH_START:
                         branch_symbols, _ = read_enclosure(
