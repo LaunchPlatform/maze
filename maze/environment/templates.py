@@ -30,3 +30,19 @@ class LinearEnvironment:
         :param avatar: avatar to run
         """
         raise NotImplementedError
+
+    def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
+        """Called to breed new agents to be inserted into the zone after a period finished.
+
+        :param zone: zone to breed agents
+        :return: a list of offspring agents
+        """
+        raise NotImplementedError
+
+    def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
+        """Called to promote agents into the next environments after a period finished.
+
+        :param zone: zone to promote agents from
+        :return: a list of agents to promote
+        """
+        raise NotImplementedError
