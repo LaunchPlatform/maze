@@ -21,3 +21,4 @@ class Driver:
             environments = self.template.make_environments()
             for environment in environments:
                 db.add(environment)
+            db.commit()
