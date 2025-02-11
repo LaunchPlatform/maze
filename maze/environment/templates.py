@@ -1,7 +1,17 @@
+from sqlalchemy.orm import Session
+
 from .. import models
 
 
 class EnvironmentTemplate:
+    def is_initialized(self, db: Session) -> bool:
+        """Check and see if the records in database initialized for this environment(s)
+
+        :param db: database session
+        :return: ture if it's already initialized
+        """
+        raise NotImplementedError
+
     def make_environments(self) -> list[models.Environment]:
         """Called to make environments
 
@@ -15,6 +25,12 @@ class LinearEnvironment(EnvironmentTemplate):
     count: int
     # the group name of the series of environments, making it much easier to query and found
     group: str
+
+    def is_initialized(self, db: Session) -> bool:
+        return (
+            db.query(models.Environment).filter_by(name=self.name(0)).one_or_none()
+            is not None
+        )
 
     def make_environments(self) -> list[models.Environment]:
         return [
