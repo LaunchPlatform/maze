@@ -7,12 +7,8 @@ from maze.gene.symbols import LookupTable
 from maze.gene.symbols import random_lookup
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import Symbol
+from maze.gene.symbols import symbols_adapter
 from maze.gene.symbols import SymbolType
-
-
-@pytest.fixture
-def symbols_adapter() -> TypeAdapter:
-    return TypeAdapter(list[Symbol])
 
 
 @pytest.mark.parametrize(
@@ -32,7 +28,6 @@ def symbols_adapter() -> TypeAdapter:
     ],
 )
 def test_serialization(
-    symbols_adapter: TypeAdapter[list[Symbol]],
     symbols: list[Symbol],
     expected: list[dict],
 ):
@@ -61,7 +56,6 @@ def test_serialization(
     ],
 )
 def test_deserialization(
-    symbols_adapter: TypeAdapter[list[Symbol]],
     json_objs: list[dict],
     expected: list[Symbol],
 ):

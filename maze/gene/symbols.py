@@ -103,6 +103,7 @@ Symbol = (
 )
 
 symbol_adapter = TypeAdapter(Symbol)
+symbols_adapter = TypeAdapter(list[Symbol])
 
 
 @dataclasses.dataclass(frozen=True)
@@ -114,24 +115,8 @@ class SymbolParameterRange:
     adaptive_avg_pool1d_out_features: tuple[int, int] = (1, 8192)
 
 
-def is_symbol_type(symbol_type: SymbolType, symbol: BaseSymbol) -> bool:
-    if symbol_type == SymbolType.LINEAR and isinstance(symbol, LinearSymbol):
-        return True
-    elif symbol_type == SymbolType.REPEAT_START and isinstance(
-        symbol, RepeatStartSymbol
-    ):
-        return True
-    elif symbol_type == SymbolType.ADAPTIVE_MAXPOOL1D and isinstance(
-        symbol, AdaptiveMaxPool1DSymbol
-    ):
-        return True
-    elif symbol_type == SymbolType.ADAPTIVE_AVGPOOL1D and isinstance(
-        symbol, AdaptiveAvgPool1DSymbol
-    ):
-        return True
-    elif isinstance(symbol, SimpleSymbol):
-        return symbol.type == symbol_type
-    return False
+def is_symbol_type(symbol_type: SymbolType, symbol: Symbol) -> bool:
+    return symbol.type == symbol_type
 
 
 def build_lookup_table(

@@ -1,3 +1,5 @@
+import random
+
 from sqlalchemy.orm import object_session
 from torch import nn
 from torch.utils.data import DataLoader
@@ -8,6 +10,11 @@ from maze import models
 from maze.environment.templates import LinearEnvironment
 from maze.environment.vehicle import Vehicle
 from maze.environment.zone import eval_agent
+from maze.gene.symbols import generate_gene
+from maze.gene.symbols import SymbolParameterRange
+from maze.gene.symbols import symbols_adapter
+from maze.gene.symbols import SymbolType
+from maze.gene.utils import gen_symbol_table
 
 training_data = datasets.MNIST(
     root="data",
@@ -38,6 +45,36 @@ class KingOfMnist(LinearEnvironment):
             models.Zone(agent_slots=100, index=zone_index)
             for zone_index in range(zone_count)
         ]
+
+    def initialize_zone(self, zone: models.Zone):
+        if zone.environment.index != 0:
+            # we only want to populate first environment
+            return
+        db = object_session(zone)
+        for _ in range(zone.agent_slots):
+            # TODO: do we really need this?
+            symbol_table = gen_symbol_table(
+                symbols=list(SymbolType), random_range=(1, 1024)
+            )
+            gene_length = random.randint(5, 100)
+            symbols = list(
+                generate_gene(
+                    symbol_table=symbol_table,
+                    length=gene_length,
+                    param_range=SymbolParameterRange(),
+                )
+            )
+            agent = models.Agent(
+                gene=symbols_adapter.dump_python(symbols, mode="json"),
+                symbol_table={},
+                input_shape=[28, 28],
+            )
+            db.add(agent)
+            avatar = models.Avatar(
+                agent=agent,
+                zone=zone,
+            )
+            db.add(avatar)
 
     def run_avatar(self, avatar: models.Avatar):
         vehicle = Vehicle(
