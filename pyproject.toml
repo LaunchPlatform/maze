@@ -18,6 +18,7 @@ beanqueue = "^1.1.6"
 onnx = "^1.17.0"
 onnxscript = "^0.1.0"
 pydantic = "^2.10.6"
+pytest-dotenv = "^0.5.2"
 
 
 [tool.poetry.group.dev.dependencies]

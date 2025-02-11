@@ -12,7 +12,7 @@ jobs:
       - image: cimg/postgres:17.1
         environment:
           POSTGRES_USER: maze
-          POSTGRES_DB: maze
+          POSTGRES_DB: maze_test
     steps:
       - checkout
       - python/install-packages:
