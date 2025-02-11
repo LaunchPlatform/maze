@@ -2,7 +2,9 @@ from .. import models
 
 
 class LinearEnvironment:
+    # count of environments in the linear environment series
     count: int
+    # the group name of the series of environments, making it much easier to query and found
     group: str
 
     def name(self, index: int) -> str:
