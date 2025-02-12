@@ -29,12 +29,12 @@ def main(env: CliEnvironment, template_cls: str):
     driver.initialize_zones()
     with Session() as db:
         experiment = driver.get_experiment(db)
+        period = (
+            experiment.periods.order_by(None)
+            .order_by(models.Period.index.desc())
+            .first()
+        )
         while True:
-            period = (
-                experiment.periods.order_by(None)
-                .order_by(models.Period.index.desc())
-                .first()
-            )
             logger.info("Processing period %s", period.display_name)
             while True:
                 avatar = (
@@ -59,7 +59,7 @@ def main(env: CliEnvironment, template_cls: str):
                 experiment=experiment,
                 index=period.index + 1,
             )
-            db.add(period)
+            db.add(new_period)
             db.flush()
             logger.info("Created new period %s", new_period.display_name)
             driver.breed_next_gen(old_period=period, new_period=new_period)

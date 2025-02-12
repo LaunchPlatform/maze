@@ -62,7 +62,7 @@ class Driver:
         )
         with Session() as db:
             experiment = self.get_experiment(db)
-            period = experiment.periods.one()
+            period = experiment.periods.first()
             for environment in self.template.environments(db):
                 for zone in environment.zones:
                     if zone.initialized:
@@ -142,5 +142,12 @@ class Driver:
         for environment in self.template.environments(db):
             for zone in environment.zones:
                 new_agents = self.template.breed_agents(
-                    zone=zone, old_period=old_period, new_period=new_period
+                    zone=zone, period=old_period,
                 )
+                for agent in new_agents:
+                    avatar = models.Avatar(
+                        agent=agent,
+                        zone=zone,
+                        period=new_period,
+                    )
+                    db.add(avatar)

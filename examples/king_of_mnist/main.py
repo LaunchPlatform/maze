@@ -167,7 +167,7 @@ class KingOfMnist(LinearEnvironment):
             yield epoch
 
     def breed_agents(
-        self, zone: models.Zone, old_period: models.Period, new_period: models.Period
+        self, zone: models.Zone, period: models.Period,
     ) -> list[models.Agent]:
         db = object_session(zone)
 
@@ -177,7 +177,7 @@ class KingOfMnist(LinearEnvironment):
             .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
             .filter(models.Avatar.zone == zone)
             .filter(models.Avatar.status == models.AvatarStatus.DEAD)
-            .filter(models.Avatar.period == old_period)
+            .filter(models.Avatar.period == period)
         ).all()
         if not agent_credits:
             return []
@@ -194,9 +194,7 @@ class KingOfMnist(LinearEnvironment):
             lhs_gene = lhs.agent_data.symbols
             rhs_gene = rhs.agent_data.symbols
             gene = list(merge_gene(lhs_gene, rhs_gene, jiter_config=JiterConfig()))
-            print("$", lhs_gene)
-            print("$", rhs_gene)
-            print("=", gene)
+            # TODO: mutations
             new_agent = models.Agent(
                 lhs_parent=lhs,
                 rhs_parent=rhs,
@@ -206,7 +204,6 @@ class KingOfMnist(LinearEnvironment):
                 symbol_table={},
             )
             offspring_agents.append(new_agent)
-        print("@" * 10, offspring_agents)
         return offspring_agents
 
     def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
