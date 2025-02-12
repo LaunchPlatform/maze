@@ -5,6 +5,7 @@ from sqlalchemy import DateTime
 from sqlalchemy import func
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import DynamicMapped
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -25,10 +26,12 @@ class Experiment(Base):
     environments: Mapped[list["Environment"]] = relationship(
         "Environment",
         back_populates="experiment",
+        order_by="Environment.index",
     )
-    periods: Mapped[list["Period"]] = relationship(
+    periods: DynamicMapped["Period"] = relationship(
         "Period",
         back_populates="experiment",
+        order_by="Environment.index",
     )
 
     def __repr__(self) -> str:

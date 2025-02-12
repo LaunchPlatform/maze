@@ -63,9 +63,9 @@ class KingOfMnist(LinearEnvironment):
     experiment = "king-of-mnist"
 
     def make_zones(self, index: int) -> list[models.Zone]:
-        zone_count = [100, 50, 25, 10, 1][index]
+        zone_count = [10, 5, 2, 1, 1][index]
         return [
-            models.Zone(agent_slots=100, index=zone_index)
+            models.Zone(agent_slots=10, index=zone_index)
             for zone_index in range(zone_count)
         ]
 
@@ -82,7 +82,7 @@ class KingOfMnist(LinearEnvironment):
             )
         )
 
-    def initialize_zone(self, zone: models.Zone):
+    def initialize_zone(self, period: models.Period, zone: models.Zone):
         if zone.environment.index != 0:
             # we only want to populate first environment
             return
@@ -107,6 +107,7 @@ class KingOfMnist(LinearEnvironment):
             )
             db.add(agent)
             avatar = models.Avatar(
+                period=period,
                 agent=agent,
                 zone=zone,
             )

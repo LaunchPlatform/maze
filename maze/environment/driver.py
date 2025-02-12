@@ -60,7 +60,7 @@ class Driver:
                 .filter_by(name=self.template.experiment)
                 .one()
             )
-            period = experiment.periods[0]
+            period = experiment.periods.one()
             for environment in self.template.environments(db):
                 for zone in environment.zones:
                     if zone.initialized:
