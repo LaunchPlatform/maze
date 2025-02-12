@@ -163,7 +163,9 @@ class KingOfMnist(LinearEnvironment):
                 raise OutOfCreditError("Out of credit")
             yield epoch
 
-    def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
+    def breed_agents(
+        self, zone: models.Zone, old_period: models.Period, new_period: models.Period
+    ) -> list[models.Agent]:
         pass
 
     def promote_agents(self, zone: models.Zone) -> list[models.Agent]:

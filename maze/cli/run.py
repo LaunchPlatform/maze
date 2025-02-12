@@ -2,13 +2,12 @@ import logging
 import typing
 
 import click
+from sqlalchemy.testing.provision import drop_views
 
+from .. import models
 from ..db.session import Session
-
-S = Session()
 from ..environment.driver import Driver
 from ..environment.templates import EnvironmentTemplate
-from .. import models
 from .cli import cli
 from .environment import CliEnvironment
 from .environment import pass_env
@@ -29,23 +28,40 @@ def main(env: CliEnvironment, template_cls: str):
     driver = Driver(template)
     driver.initialize_db()
     driver.initialize_zones()
-    while True:
-        with Session() as db:
-            experiment = driver.get_experiment(db)
+    with Session() as db:
+        experiment = driver.get_experiment(db)
+        while True:
             period = (
                 experiment.periods.order_by(None)
                 .order_by(models.Period.index.desc())
                 .first()
             )
-            avatar = (
-                period.avatars.filter_by(
-                    status=models.AvatarStatus.ALIVE
-                ).with_for_update()
-            ).first()
-            if avatar is None:
-                logger.info(
-                    "No more alive avatar found for period %s", period.display_name
-                )
+            logger.info("Processing period %s", period.display_name)
+            while True:
+                avatar = (
+                    period.avatars.filter_by(
+                        status=models.AvatarStatus.ALIVE,
+                        # TODO: add skip lock for concurrent processing
+                    ).with_for_update()
+                ).first()
+                if avatar is None:
+                    logger.info(
+                        "No more alive avatar found for period %s", period.display_name
+                    )
+                    break
+                driver.run_avatar(avatar)
+                db.commit()
+            if not period.avatars.count():
+                logger.info("Did not process any avatar, nothing to run")
                 break
-            driver.run_avatar(avatar)
+            # TODO: extract this into driver?
+            new_period = models.Period(
+                experiment=experiment,
+                index=period.index + 1,
+            )
+            db.add(period)
+            db.flush()
+            logger.info("Created new period %s", new_period.display_name)
+            driver.breed_next_gen(old_period=period, new_period=new_period)
+            period = new_period
             db.commit()

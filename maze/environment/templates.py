@@ -43,10 +43,14 @@ class EnvironmentTemplate:
         """
         raise NotImplementedError
 
-    def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
+    def breed_agents(
+        self, zone: models.Zone, old_period: models.Period, new_period: models.Period
+    ) -> list[models.Agent]:
         """Called to breed new agents to be inserted into the zone after a period finished.
 
         :param zone: zone to breed agents
+        :param old_period: old period to breed agents from
+        :param new_period: new period to breed agents to
         :return: a list of offspring agents
         """
         raise NotImplementedError

@@ -136,3 +136,11 @@ class Driver:
             logger.info("Avatar %s runs out of credit", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_CREDIT
             db.add(avatar)
+
+    def breed_next_gen(self, old_period: models.Period, new_period: models.Period):
+        db = object_session(old_period)
+        for environment in self.template.environments(db):
+            for zone in environment.zones:
+                new_agents = self.template.breed_agents(
+                    zone=zone, old_period=old_period, new_period=new_period
+                )
