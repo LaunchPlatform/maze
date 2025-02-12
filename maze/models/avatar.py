@@ -7,8 +7,10 @@ from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
+from sqlalchemy import select
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import column_property
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -53,7 +55,7 @@ class Avatar(Base):
         server_default="ALIVE",
         nullable=False,
     )
-    credit: Mapped[int] = mapped_column(
+    initial_credit: Mapped[int] = mapped_column(
         Integer, nullable=False, default=0, server_default="0"
     )
     error: Mapped[String] = mapped_column(String, nullable=True)
@@ -89,3 +91,12 @@ class Avatar(Base):
             ("credit", self.credit),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
+
+    @classmethod
+    def __declare_last__(cls):
+        from .epoch import Epoch
+
+        cls.credit = column_property(
+            select([func.sum(Epoch.income - Epoch.cost)]).where(Epoch.avatar_id == id),
+            deferred=True,
+        )
