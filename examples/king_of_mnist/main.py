@@ -60,6 +60,7 @@ def to_millions(l: list[int]) -> list[int]:
 class KingOfMnist(LinearEnvironment):
     count = 5
     group = "king-of-mnist"
+    experiment = "king-of-mnist"
 
     def make_zones(self, index: int) -> list[models.Zone]:
         zone_count = [100, 50, 25, 10, 1][index]
