@@ -113,13 +113,14 @@ class KingOfMnist(LinearEnvironment):
 
         reward = 100_000_000
         credit = 100_000_000
+        epoch_cost = 2_000_000
         for epoch in eval_agent(
             vehicle=vehicle,
             train_dataloader=train_dataloader,
             test_dataloader=test_dataloader,
             epochs=100,
         ):
-            epoch.cost = avatar.agent.op_cost + 10_000
+            epoch.cost = avatar.agent.op_cost + epoch_cost
             epoch.income = int(
                 reward * (epoch.test_correct_count / epoch.test_total_count)
             )
