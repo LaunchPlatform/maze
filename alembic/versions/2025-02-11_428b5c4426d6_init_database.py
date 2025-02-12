@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: b7df9411b3d7
+Revision ID: 428b5c4426d6
 Revises:
-Create Date: 2025-02-11 18:56:18.301668
+Create Date: 2025-02-11 23:30:50.364529
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "b7df9411b3d7"
+revision: str = "428b5c4426d6"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -50,16 +50,31 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(
+        "experiment",
+        sa.Column(
+            "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
+        sa.Column("name", sa.String(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint("name"),
+    )
+    op.create_table(
         "environment",
         sa.Column(
             "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
         ),
+        sa.Column("experiment_id", sa.UUID(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("group", sa.String(), nullable=True),
         sa.Column("type", sa.Enum("LINEAR", name="environmenttype"), nullable=False),
         sa.Column("index", sa.Integer(), nullable=True),
         sa.Column("arguments", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["experiment_id"],
+            ["experiment.id"],
+        ),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
     )
@@ -82,6 +97,20 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["agent_id"],
             ["agent.id"],
+        ),
+        sa.PrimaryKeyConstraint("id"),
+    )
+    op.create_table(
+        "period",
+        sa.Column(
+            "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
+        sa.Column("experiment_id", sa.UUID(), nullable=False),
+        sa.Column("index", sa.Integer(), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["experiment_id"],
+            ["experiment.id"],
         ),
         sa.PrimaryKeyConstraint("id"),
     )
@@ -111,6 +140,7 @@ def upgrade() -> None:
         ),
         sa.Column("agent_id", sa.UUID(), nullable=False),
         sa.Column("zone_id", sa.UUID(), nullable=False),
+        sa.Column("period_id", sa.UUID(), nullable=False),
         sa.Column(
             "status",
             sa.Enum(
@@ -132,6 +162,10 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["agent_id"],
             ["agent.id"],
+        ),
+        sa.ForeignKeyConstraint(
+            ["period_id"],
+            ["period.id"],
         ),
         sa.ForeignKeyConstraint(
             ["zone_id"],
@@ -171,7 +205,9 @@ def downgrade() -> None:
     op.drop_table("epoch")
     op.drop_table("avatar")
     op.drop_table("zone")
+    op.drop_table("period")
     op.drop_table("mutation")
     op.drop_table("environment")
+    op.drop_table("experiment")
     op.drop_table("agent")
     # ### end Alembic commands ###
