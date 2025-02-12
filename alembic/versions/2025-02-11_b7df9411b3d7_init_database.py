@@ -1,8 +1,8 @@
 """Init database
 
-Revision ID: 872a7085a1d6
+Revision ID: b7df9411b3d7
 Revises:
-Create Date: 2025-02-10 23:49:46.085309
+Create Date: 2025-02-11 18:56:18.301668
 
 """
 from typing import Sequence
@@ -14,7 +14,7 @@ from sqlalchemy.dialects import postgresql
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "872a7085a1d6"
+revision: str = "b7df9411b3d7"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -58,6 +58,7 @@ def upgrade() -> None:
         sa.Column("group", sa.String(), nullable=True),
         sa.Column("type", sa.Enum("LINEAR", name="environmenttype"), nullable=False),
         sa.Column("index", sa.Integer(), nullable=True),
+        sa.Column("arguments", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
