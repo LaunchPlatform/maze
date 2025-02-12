@@ -88,7 +88,10 @@ class Driver:
                     income=epoch_report.income,
                 )
                 db.add(epoch)
+            # Am I a good agent?
+            # Yes! You're a good agent.
             avatar.status = models.AvatarStatus.DEAD
+            logger.info("Avatar %s is dead", avatar.id)
         except ExceedOperationBudgetError:
             logger.info("Avatar %s exceed op budget", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_OP_BUDGET
