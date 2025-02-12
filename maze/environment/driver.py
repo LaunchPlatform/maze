@@ -22,10 +22,20 @@ class Driver:
             "Initializing db for template %s ...", self.template.__class__.__name__
         )
         with Session() as db:
-            if self.template.is_initialized(db):
+            experiment = (
+                db.query(models.Experiment)
+                .filter_by(name=self.template.experiment)
+                .with_for_update()
+            ).one_or_none()
+            if experiment is not None:
                 logger.info("Already initialized, skip")
                 return
-            environments = self.template.make_environments()
+            experiment = models.Experiment(name=self.template.experiment)
+            db.add(experiment)
+            db.flush()
+            db.refresh(experiment, with_for_update=True)
+
+            environments = self.template.make_environments(experiment)
             for environment in environments:
                 db.add(environment)
                 db.flush()

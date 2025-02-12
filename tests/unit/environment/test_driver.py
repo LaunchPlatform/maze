@@ -13,6 +13,7 @@ from maze.gene.symbols import SymbolType
 @pytest.fixture
 def env_template() -> EnvironmentTemplate:
     class Sample(LinearEnvironment):
+        experiment = "sample"
         count = 5
         group = "sample"
 
@@ -46,10 +47,14 @@ def env_template() -> EnvironmentTemplate:
 
 
 def test_initialize_db(db: Session, env_template: EnvironmentTemplate):
-    assert not env_template.is_initialized(db)
     driver = Driver(env_template)
     driver.initialize_db()
-    assert env_template.is_initialized(db)
+    experiment = (
+        db.query(models.Experiment)
+        .filter_by(name=env_template.experiment)
+        .one_or_none()
+    )
+    assert experiment is not None
     expected_zone_counts = [100, 50, 25, 10, 1]
     for index in range(env_template.count):
         env = (
@@ -57,6 +62,7 @@ def test_initialize_db(db: Session, env_template: EnvironmentTemplate):
         )
         expected_zone_count = expected_zone_counts[index]
         assert len(env.zones) == expected_zone_count
+        assert env.experiment == experiment
 
 
 def test_initialize_zones(db: Session, env_template: EnvironmentTemplate):

@@ -7,17 +7,14 @@ from .zone import EpochReport
 
 
 class EnvironmentTemplate:
-    def is_initialized(self, db: Session) -> bool:
-        """Check and see if the records in database initialized for this environment(s)
+    experiment: str
 
-        :param db: database session
-        :return: ture if it's already initialized
-        """
-        raise NotImplementedError
-
-    def make_environments(self) -> list[models.Environment]:
+    def make_environments(
+        self, experiment: models.Experiment
+    ) -> list[models.Environment]:
         """Called to make environments
 
+        :param experiment: the experiment this environment is attached to
         :return: a list of environments
         """
         raise NotImplementedError
@@ -68,15 +65,12 @@ class LinearEnvironment(EnvironmentTemplate):
     # the group name of the series of environments, making it much easier to query and found
     group: str
 
-    def is_initialized(self, db: Session) -> bool:
-        return (
-            db.query(models.Environment).filter_by(name=self.name(0)).one_or_none()
-            is not None
-        )
-
-    def make_environments(self) -> list[models.Environment]:
+    def make_environments(
+        self, experiment: models.Experiment
+    ) -> list[models.Environment]:
         return [
             models.Environment(
+                experiment=experiment,
                 type=models.EnvironmentType.LINEAR,
                 group=self.group,
                 index=index,

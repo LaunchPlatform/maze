@@ -46,6 +46,11 @@ class Environment(Base):
         back_populates="environment",
         order_by="Zone.index",
     )
+    experiment: Mapped["Experiment"] = relationship(
+        "Experiment",
+        back_populates="environments",
+        uselist=False,
+    )
 
     def __repr__(self) -> str:
         items = [
