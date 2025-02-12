@@ -30,7 +30,10 @@ class Driver:
                 db.add(environment)
                 db.flush()
                 logger.info(
-                    "Created environment %s (id=%s)", environment.name, environment.id
+                    "Created environment %s (id=%s), arguments=%s",
+                    environment.name,
+                    environment.id,
+                    environment.arguments,
                 )
             db.commit()
         logger.info("Initialized db for template %s", self.template.__class__.__name__)
@@ -75,6 +78,12 @@ class Driver:
 
     def run_avatar(self, avatar: models.Avatar):
         db = object_session(avatar)
+        logger.info(
+            "Running avatar %s in zone %s, arguments=%s",
+            avatar.id,
+            avatar.zone.display_name,
+            avatar.zone.environment.arguments,
+        )
         try:
             for epoch_report in self.template.run_avatar(avatar):
                 epoch = models.Epoch(
