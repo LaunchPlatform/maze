@@ -1,5 +1,4 @@
 import pytest
-from pydantic import TypeAdapter
 
 from maze.gene.symbols import build_lookup_table
 from maze.gene.symbols import LinearSymbol
