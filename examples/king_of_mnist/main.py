@@ -105,13 +105,13 @@ class KingOfMnist(LinearEnvironment):
         logger.info(
             "Built avatar %s model with build_cost=%s, op_cost=%s, parameters_count=%s",
             avatar.id,
-            format_number(avatar.agent.op_cost),
             format_number(avatar.agent.build_cost),
+            format_number(avatar.agent.op_cost),
             format_number(avatar.agent.parameters_count),
         )
         logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
 
-        reward = 10_000_000
+        reward = 100_000_000
         credit = 100_000_000
         for epoch in eval_agent(
             vehicle=vehicle,
