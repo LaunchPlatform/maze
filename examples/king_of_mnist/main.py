@@ -3,7 +3,9 @@ import logging
 import random
 import typing
 
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
+from sqlalchemy.orm import undefer
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -15,12 +17,11 @@ from maze.environment.vehicle import Vehicle
 from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
 from maze.environment.zone import OutOfCreditError
+from maze.gene.freq_table import gen_freq_table
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
 from maze.gene.symbols import SymbolType
-from maze.gene.utils import gen_symbol_table
-
 
 training_data = datasets.MNIST(
     root="data",
@@ -89,7 +90,7 @@ class KingOfMnist(LinearEnvironment):
         db = object_session(zone)
         for _ in range(zone.agent_slots):
             # TODO: do we really need this?
-            symbol_table = gen_symbol_table(
+            symbol_table = gen_freq_table(
                 symbols=list(SymbolType), random_range=(1, 1024)
             )
             gene_length = random.randint(5, 100)
@@ -166,7 +167,24 @@ class KingOfMnist(LinearEnvironment):
     def breed_agents(
         self, zone: models.Zone, old_period: models.Period, new_period: models.Period
     ) -> list[models.Agent]:
-        pass
+        db = object_session(zone)
+        total_credit = (
+            db.query(func.sum(models.Avatar.credit))
+            .filter(models.Avatar.zone == zone)
+            .filter(models.Avatar.status == models.AvatarStatus.DEAD)
+            .filter(models.Avatar.period == old_period)
+        ).scalar()
+        if total_credit is None:
+            return []
+        total_credit = float(total_credit)
+
+        total_slots = zone.agent_slots
+        offspring_slots = total_slots * 0.7
+
+        avg_slot_cost = total_credit / offspring_slots
+        for _ in range(int(offspring_slots)):
+            pass
+        print(total_slots, offspring_slots, avg_slot_cost)
 
     def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
         pass

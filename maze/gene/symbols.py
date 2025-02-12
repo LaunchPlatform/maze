@@ -1,12 +1,14 @@
 import dataclasses
 import enum
-import itertools
 import random
 import typing
-from bisect import bisect_right
 
 from pydantic import BaseModel
 from pydantic import TypeAdapter
+
+from maze.gene.freq_table import build_lookup_table
+from maze.gene.freq_table import LookupTable
+from maze.gene.freq_table import random_lookup
 
 
 @enum.unique
@@ -66,7 +68,6 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.SOFTMAX,
     SymbolType.TANH,
 ]
-LookupTable = list[tuple[int, SymbolType]]
 
 
 class SimpleSymbol(BaseSymbol):
@@ -117,31 +118,6 @@ class SymbolParameterRange:
 
 def is_symbol_type(symbol_type: SymbolType, symbol: Symbol) -> bool:
     return symbol.type == symbol_type
-
-
-def build_lookup_table(
-    symbol_table: dict[SymbolType, int],
-) -> LookupTable:
-    """Build table for looking up quickly when rolling a dice to decide which symbol to pick based on the frequency
-    table.
-
-    :param symbol_table: mapping symbols to frequency
-    :return: a list of (accumulated_freq, symbol) for looking up quickly by rolling a random int under sum(all freq)
-    """
-    symbol_freq = list((freq, symbol) for symbol, freq in symbol_table.items())
-    # sorting actually not needed, but do it anyway to make it more deterministic
-    symbol_freq.sort(key=lambda item: (item[0], item[1].value))
-    return list(
-        zip(
-            itertools.accumulate(freq for freq, _ in symbol_freq),
-            (symbol for _, symbol in symbol_freq),
-        )
-    )
-
-
-def random_lookup(lookup_table: LookupTable, random_number: int) -> SymbolType:
-    index = bisect_right(lookup_table, random_number, key=lambda item: item[0])
-    return lookup_table[index][1]
 
 
 def generate_random_symbol(

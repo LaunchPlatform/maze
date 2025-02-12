@@ -2,7 +2,6 @@ import logging
 import typing
 
 import click
-from sqlalchemy.testing.provision import drop_views
 
 from .. import models
 from ..db.session import Session
@@ -51,6 +50,7 @@ def main(env: CliEnvironment, template_cls: str):
                     break
                 driver.run_avatar(avatar)
                 db.commit()
+
             if not period.avatars.count():
                 logger.info("Did not process any avatar, nothing to run")
                 break

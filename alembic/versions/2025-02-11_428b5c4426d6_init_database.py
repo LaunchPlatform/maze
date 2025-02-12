@@ -156,7 +156,7 @@ def upgrade() -> None:
             server_default="ALIVE",
             nullable=False,
         ),
-        sa.Column("credit", sa.Integer(), server_default="0", nullable=False),
+        sa.Column("initial_credit", sa.Integer(), server_default="0", nullable=False),
         sa.Column("error", sa.String(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
