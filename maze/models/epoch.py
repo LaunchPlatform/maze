@@ -32,8 +32,8 @@ class Epoch(Base):
     train_data_size: Mapped[int] = mapped_column(Integer, nullable=False)
     test_correct_count: Mapped[int] = mapped_column(Integer, nullable=False)
     test_total_count: Mapped[int] = mapped_column(Integer, nullable=False)
-    cost: Mapped[int] = mapped_column(Integer, nullable=False)
-    income: Mapped[int] = mapped_column(Integer, nullable=False)
+    cost: Mapped[int] = mapped_column(Integer, nullable=True)
+    income: Mapped[int] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )

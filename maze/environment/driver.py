@@ -7,6 +7,7 @@ from ..db.session import Session
 from ..gene.builder import ExceedBuildBudgetError
 from ..gene.builder import ExceedOperationBudgetError
 from .templates import EnvironmentTemplate
+from .vehicle import NoParametersError
 from .zone import OutOfCreditError
 
 logger = logging.getLogger(__name__)
@@ -92,6 +93,9 @@ class Driver:
             # Yes! You're a good agent.
             avatar.status = models.AvatarStatus.DEAD
             logger.info("Avatar %s is dead", avatar.id)
+        except NoParametersError:
+            logger.info("Avatar %s has no parameter", avatar.id)
+            avatar.status = models.AvatarStatus.NO_PARAMETERS
         except ExceedOperationBudgetError:
             logger.info("Avatar %s exceed op budget", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_OP_BUDGET

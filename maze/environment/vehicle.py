@@ -13,6 +13,14 @@ from .agentdata import AgentData
 logger = logging.getLogger(__name__)
 
 
+class VehicleError(RuntimeError):
+    pass
+
+
+class NoParametersError(VehicleError):
+    pass
+
+
 def detect_device() -> str:
     if torch.cuda.is_available():
         return "cuda"
@@ -38,13 +46,18 @@ class Vehicle:
         self.model: Model | None = None
         self.torch_model: nn.Module | None = None
 
-    def build_models(self):
+    def build_models(self, allow_no_parameters: bool = False):
         self.model = build_models(
             symbols=iter(self.agent.symbols),
             input_shape=self.agent.input_shape,
             budget=self.budget,
         )
         self.torch_model = nn.Sequential(*self.model.modules).to(self.device)
+        if not allow_no_parameters and not self.parameter_count():
+            raise NoParametersError("PyTorch model has no parameter")
+
+    def parameter_count(self) -> int:
+        return sum(p.numel() for p in self.torch_model.parameters())
 
     def train(
         self, data_loader: DataLoader

@@ -34,8 +34,8 @@ class EpochReport:
     train_data_size: int
     test_correct_count: int
     test_total_count: int
-    cost: int
-    income: int | None
+    cost: int | None = None
+    income: int | None = None
 
 
 def format_number(value: int) -> str:
@@ -51,11 +51,7 @@ def eval_agent(
     train_dataloader: DataLoader,
     test_dataloader: DataLoader,
     epochs: int = 100,
-    basic_op_cost: int = 0,
-    credit: int | None = None,
-    calculate_income: typing.Callable | None = None,
 ) -> typing.Generator[EpochReport, None, None]:
-    remaining_credit = credit
     for epoch_idx in range(epochs):
         train_values = list(vehicle.train(train_dataloader))
         train_data_size = len(train_dataloader.dataset)
@@ -67,19 +63,8 @@ def eval_agent(
             train_data_size=train_data_size,
             test_correct_count=correct_count,
             test_total_count=total_count,
-            cost=vehicle.model.cost.operation + basic_op_cost,
-            income=(
-                calculate_income(correct_count=correct_count, total_count=total_count)
-                if calculate_income is not None
-                else None
-            ),
         )
         yield epoch_report
-
-        if remaining_credit is not None and epoch_report.income is not None:
-            remaining_credit += epoch_report.income - epoch_report.cost
-            if remaining_credit < 0:
-                raise OutOfCreditError("Agent runs out of credit")
 
 
 def run_agent(
