@@ -3,8 +3,12 @@ import typing
 
 import click
 
+from ..db.session import Session
+
+S = Session()
 from ..environment.driver import Driver
 from ..environment.templates import EnvironmentTemplate
+from .. import models
 from .cli import cli
 from .clienvironment import CliEnvironment
 from .clienvironment import pass_env
@@ -25,4 +29,14 @@ def main(env: CliEnvironment, template_cls: str):
     driver = Driver(template)
     driver.initialize_db()
     driver.initialize_zones()
-    # TODO: run agents
+    while True:
+        with Session() as db:
+            avatar = (
+                # TODO: limit in our environments or a particular zone
+                db.query(models.Avatar).filter(
+                    models.Avatar.status == models.AvatarStatus.ALIVE
+                )
+            ).first()
+            if avatar is None:
+                break
+            driver.run_avatar(avatar)
