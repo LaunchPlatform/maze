@@ -82,6 +82,7 @@ class LinearEnvironment(EnvironmentTemplate):
                 index=index,
                 name=self.name(index),
                 zones=self.make_zones(index),
+                arguments=self.make_arguments(index),
             )
             for index in range(self.count)
         ]
@@ -115,3 +116,10 @@ class LinearEnvironment(EnvironmentTemplate):
         :return: a list of Zones
         """
         raise NotImplementedError
+
+    def make_arguments(self, index: int) -> dict | None:
+        """Called to make the arguments of the environment for the given index.
+
+        :param index: index of the environment
+        :return: arguments for the environment
+        """

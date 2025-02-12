@@ -10,8 +10,8 @@ from ..environment.driver import Driver
 from ..environment.templates import EnvironmentTemplate
 from .. import models
 from .cli import cli
-from .clienvironment import CliEnvironment
-from .clienvironment import pass_env
+from .environment import CliEnvironment
+from .environment import pass_env
 from .utils import load_module_var
 
 logger = logging.getLogger(__name__)

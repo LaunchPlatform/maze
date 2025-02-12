@@ -7,6 +7,7 @@ from sqlalchemy import Enum
 from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import String
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -29,6 +30,7 @@ class Environment(Base):
     group: Mapped[str] = mapped_column(String, nullable=True)
     type: Mapped[EnvironmentType] = mapped_column(Enum(EnvironmentType), nullable=False)
     index: Mapped[int] = mapped_column(Integer, nullable=True)
+    arguments: Mapped[dict] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )

@@ -5,10 +5,10 @@ import click
 from rich.logging import Console
 from rich.logging import RichHandler
 
-from .clienvironment import CliEnvironment
-from .clienvironment import LOG_LEVEL_MAP
-from .clienvironment import LogLevel
-from .clienvironment import pass_env
+from .environment import CliEnvironment
+from .environment import LOG_LEVEL_MAP
+from .environment import LogLevel
+from .environment import pass_env
 
 
 @click.group(help="Command line tools for MAZE")
