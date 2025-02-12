@@ -106,4 +106,3 @@ class Driver:
             logger.info("Avatar %s runs out of credit", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_CREDIT
             db.add(avatar)
-        db.commit()

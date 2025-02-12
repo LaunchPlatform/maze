@@ -150,8 +150,8 @@ def upgrade() -> None:
         sa.Column("train_data_size", sa.Integer(), nullable=False),
         sa.Column("test_correct_count", sa.Integer(), nullable=False),
         sa.Column("test_total_count", sa.Integer(), nullable=False),
-        sa.Column("cost", sa.Integer(), nullable=False),
-        sa.Column("income", sa.Integer(), nullable=False),
+        sa.Column("cost", sa.Integer(), nullable=True),
+        sa.Column("income", sa.Integer(), nullable=True),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(
             ["avatar_id"],

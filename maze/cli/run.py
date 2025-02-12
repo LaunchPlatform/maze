@@ -40,3 +40,4 @@ def main(env: CliEnvironment, template_cls: str):
             if avatar is None:
                 break
             driver.run_avatar(avatar)
+            db.commit()
