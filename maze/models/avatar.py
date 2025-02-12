@@ -96,7 +96,13 @@ class Avatar(Base):
     def __declare_last__(cls):
         from .epoch import Epoch
 
+        total_credit_delta = (
+            select(func.sum(Epoch.income - Epoch.cost))
+            .where(Epoch.avatar_id == cls.id)
+            .correlate_except(Epoch)
+            .scalar_subquery()
+        )
         cls.credit = column_property(
-            select([func.sum(Epoch.income - Epoch.cost)]).where(Epoch.avatar_id == id),
+            cls.initial_credit + total_credit_delta,
             deferred=True,
         )
