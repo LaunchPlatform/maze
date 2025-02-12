@@ -1,4 +1,5 @@
 import random
+import typing
 
 from sqlalchemy.orm import object_session
 from torch import nn
@@ -9,6 +10,7 @@ from torchvision.transforms import ToTensor
 from maze import models
 from maze.environment.templates import LinearEnvironment
 from maze.environment.vehicle import Vehicle
+from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
@@ -76,9 +78,11 @@ class KingOfMnist(LinearEnvironment):
             )
             db.add(avatar)
 
-    def run_avatar(self, avatar: models.Avatar):
+    def run_avatar(
+        self, avatar: models.Avatar
+    ) -> typing.Generator[EpochReport, None, None]:
         vehicle = Vehicle(
-            agent=avatar.agent_data,
+            agent=avatar.agent.agent_data,
             loss_fn=nn.CrossEntropyLoss(),
         )
         vehicle.build_models()
@@ -87,7 +91,7 @@ class KingOfMnist(LinearEnvironment):
             train_dataloader=train_dataloader,
             test_dataloader=test_dataloader,
         ):
-            print(epoch)
+            yield epoch
 
     def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
         pass

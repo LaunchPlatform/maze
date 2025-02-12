@@ -1,6 +1,9 @@
+import typing
+
 from sqlalchemy.orm import Session
 
 from .. import models
+from .zone import EpochReport
 
 
 class EnvironmentTemplate:
@@ -30,6 +33,31 @@ class EnvironmentTemplate:
         """Called to initialize zone, usually for populating it with initial random agents
 
         :param zone: zone to initialize
+        """
+        raise NotImplementedError
+
+    def run_avatar(
+        self, avatar: models.Avatar
+    ) -> typing.Generator[EpochReport, None, None]:
+        """Called to run an avatar (agent in a zone)
+
+        :param avatar: avatar to run
+        """
+        raise NotImplementedError
+
+    def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
+        """Called to breed new agents to be inserted into the zone after a period finished.
+
+        :param zone: zone to breed agents
+        :return: a list of offspring agents
+        """
+        raise NotImplementedError
+
+    def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
+        """Called to promote agents into the next environments after a period finished.
+
+        :param zone: zone to promote agents from
+        :return: a list of agents to promote
         """
         raise NotImplementedError
 
@@ -85,28 +113,5 @@ class LinearEnvironment(EnvironmentTemplate):
 
         :param index: index of the environment
         :return: a list of Zones
-        """
-        raise NotImplementedError
-
-    def run_avatar(self, avatar: models.Avatar):
-        """Called to run an avatar (agent in a zone)
-
-        :param avatar: avatar to run
-        """
-        raise NotImplementedError
-
-    def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
-        """Called to breed new agents to be inserted into the zone after a period finished.
-
-        :param zone: zone to breed agents
-        :return: a list of offspring agents
-        """
-        raise NotImplementedError
-
-    def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
-        """Called to promote agents into the next environments after a period finished.
-
-        :param zone: zone to promote agents from
-        :return: a list of agents to promote
         """
         raise NotImplementedError

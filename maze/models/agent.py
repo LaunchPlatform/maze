@@ -14,6 +14,8 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from ..db.base import Base
+from ..environment.agentdata import AgentData
+from ..gene.symbols import symbols_adapter
 from .helpers import make_repr_attrs
 
 
@@ -84,3 +86,10 @@ class Agent(Base):
             ("symbol_table", self.symbol_table),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
+
+    @property
+    def agent_data(self) -> AgentData:
+        return AgentData(
+            symbols=symbols_adapter.validate_python(self.gene),
+            input_shape=tuple(self.input_shape),
+        )
