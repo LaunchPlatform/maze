@@ -22,11 +22,11 @@ class Experiment(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
-    environments: Mapped["Environment"] = relationship(
+    environments: Mapped[list["Environment"]] = relationship(
         "Environment",
         back_populates="experiment",
     )
-    periods: Mapped["Period"] = relationship(
+    periods: Mapped[list["Period"]] = relationship(
         "Period",
         back_populates="experiment",
     )

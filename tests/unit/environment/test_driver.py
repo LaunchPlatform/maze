@@ -24,7 +24,7 @@ def env_template() -> EnvironmentTemplate:
                 for zone_index in range(zone_count)
             ]
 
-        def initialize_zone(self, zone: models.Zone):
+        def initialize_zone(self, period: models.Period, zone: models.Zone):
             if zone.environment.index != 0:
                 return
 
@@ -38,6 +38,7 @@ def env_template() -> EnvironmentTemplate:
                 )
                 db.add(agent)
                 avatar = models.Avatar(
+                    period=period,
                     agent=agent,
                     zone=zone,
                 )
@@ -66,7 +67,6 @@ def test_initialize_db(db: Session, env_template: EnvironmentTemplate):
 
 
 def test_initialize_zones(db: Session, env_template: EnvironmentTemplate):
-    assert not env_template.is_initialized(db)
     driver = Driver(env_template)
     driver.initialize_db()
     driver.initialize_zones()

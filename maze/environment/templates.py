@@ -26,9 +26,10 @@ class EnvironmentTemplate:
         """
         raise NotImplementedError
 
-    def initialize_zone(self, zone: models.Zone):
+    def initialize_zone(self, period: models.Period, zone: models.Zone):
         """Called to initialize zone, usually for populating it with initial random agents
 
+        :param period: the first period
         :param zone: zone to initialize
         """
         raise NotImplementedError

@@ -45,6 +45,8 @@ class Driver:
                     environment.id,
                     environment.arguments,
                 )
+            period = models.Period(experiment=experiment, index=0)
+            db.add(period)
             db.commit()
         logger.info("Initialized db for template %s", self.template.__class__.__name__)
 
@@ -53,6 +55,12 @@ class Driver:
             "Initializing zones for template %s ...", self.template.__class__.__name__
         )
         with Session() as db:
+            experiment = (
+                db.query(models.Experiment)
+                .filter_by(name=self.template.experiment)
+                .one()
+            )
+            period = experiment.periods[0]
             for environment in self.template.environments(db):
                 for zone in environment.zones:
                     if zone.initialized:
@@ -75,7 +83,7 @@ class Driver:
                     logger.info(
                         "Initializing zone %s (id=%s) ...", zone.display_name, zone.id
                     )
-                    self.template.initialize_zone(zone)
+                    self.template.initialize_zone(period, zone)
                     zone.initialized = True
                     db.add(zone)
                     db.commit()

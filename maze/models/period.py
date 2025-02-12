@@ -36,7 +36,7 @@ class Period(Base):
         back_populates="periods",
         uselist=False,
     )
-    avatars: Mapped["Avatar"] = relationship(
+    avatars: Mapped[list["Avatar"]] = relationship(
         "Avatar",
         back_populates="period",
     )
