@@ -89,6 +89,7 @@ class Driver:
                     income=epoch_report.income,
                 )
                 db.add(epoch)
+                # TODO: logs?
             # Am I a good agent?
             # Yes! You're a good agent.
             avatar.status = models.AvatarStatus.DEAD

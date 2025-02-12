@@ -1,3 +1,4 @@
+import logging
 import random
 import typing
 
@@ -12,11 +13,13 @@ from maze.environment.templates import LinearEnvironment
 from maze.environment.vehicle import Vehicle
 from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
+from maze.environment.zone import OutOfCreditError
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
 from maze.gene.symbols import SymbolType
 from maze.gene.utils import gen_symbol_table
+
 
 training_data = datasets.MNIST(
     root="data",
@@ -35,6 +38,10 @@ test_data = datasets.MNIST(
 batch_size = 64
 train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
+
+
+def format_number(value: int) -> str:
+    return f"{value:,}"
 
 
 class KingOfMnist(LinearEnvironment):
@@ -81,16 +88,45 @@ class KingOfMnist(LinearEnvironment):
     def run_avatar(
         self, avatar: models.Avatar
     ) -> typing.Generator[EpochReport, None, None]:
+        db = object_session(avatar)
+        logger = logging.getLogger(__name__)
+
         vehicle = Vehicle(
             agent=avatar.agent.agent_data,
             loss_fn=nn.CrossEntropyLoss(),
         )
         vehicle.build_models()
+
+        # TODO: DRY these?
+        avatar.agent.op_cost = vehicle.model.cost.operation
+        avatar.agent.build_cost = vehicle.model.cost.build
+        avatar.agent.parameters_count = vehicle.parameter_count()
+        db.add(avatar.agent)
+        logger.info(
+            "Built avatar %s model with build_cost=%s, op_cost=%s, parameters_count=%s",
+            avatar.id,
+            format_number(avatar.agent.op_cost),
+            format_number(avatar.agent.build_cost),
+            format_number(avatar.agent.parameters_count),
+        )
+        logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
+
+        reward = 10_000_000
+        credit = 100_000_000
         for epoch in eval_agent(
             vehicle=vehicle,
             train_dataloader=train_dataloader,
             test_dataloader=test_dataloader,
+            epochs=100,
         ):
+            epoch.cost = avatar.agent.op_cost + 10_000
+            epoch.income = int(
+                reward * (epoch.test_correct_count / epoch.test_total_count)
+            )
+            credit += epoch.income - epoch.cost
+            logger.info("Avatar remaining credit: %s", format_number(credit))
+            if credit < 0:
+                raise OutOfCreditError("Out of credit")
             yield epoch
 
     def breed_agents(self, zone: models.Zone) -> list[models.Agent]:
