@@ -191,9 +191,12 @@ class KingOfMnist(LinearEnvironment):
             lhs = random_lookup(lookup_table)
             # TODO: avoid self mating
             rhs = random_lookup(lookup_table)
-            lhs_gene = symbols_adapter.validate_python(lhs.gene)
-            rhs_gene = symbols_adapter.validate_python(rhs.gene)
-            gene = merge_gene(lhs_gene, rhs_gene, jiter_config=JiterConfig())
+            lhs_gene = lhs.agent_data.symbols
+            rhs_gene = rhs.agent_data.symbols
+            gene = list(merge_gene(lhs_gene, rhs_gene, jiter_config=JiterConfig()))
+            print("$", lhs_gene)
+            print("$", rhs_gene)
+            print("=", gene)
             new_agent = models.Agent(
                 lhs_parent=lhs,
                 rhs_parent=rhs,
