@@ -31,7 +31,7 @@ class Experiment(Base):
     periods: DynamicMapped["Period"] = relationship(
         "Period",
         back_populates="experiment",
-        order_by="Environment.index",
+        order_by="Period.index",
     )
 
     def __repr__(self) -> str:
