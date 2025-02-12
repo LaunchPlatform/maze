@@ -42,6 +42,11 @@ class Avatar(Base):
         ForeignKey("zone.id"),
         nullable=False,
     )
+    period_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("period.id"),
+        nullable=False,
+    )
     status: Mapped[AvatarStatus] = mapped_column(
         Enum(AvatarStatus),
         default=AvatarStatus.ALIVE,

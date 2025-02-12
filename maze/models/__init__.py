@@ -4,6 +4,8 @@ from .avatar import AvatarStatus
 from .environment import Environment
 from .environment import EnvironmentType
 from .epoch import Epoch
+from .experiment import Experiment
 from .mutation import Mutation
 from .mutation import MutationType
+from .period import Period
 from .zone import Zone
