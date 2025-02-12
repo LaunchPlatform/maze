@@ -24,7 +24,7 @@ def env_template() -> EnvironmentTemplate:
                 for zone_index in range(zone_count)
             ]
 
-        def initialize_zone(self, period: models.Period, zone: models.Zone):
+        def initialize_zone(self, zone: models.Zone, period: models.Period):
             if zone.environment.index != 0:
                 return
 

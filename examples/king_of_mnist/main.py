@@ -75,7 +75,7 @@ class KingOfMnist(LinearEnvironment):
         reward = to_millions([100, 90, 80, 70, 60])[index]
         return dataclasses.asdict(
             Arguments(
-                epoch=[10, 25, 50, 75, 100][index],
+                epoch=[1, 3, 5, 7, 9][index],
                 initial_credit=100 * mi,
                 basic_cost=basic_cost,
                 reward=reward,

@@ -1,14 +1,12 @@
 import datetime
 import uuid
 
-from sqlalchemy import ARRAY
 from sqlalchemy import DateTime
-from sqlalchemy import Float
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
-from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import DynamicMapped
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -36,7 +34,7 @@ class Period(Base):
         back_populates="periods",
         uselist=False,
     )
-    avatars: Mapped[list["Avatar"]] = relationship(
+    avatars: DynamicMapped["Avatar"] = relationship(
         "Avatar",
         back_populates="period",
     )
@@ -48,3 +46,7 @@ class Period(Base):
             ("index", self.index),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
+
+    @property
+    def display_name(self) -> str:
+        return f"{self.experiment.name}.periods[{self.index}]"

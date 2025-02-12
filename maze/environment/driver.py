@@ -17,16 +17,22 @@ class Driver:
     def __init__(self, template: EnvironmentTemplate):
         self.template = template
 
+    def get_experiment(
+        self, db: Session, lock: bool = False
+    ) -> models.Experiment | None:
+        experiment = db.query(models.Experiment).filter_by(
+            name=self.template.experiment
+        )
+        if lock:
+            experiment = experiment.with_for_update()
+        return experiment.one_or_none()
+
     def initialize_db(self):
         logger.info(
             "Initializing db for template %s ...", self.template.__class__.__name__
         )
         with Session() as db:
-            experiment = (
-                db.query(models.Experiment)
-                .filter_by(name=self.template.experiment)
-                .with_for_update()
-            ).one_or_none()
+            experiment = self.get_experiment(db, lock=True)
             if experiment is not None:
                 logger.info("Already initialized, skip")
                 return
@@ -55,11 +61,7 @@ class Driver:
             "Initializing zones for template %s ...", self.template.__class__.__name__
         )
         with Session() as db:
-            experiment = (
-                db.query(models.Experiment)
-                .filter_by(name=self.template.experiment)
-                .one()
-            )
+            experiment = self.get_experiment(db)
             period = experiment.periods.one()
             for environment in self.template.environments(db):
                 for zone in environment.zones:

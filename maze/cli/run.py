@@ -31,13 +31,21 @@ def main(env: CliEnvironment, template_cls: str):
     driver.initialize_zones()
     while True:
         with Session() as db:
+            experiment = driver.get_experiment(db)
+            period = (
+                experiment.periods.order_by(None)
+                .order_by(models.Period.index.desc())
+                .first()
+            )
             avatar = (
-                # TODO: limit in our environments or a particular zone
-                db.query(models.Avatar).filter(
-                    models.Avatar.status == models.AvatarStatus.ALIVE
-                )
+                period.avatars.filter_by(
+                    status=models.AvatarStatus.ALIVE
+                ).with_for_update()
             ).first()
             if avatar is None:
+                logger.info(
+                    "No more alive avatar found for period %s", period.display_name
+                )
                 break
             driver.run_avatar(avatar)
             db.commit()
