@@ -10,7 +10,7 @@ from pydantic import TypeAdapter
 
 
 @enum.unique
-class SymbolType(enum.Enum):
+class SymbolType(enum.StrEnum):
     # branch out the following gene till BRANCH_STOP
     BRANCH_START = "BRANCH_START"
     # marker for different segment of branch

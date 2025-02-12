@@ -53,6 +53,16 @@ def test_serialization(
                 LinearSymbol(bias=True, out_features=1234),
             ],
         ),
+        (
+            [
+                dict(type=SymbolType.RELU.value),
+                dict(type=SymbolType.LINEAR.value, bias=True, out_features=1234),
+            ],
+            [
+                SimpleSymbol(type=SymbolType.RELU),
+                LinearSymbol(bias=True, out_features=1234),
+            ],
+        ),
     ],
 )
 def test_deserialization(
