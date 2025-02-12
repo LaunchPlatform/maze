@@ -3,9 +3,7 @@ import logging
 import random
 import typing
 
-from sqlalchemy import func
 from sqlalchemy.orm import object_session
-from sqlalchemy.orm import undefer
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -20,6 +18,8 @@ from maze.environment.zone import OutOfCreditError
 from maze.gene.freq_table import build_lookup_table
 from maze.gene.freq_table import gen_freq_table
 from maze.gene.freq_table import random_lookup
+from maze.gene.merge import JiterConfig
+from maze.gene.merge import merge_gene
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
@@ -186,11 +186,23 @@ class KingOfMnist(LinearEnvironment):
         total_slots = zone.agent_slots
         offspring_slots = total_slots * 0.7
 
+        offspring_agents = []
         for _ in range(int(offspring_slots)):
             lhs = random_lookup(lookup_table)
             # TODO: avoid self mating
             rhs = random_lookup(lookup_table)
-            print(lhs, rhs)
+            gene = merge_gene(lhs.gene, rhs.gene, jiter_config=JiterConfig())
+            new_agent = models.Agent(
+                lhs_parent=lhs,
+                rhs_parent=rhs,
+                gene=gene,
+                input_shape=lhs.input_shape,
+                # TODO: remove this?
+                symbol_table={},
+            )
+            offspring_agents.append(new_agent)
+        print("@" * 10, offspring_agents)
+        return offspring_agents
 
     def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
         pass
