@@ -83,7 +83,7 @@ class Driver:
                     logger.info(
                         "Initializing zone %s (id=%s) ...", zone.display_name, zone.id
                     )
-                    self.template.initialize_zone(period, zone)
+                    self.template.initialize_zone(zone, period)
                     zone.initialized = True
                     db.add(zone)
                     db.commit()
