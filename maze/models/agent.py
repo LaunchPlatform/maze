@@ -82,8 +82,6 @@ class Agent(Base):
             ("id", self.id),
             ("lhs_parent_id", self.lhs_parent_id),
             ("rhs_parent_id", self.rhs_parent_id),
-            ("gene", repr(self.gene)),
-            ("symbol_table", self.symbol_table),
         ]
         return f"<{self.__class__.__name__} {make_repr_attrs(items)}>"
 

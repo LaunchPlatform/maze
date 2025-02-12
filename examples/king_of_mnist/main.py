@@ -17,7 +17,9 @@ from maze.environment.vehicle import Vehicle
 from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
 from maze.environment.zone import OutOfCreditError
+from maze.gene.freq_table import build_lookup_table
 from maze.gene.freq_table import gen_freq_table
+from maze.gene.freq_table import random_lookup
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
@@ -168,23 +170,27 @@ class KingOfMnist(LinearEnvironment):
         self, zone: models.Zone, old_period: models.Period, new_period: models.Period
     ) -> list[models.Agent]:
         db = object_session(zone)
-        total_credit = (
-            db.query(func.sum(models.Avatar.credit))
+
+        agent_credits = (
+            db.query(models.Agent, models.Avatar.credit)
+            .select_from(models.Agent)
+            .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
             .filter(models.Avatar.zone == zone)
             .filter(models.Avatar.status == models.AvatarStatus.DEAD)
             .filter(models.Avatar.period == old_period)
-        ).scalar()
-        if total_credit is None:
+        ).all()
+        if not agent_credits:
             return []
-        total_credit = float(total_credit)
 
+        lookup_table = build_lookup_table(agent_credits)
         total_slots = zone.agent_slots
         offspring_slots = total_slots * 0.7
 
-        avg_slot_cost = total_credit / offspring_slots
         for _ in range(int(offspring_slots)):
-            pass
-        print(total_slots, offspring_slots, avg_slot_cost)
+            lhs = random_lookup(lookup_table)
+            # TODO: avoid self mating
+            rhs = random_lookup(lookup_table)
+            print(lhs, rhs)
 
     def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
         pass

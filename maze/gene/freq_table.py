@@ -18,7 +18,7 @@ def build_lookup_table(
     """
     symbol_freq = list((freq, symbol) for symbol, freq in freq_table)
     # sorting actually not needed, but do it anyway to make it more deterministic
-    symbol_freq.sort(key=lambda item: (item[0], item[1].value))
+    symbol_freq.sort(key=lambda item: (item[0], item[1]))
     return list(
         zip(
             itertools.accumulate(freq for freq, _ in symbol_freq),
@@ -28,8 +28,13 @@ def build_lookup_table(
 
 
 def random_lookup(
-    lookup_table: LookupTable, random_number: int, return_index: bool = False
+    lookup_table: LookupTable,
+    random_number: int | None = None,
+    return_index: bool = False,
 ) -> typing.Any | int:
+    if random_number is None:
+        upper_val = lookup_table[-1][0]
+        random_number = random.randrange(0, upper_val)
     index = bisect_right(lookup_table, random_number, key=lambda item: item[0])
     if return_index:
         return index
