@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import random
 import typing
@@ -40,8 +41,20 @@ train_dataloader = DataLoader(training_data, batch_size=batch_size)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
+@dataclasses.dataclass(frozen=True)
+class Arguments:
+    epoch: int
+    initial_credit: int
+    basic_cost: int
+    reward: int
+
+
 def format_number(value: int) -> str:
     return f"{value:,}"
+
+
+def to_millions(l: list[int]) -> list[int]:
+    return list(map(lambda x: x * 1_000_000, l))
 
 
 class KingOfMnist(LinearEnvironment):
@@ -54,6 +67,19 @@ class KingOfMnist(LinearEnvironment):
             models.Zone(agent_slots=100, index=zone_index)
             for zone_index in range(zone_count)
         ]
+
+    def make_arguments(self, index: int) -> dict | None:
+        mi = 1_000_000
+        basic_cost = to_millions([1, 2, 3, 4, 5])[index]
+        reward = to_millions([100, 90, 80, 70, 60])[index]
+        return dataclasses.asdict(
+            Arguments(
+                epoch=[10, 25, 50, 75, 100][index],
+                initial_credit=100 * mi,
+                basic_cost=basic_cost,
+                reward=reward,
+            )
+        )
 
     def initialize_zone(self, zone: models.Zone):
         if zone.environment.index != 0:
@@ -90,6 +116,7 @@ class KingOfMnist(LinearEnvironment):
     ) -> typing.Generator[EpochReport, None, None]:
         db = object_session(avatar)
         logger = logging.getLogger(__name__)
+        args = Arguments(**avatar.zone.environment.arguments)
 
         vehicle = Vehicle(
             agent=avatar.agent.agent_data,
@@ -111,18 +138,16 @@ class KingOfMnist(LinearEnvironment):
         )
         logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
 
-        reward = 100_000_000
-        credit = 100_000_000
-        epoch_cost = 2_000_000
+        credit = args.initial_credit
         for epoch in eval_agent(
             vehicle=vehicle,
             train_dataloader=train_dataloader,
             test_dataloader=test_dataloader,
-            epochs=100,
+            epochs=args.epoch,
         ):
-            epoch.cost = avatar.agent.op_cost + epoch_cost
+            epoch.cost = avatar.agent.op_cost + args.basic_cost
             epoch.income = int(
-                reward * (epoch.test_correct_count / epoch.test_total_count)
+                args.reward * (epoch.test_correct_count / epoch.test_total_count)
             )
             credit += epoch.income - epoch.cost
             logger.info("Avatar remaining credit: %s", format_number(credit))
