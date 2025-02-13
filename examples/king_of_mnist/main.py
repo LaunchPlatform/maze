@@ -214,5 +214,47 @@ class KingOfMnist(LinearEnvironment):
             offspring_agents.append(new_agent)
         return offspring_agents
 
-    def promote_agents(self, zone: models.Zone) -> list[models.Agent]:
-        pass
+    def promote_agents(
+        self,
+        from_env: models.Environment | None,
+        to_env: models.Environment,
+        period: models.Period,
+        agent_count: int,
+    ) -> list[models.Agent]:
+        db = object_session(from_env)
+        agents = []
+        if from_env is None:
+            # no source env, it means this is the first env.
+            # let's fill the slots with random new ones
+            for _ in range(agent_count):
+                # TODO: do we really need this?
+                symbol_table = gen_freq_table(
+                    symbols=list(SymbolType), random_range=(1, 1024)
+                )
+                gene_length = random.randint(5, 100)
+                symbols = list(
+                    generate_gene(
+                        symbol_table=symbol_table,
+                        length=gene_length,
+                        param_range=SymbolParameterRange(),
+                    )
+                )
+                agent = models.Agent(
+                    gene=symbols_adapter.dump_python(symbols, mode="json"),
+                    symbol_table={},
+                    input_shape=[28, 28],
+                )
+                agents.append(agent)
+            return agents
+        return (
+            (
+                db.query(models.Agent)
+                .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
+                .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
+                .filter(models.Zone.environment == from_env)
+                .filter(models.Avatar.credit > 0)
+                .order_by(models.Avatar.credit.desc())
+            )
+            .limit(agent_count)
+            .all()
+        )
