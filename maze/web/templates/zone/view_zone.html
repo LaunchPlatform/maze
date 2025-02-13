@@ -21,7 +21,7 @@
 
 <h1>Zone: {{ zone.display_name }}</h1>
 
-{% for period in zone.environment.experiment.periods %}
+{% for period in zone.environment.experiment.periods.order_by(models.Period.index.desc()) %}
 
 <h2>Period: {{ period.index }}</h2>
 
@@ -30,6 +30,7 @@
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Status</th>
+      <th scope="col" class="text-end">Initial Credit</th>
       <th scope="col" class="text-end">Credit</th>
     </tr>
   </thead>
@@ -41,6 +42,9 @@
       </th>
       <td>
         {{ avatar.status.value }}
+      </td>
+      <td class="text-end">
+        {{ avatar.initial_credit | format_int | default('', true) }}
       </td>
       <td class="text-end">
         {{ avatar.credit | format_int | default('', true) }}
