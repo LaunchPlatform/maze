@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+  View avatar {{ avatar.id }}
+{% endblock %}
+
+{% block content %}
+<h1>Avatar: {{ avatar.id }}</h1>
+
+<dl>
+  <dt>ID</dt>
+  <dd>{{ avatar.id }}</dd>
+
+  <dt>Status</dt>
+  <dd>{{ avatar.status.value }}</dd>
+
+  <dt>Initial credit</dt>
+  <dd>{{ avatar.initial_credit }}</dd>
+
+  <dt>Zone</dt>
+  <dd><a href="{{ url_for('view_zone', id=avatar.zone_id) }}">{{ avatar.zone.display_name}}</a></dd>
+
+  <dt>Period</dt>
+  <dd><a href="#">{{ avatar.period.index}}</a></dd>
+
+  <dt>Agent</dt>
+  <dd><a href="#">{{ avatar.agent_id }}</a></dd>
+</dl>
+
+{% endblock content %}

@@ -14,7 +14,7 @@ Avatars:
 <ul>
   {% for avatar in zone.avatars %}
   <li>
-    <div>{{ avatar.id }}, status={{ avatar.status.value }}</div>
+    <div><a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}, status={{ avatar.status.value }}</a></div>
   </li>
   {% endfor %}
 </ul>
