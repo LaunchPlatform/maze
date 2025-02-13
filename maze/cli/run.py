@@ -38,10 +38,16 @@ def main(env: CliEnvironment, template_cls: str):
             logger.info("Processing period %s", period.display_name)
             while True:
                 avatar = (
-                    period.avatars.filter_by(
-                        status=models.AvatarStatus.ALIVE,
-                        # TODO: add skip lock for concurrent processing
-                    ).with_for_update()
+                    db.query(models.Avatar)
+                    .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
+                    .join(
+                        models.Environment,
+                        models.Zone.environment_id == models.Environment.id,
+                    )
+                    .filter(models.Avatar.period == period)
+                    .filter(models.Avatar.status == models.AvatarStatus.ALIVE)
+                    .order_by(models.Environment.index, models.Zone.index)
+                    .with_for_update(of=models.Avatar, skip_locked=True)
                 ).first()
                 if avatar is None:
                     logger.info(
