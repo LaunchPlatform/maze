@@ -54,6 +54,24 @@ def main(env: CliEnvironment, template_cls: str):
             if not period.avatars.count():
                 logger.info("Did not process any avatar, nothing to run")
                 break
+            # lock period
+            db.refresh(period, with_for_update=True)
+            new_period = (
+                db.query(models.Period)
+                .filter_by(
+                    experiment=experiment,
+                    index=period.index + 1,
+                )
+                .one_or_none()
+            )
+            if new_period is not None:
+                logger.info(
+                    "New period %s already created by someone else, let's continue processing",
+                    new_period.display_name,
+                )
+                period = new_period
+                db.rollback()
+                continue
             # TODO: extract this into driver?
             new_period = models.Period(
                 experiment=experiment,
