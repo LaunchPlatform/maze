@@ -180,6 +180,7 @@ class KingOfMnist(LinearEnvironment):
             .filter(models.Avatar.zone == zone)
             .filter(models.Avatar.status == models.AvatarStatus.DEAD)
             .filter(models.Avatar.period == period)
+            .filter(models.Avatar.credit > 0)
         ).all()
         if len(agent_credits) <= 1:
             return []

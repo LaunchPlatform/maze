@@ -142,7 +142,11 @@ class Driver:
         for environment in self.template.environments(db):
             for zone in environment.zones:
                 new_agents = self.template.breed_agents(
-                    zone=zone, period=old_period,
+                    zone=zone,
+                    period=old_period,
+                )
+                logger.info(
+                    "Zone %s breed new %s agents", zone.display_name, len(new_agents)
                 )
                 for agent in new_agents:
                     avatar = models.Avatar(
