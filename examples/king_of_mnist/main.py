@@ -216,13 +216,13 @@ class KingOfMnist(LinearEnvironment):
 
     def promote_agents(
         self,
-        from_env: models.Environment | None,
+        environment: models.Environment | None,
         period: models.Period,
         agent_count: int,
     ) -> list[models.Agent]:
-        db = object_session(from_env)
+        db = object_session(period)
         agents = []
-        if from_env is None:
+        if environment is None:
             # no source env, it means this is the first env.
             # let's fill the slots with random new ones
             for _ in range(agent_count):
@@ -250,9 +250,10 @@ class KingOfMnist(LinearEnvironment):
                 db.query(models.Agent)
                 .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
                 .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
-                .filter(models.Zone.environment == from_env)
+                .filter(models.Zone.environment == environment)
                 .filter(models.Avatar.period == period)
                 .filter(models.Avatar.credit > 0)
+                .filter(models.Avatar.status == models.AvatarStatus.DEAD)
                 .order_by(models.Avatar.credit.desc())
             )
             .limit(agent_count)

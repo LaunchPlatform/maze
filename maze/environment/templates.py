@@ -58,13 +58,13 @@ class EnvironmentTemplate:
 
     def promote_agents(
         self,
-        from_env: models.Environment | None,
+        environment: models.Environment | None,
         period: models.Period,
         agent_count: int,
     ) -> list[models.Agent]:
         """Called to promote agents into the next environments after a period finished.
 
-        :param from_env: environment to promote agents from
+        :param environment: environment to promote agents from, None indicates we are promoting to the first env.
         :param period: the current period
         :param agent_count: count of agent to promote (available slots in the to_env)
         :return: a list of agents to promote

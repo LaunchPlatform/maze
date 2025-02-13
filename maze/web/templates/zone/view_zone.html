@@ -30,6 +30,8 @@
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Status</th>
+      <th scope="col" class="text-end">Op Cost</th>
+      <th scope="col" class="text-end">Parameters</th>
       <th scope="col" class="text-end">Initial Credit</th>
       <th scope="col" class="text-end">Credit</th>
     </tr>
@@ -42,6 +44,12 @@
       </th>
       <td>
         {{ avatar.status.value }}
+      </td>
+      <td class="text-end">
+        {{ avatar.agent.op_cost | format_int | default('', true) }}
+      </td>
+      <td class="text-end">
+        {{ avatar.agent.parameters_count | format_int | default('', true) }}
       </td>
       <td class="text-end">
         {{ avatar.initial_credit | format_int | default('', true) }}

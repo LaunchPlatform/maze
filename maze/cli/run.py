@@ -63,6 +63,7 @@ def main(env: CliEnvironment, template_cls: str):
             db.flush()
             logger.info("Created new period %s", new_period.display_name)
             driver.breed_next_gen(old_period=period, new_period=new_period)
+            db.flush()
             driver.promote_agents(old_period=period, new_period=new_period)
             period = new_period
             db.commit()

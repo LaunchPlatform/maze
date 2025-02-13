@@ -167,23 +167,28 @@ class Driver:
         prev_env = None
         for environment in self.template.environments(db):
             # count new avatars already created by breeding or other process before this
-            new_avatar_count = new_period.avatars.filter(
-                models.Avatar.period == new_period
+            new_avatar_count = (
+                db.query(models.Avatar)
+                .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
+                .filter(models.Avatar.period == new_period)
+                .filter(models.Zone.environment == environment)
             ).count()
-            total_zone_slots = environment.zones.with_entities(
-                func.sum(models.Zone.agent_slots)
+            total_zone_slots = (
+                db.query(func.sum(models.Zone.agent_slots))
+                .select_from(models.Zone)
+                .filter(models.Zone.environment == environment)
             ).scalar()
             available_slots = total_zone_slots - new_avatar_count
             logger.info(
-                "Environment %s (period %s) promoting agents to %s (period %s) to %s with %s slots",
-                prev_env.name,
+                "Environment %s (period %s) promoting agents to %s (period %s) with %s slots",
+                prev_env.name if prev_env is not None else "<None>",
                 old_period.index,
                 environment.name,
                 new_period.index,
                 available_slots,
             )
             new_agents = self.template.promote_agents(
-                from_env=prev_env,
+                environment=prev_env,
                 period=old_period,
                 agent_count=available_slots,
             )
@@ -192,6 +197,8 @@ class Driver:
             )
             agent_index = 0
             for zone in environment.zones:
+                if agent_index >= len(new_agents):
+                    break
                 agent = new_agents[agent_index]
                 agent_index += 1
                 avatar = models.Avatar(
