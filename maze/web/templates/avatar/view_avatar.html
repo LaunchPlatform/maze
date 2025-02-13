@@ -19,7 +19,7 @@
 
   <dt>Credit</dt>
   <dd>
-    {{ avatar.credit | format_number | default('None', true) }}
+    {{ avatar.credit | format_int | default('None', true) }}
   </dd>
 
   <dt>Zone</dt>
@@ -41,7 +41,7 @@
       <th scope="col">Train Size</th>
       <th scope="col">Loss</th>
       <th scope="col">Correct</th>
-      <th scope="col">Total</th>
+      <th scope="col">Tests</th>
       <th scope="col">Accuracy</th>
       <th scope="col">Cost</th>
       <th scope="col">Income</th>
@@ -52,25 +52,25 @@
     <tr>
       <th scope="row">{{ epoch.index }}</th>
       <td>
-        {{ epoch.train_data_size | format_number }}
+        {{ epoch.train_data_size | format_int }}
       </td>
       <td>
-        {{ epoch.train_loss[-1] | format_number }}
+        {{ epoch.train_loss[-1] | format_float }}
       </td>
       <td>
-        {{ epoch.test_correct_count | format_number }}
+        {{ epoch.test_correct_count | format_int }}
       </td>
       <td>
-        {{ epoch.test_total_count | format_number }}
+        {{ epoch.test_total_count | format_int }}
       </td>
       <td>
         {{ (epoch.test_correct_count / epoch.test_total_count) | percentage }}
       </td>
       <td>
-        {{ epoch.cost | format_number }}
+        {{ epoch.cost | format_int }}
       </td>
       <td>
-        {{ epoch.income | format_number }}
+        {{ epoch.income | format_int }}
       </td>
     </tr>
     {% endfor %}

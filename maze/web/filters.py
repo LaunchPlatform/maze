@@ -1,7 +1,13 @@
 import decimal
 
 
-def format_number(number: int | float | decimal.Decimal | None) -> str | None:
+def format_int(number: int | None) -> str | None:
+    if number is None:
+        return
+    return f"{number:,}"
+
+
+def format_float(number: float | decimal.Decimal | None) -> str | None:
     if number is None:
         return
     return f"{number:,.2f}"
