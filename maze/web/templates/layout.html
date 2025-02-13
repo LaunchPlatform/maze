@@ -88,7 +88,7 @@
           <ul class="nav flex-column mb-auto">
             {% for experiment in experiments %}
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center gap-2" href="#">
+              <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('view_experiment', id=experiment.id) }}">
                 {{ experiment.name }}
               </a>
             </li>
