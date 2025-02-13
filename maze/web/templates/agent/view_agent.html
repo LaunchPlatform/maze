@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+  View agent {{ agent.id }}
+{% endblock %}
+
+{% block content %}
+<h1>Agent: {{ agent.id }}</h1>
+
+<dl>
+  <dt>ID</dt>
+  <dd>{{ agent.id }}</dd>
+
+  <dt>Gene</dt>
+  <dd>{{ agent.gene}}</dd>
+
+  <dt>LHS Parent</dt>
+  <dd>{{ agent.lhs_parent }}</dd>
+
+  <dt>RHS Parent</dt>
+  <dd>{{ agent.rhs_parent }}</dd>
+</dl>
+
+TODO: list avatars
+
+{% endblock content %}

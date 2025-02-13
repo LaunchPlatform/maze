@@ -24,7 +24,7 @@
   <dd><a href="#">{{ avatar.period.index}}</a></dd>
 
   <dt>Agent</dt>
-  <dd><a href="#">{{ avatar.agent_id }}</a></dd>
+  <dd><a href="{{ url_for('view_agent', id=avatar.agent_id) }}">{{ avatar.agent_id }}</a></dd>
 </dl>
 
 {% endblock content %}
