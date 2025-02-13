@@ -78,7 +78,7 @@ class Avatar(Base):
         back_populates="avatars",
         uselist=False,
     )
-    epoches: Mapped["Epoch"] = relationship(
+    epoches: Mapped[list["Epoch"]] = relationship(
         "Epoch",
         back_populates="avatar",
     )

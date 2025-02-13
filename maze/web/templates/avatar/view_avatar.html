@@ -19,11 +19,7 @@
 
   <dt>Credit</dt>
   <dd>
-    {% if avatar.credit is not none %}
-      {{ avatar.credit | format_number }}
-    {% else %}
-      None
-    {% endif %}
+    {{ avatar.credit | format_number | default('None', true) }}
   </dd>
 
   <dt>Zone</dt>
@@ -35,5 +31,51 @@
   <dt>Agent</dt>
   <dd><a href="{{ url_for('view_agent', id=avatar.agent_id) }}">{{ avatar.agent_id }}</a></dd>
 </dl>
+
+<h2>Epoches</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Train Size</th>
+      <th scope="col">Loss</th>
+      <th scope="col">Correct</th>
+      <th scope="col">Total</th>
+      <th scope="col">Accuracy</th>
+      <th scope="col">Cost</th>
+      <th scope="col">Income</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for epoch in avatar.epoches %}
+    <tr>
+      <th scope="row">{{ epoch.index }}</th>
+      <td>
+        {{ epoch.train_data_size | format_number }}
+      </td>
+      <td>
+        {{ epoch.train_loss[-1] | format_number }}
+      </td>
+      <td>
+        {{ epoch.test_correct_count | format_number }}
+      </td>
+      <td>
+        {{ epoch.test_total_count | format_number }}
+      </td>
+      <td>
+        {{ (epoch.test_correct_count / epoch.test_total_count) | percentage }}
+      </td>
+      <td>
+        {{ epoch.cost | format_number }}
+      </td>
+      <td>
+        {{ epoch.income | format_number }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
 
 {% endblock content %}
