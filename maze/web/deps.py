@@ -22,6 +22,7 @@ def get_templates(request: Request, db: Session = Depends(get_db)) -> Jinja2Temp
     templates = Jinja2Templates(directory=constants.PACKAGE_DIR / "web" / "templates")
     templates.env.globals["request"] = request
     templates.env.globals["settings"] = settings
+    templates.env.globals["models"] = models
     templates.env.globals["experiments"] = db.query(models.Experiment)
 
     templates.env.filters["format_int"] = format_int
