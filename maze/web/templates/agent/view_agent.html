@@ -24,11 +24,31 @@
   </dd>
 
   <dt>RHS Parent</dt>
+  <dd>
     {% if agent.rhs_parent is none %}
       None
     {% else %}
       <a href="{{ url_for('view_agent', id=agent.rhs_parent_id) }}">{{ agent.rhs_parent.id }}</a>
     {% endif %}
+  </dd>
+
+  <dt>LHS Children</dt>
+  <dd>
+    <ul>
+    {% for child_agent in agent.lhs_children %}
+      <li><a href="{{ url_for('view_agent', id=child_agent.id) }}">{{ child_agent.id }}</a></li>
+    {% endfor %}
+    </ul>
+  </dd>
+
+  <dt>RHS Children</dt>
+  <dd>
+    <ul>
+    {% for child_agent in agent.rhs_children %}
+      <li><a href="{{ url_for('view_agent', id=child_agent.id) }}">{{ child_agent.id }}</a></li>
+    {% endfor %}
+    </ul>
+  </dd>
 </dl>
 
 TODO: list avatars
