@@ -37,39 +37,39 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">Train Size</th>
-      <th scope="col">Loss</th>
-      <th scope="col">Correct</th>
-      <th scope="col">Tests</th>
-      <th scope="col">Accuracy</th>
-      <th scope="col">Cost</th>
-      <th scope="col">Income</th>
+      <th scope="col" class="text-end">#</th>
+      <th scope="col" class="text-end">Train Size</th>
+      <th scope="col" class="text-end">Loss</th>
+      <th scope="col" class="text-end">Correct</th>
+      <th scope="col" class="text-end">Tests</th>
+      <th scope="col" class="text-end">Accuracy</th>
+      <th scope="col" class="text-end">Cost</th>
+      <th scope="col" class="text-end">Income</th>
     </tr>
   </thead>
   <tbody>
     {% for epoch in avatar.epoches %}
     <tr>
-      <th scope="row">{{ epoch.index }}</th>
-      <td>
+      <th scope="row" class="text-end">{{ epoch.index }}</th>
+      <td class="text-end">
         {{ epoch.train_data_size | format_int }}
       </td>
-      <td>
+      <td class="text-end">
         {{ epoch.train_loss[-1] | format_float }}
       </td>
-      <td>
+      <td class="text-end">
         {{ epoch.test_correct_count | format_int }}
       </td>
-      <td>
+      <td class="text-end">
         {{ epoch.test_total_count | format_int }}
       </td>
-      <td>
+      <td class="text-end">
         {{ (epoch.test_correct_count / epoch.test_total_count) | percentage }}
       </td>
-      <td>
+      <td class="text-end">
         {{ epoch.cost | format_int }}
       </td>
-      <td>
+      <td class="text-end">
         {{ epoch.income | format_int }}
       </td>
     </tr>

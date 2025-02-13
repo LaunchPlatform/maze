@@ -10,14 +10,32 @@
 {% for period in zone.environment.experiment.periods %}
 <h2>Period: {{ period.index }}</h2>
 
-Avatars:
-<ul>
-  {% for avatar in zone.avatars %}
-  <li>
-    <div><a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}, status={{ avatar.status.value }}</a></div>
-  </li>
-  {% endfor %}
-</ul>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Status</th>
+      <th scope="col">Credit</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for avatar in zone.avatars %}
+    <tr>
+      <th scope="row">
+        <a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a>
+      </th>
+      <td>
+        {{ avatar.status.value }}
+      </td>
+      <td>
+        {{ avatar.credit | format_int }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+
+</table>
 {% endfor %}
 
 {% endblock content %}
