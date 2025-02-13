@@ -12,7 +12,16 @@
   <dd>{{ agent.id }}</dd>
 
   <dt>Gene</dt>
-  <dd>{{ agent.gene}}</dd>
+  <dd>{{ agent.gene }}</dd>
+
+  <dt>Operation Cost</dt>
+  <dd>{{ agent.op_cost | format_int }}</dd>
+
+  <dt>Build Cost</dt>
+  <dd>{{ agent.build_cost | format_int }}</dd>
+
+  <dt>Parameters</dt>
+  <dd>{{ agent.parameters_count | format_int }}</dd>
 
   <dt>LHS Parent</dt>
   <dd>
@@ -59,7 +68,5 @@
     </ul>
   </dd>
 </dl>
-
-TODO: list avatars
 
 {% endblock content %}
