@@ -21,9 +21,16 @@
 
 <h1>Zone: {{ zone.display_name }}</h1>
 
-{% for period in zone.environment.experiment.periods.order_by(none).order_by(models.Period.index.desc()) %}
+{% for period_stats, avatars in period_avatars %}
 
-<h2>Period: {{ period.index }}</h2>
+<h2>Period: {{ period_stats.period.index }}</h2>
+
+{% if period_stats.dead_avatars > 0 %}
+  {% set progress = period_stats.alive_avatars / period_stats.dead_avatars %}
+  <div class="progress" role="progressbar" aria-label="Period progress in the current zone" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-bar" style="width: {{ progress | percentage }}"></div>
+  </div>
+{% endif %}
 
 <table class="table table-striped">
   <thead>
@@ -37,7 +44,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for avatar in zone.avatars.filter_by(period=period).order_by(models.Avatar.credit.desc().nullslast(), models.Avatar.status) %}
+    {% for avatar in avatars %}
     <tr>
       <th scope="row">
         <a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a>
