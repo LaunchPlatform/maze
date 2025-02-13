@@ -193,7 +193,11 @@ class Driver:
                 agent_count=available_slots,
             )
             logger.info(
-                "Environment %s promotes %s agents", environment.name, len(new_agents)
+                "Environment %s promoted %s agents to %s (period %s)",
+                prev_env.name,
+                len(new_agents),
+                environment.name,
+                new_period.index,
             )
             agent_index = 0
             for zone in environment.zones:
