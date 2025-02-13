@@ -48,7 +48,7 @@ class Agent(Base):
         "Mutation",
         back_populates="agent",
     )
-    avatars: Mapped["Avatar"] = relationship(
+    avatars: Mapped[list["Avatar"]] = relationship(
         "Avatar",
         back_populates="agent",
     )

@@ -49,6 +49,15 @@
     {% endfor %}
     </ul>
   </dd>
+
+  <dt>Avatars</dt>
+  <dd>
+    <ul>
+    {% for avatar in agent.avatars %}
+      <li><a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a></li>
+    {% endfor %}
+    </ul>
+  </dd>
 </dl>
 
 TODO: list avatars
