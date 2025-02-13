@@ -38,7 +38,7 @@ def view_zone(
 
     aliased_avatar = aliased(models.Avatar)
     alive_avatar_count = (
-        select(func.count(aliased_avatar.id))
+        select(func.count())
         .select_from(aliased_avatar)
         .where(
             and_(
@@ -51,7 +51,7 @@ def view_zone(
 
     aliased_avatar = aliased(models.Avatar)
     dead_avatar_count = (
-        select(func.count(aliased_avatar.id))
+        select(func.count())
         .select_from(aliased_avatar)
         .where(
             and_(
@@ -83,7 +83,11 @@ def view_zone(
                 models.Avatar.zone_id == zone.id,
             ),
         )
-        .order_by(models.Avatar.credit.desc().nullslast(), models.Avatar.status)
+        .order_by(
+            models.Period.index.desc(),
+            models.Avatar.credit.desc().nullslast(),
+            models.Avatar.status,
+        )
     )
 
     period_avatars = [
@@ -98,7 +102,7 @@ def view_zone(
                     ),
                     avatar,
                 )
-                for period, avatar, alive_count, dead_count in period_avatars_query
+                for period, alive_count, dead_count, avatar in period_avatars_query
             ),
             key=lambda item: item[0],
         )
