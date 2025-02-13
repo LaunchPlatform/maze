@@ -15,10 +15,20 @@
   <dd>{{ agent.gene}}</dd>
 
   <dt>LHS Parent</dt>
-  <dd>{{ agent.lhs_parent }}</dd>
+  <dd>
+    {% if agent.lhs_parent is none %}
+      None
+    {% else %}
+      <a href="{{ url_for('view_agent', id=agent.lhs_parent_id) }}">{{ agent.lhs_parent.id }}</a>
+    {% endif %}
+  </dd>
 
   <dt>RHS Parent</dt>
-  <dd>{{ agent.rhs_parent }}</dd>
+    {% if agent.rhs_parent is none %}
+      None
+    {% else %}
+      <a href="{{ url_for('view_agent', id=agent.rhs_parent_id) }}">{{ agent.rhs_parent.id }}</a>
+    {% endif %}
 </dl>
 
 TODO: list avatars
