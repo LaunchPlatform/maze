@@ -8,6 +8,7 @@ from .. import models
 from ..core import constants
 from ..core.config import settings
 from ..db.session import Session
+from .filters import format_number
 
 
 def get_db() -> typing.Generator[Session, None, None]:
@@ -20,6 +21,8 @@ def get_templates(request: Request, db: Session = Depends(get_db)) -> Jinja2Temp
     templates.env.globals["request"] = request
     templates.env.globals["settings"] = settings
     templates.env.globals["experiments"] = db.query(models.Experiment)
+
+    templates.env.filters["format_number"] = format_number
     return templates
 
 
