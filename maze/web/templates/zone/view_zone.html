@@ -16,7 +16,7 @@
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Status</th>
-      <th scope="col">Credit</th>
+      <th scope="col" class="text-end">Credit</th>
     </tr>
   </thead>
   <tbody>
@@ -28,8 +28,8 @@
       <td>
         {{ avatar.status.value }}
       </td>
-      <td>
-        {{ avatar.credit | format_int }}
+      <td class="text-end">
+        {{ avatar.credit | format_int | default('', true) }}
       </td>
     </tr>
     {% endfor %}
