@@ -7,6 +7,20 @@
 {% block content %}
 <h1>Experiment: {{ experiment.name }}</h1>
 
+<h2>Environments</h2>
+<ul>
+  {% for environment in experiment.environments %}
+  <li>
+    <div>{{ environment.name }}</div>
+    Zones:
+    <ul>
+      {% for zone in environment.zones %}
+      <li>{{ zone.display_name }}</li>
+      {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
 TODO:
 
 {% endblock content %}
