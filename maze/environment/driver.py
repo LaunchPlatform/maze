@@ -201,14 +201,12 @@ class Driver:
             )
             agent_index = 0
             for zone in environment.zones:
-                if agent_index >= len(new_agents):
-                    break
-                agent = new_agents[agent_index]
-                agent_index += 1
-                avatar = models.Avatar(
-                    agent=agent,
-                    zone=zone,
-                    period=new_period,
-                )
-                db.add(avatar)
+                for agent in new_agents[agent_index : agent_index + zone.agent_slots]:
+                    avatar = models.Avatar(
+                        agent=agent,
+                        zone=zone,
+                        period=new_period,
+                    )
+                    db.add(avatar)
+                agent_index += zone.agent_slots
             prev_env = environment
