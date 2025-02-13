@@ -7,6 +7,17 @@
 {% block content %}
 <h1>Environment: {{ environment.name }}</h1>
 
+<dl>
+  <dt>ID</dt>
+  <dd>{{ environment.id }}</dd>
+
+  <dt>Name</dt>
+  <dd>{{ environment.name }}</dd>
+
+  <dt>Arguments</dt>
+  <dd>{{ environment.arguments }}</dd>
+</dl>
+
 <h2>Zones</h2>
 <ul>
   {% for zone in environment.zones %}
