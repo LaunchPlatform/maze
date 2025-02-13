@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy import func
 from sqlalchemy.orm import object_session
 
 from .. import models
@@ -160,3 +161,44 @@ class Driver:
                         period=new_period,
                     )
                     db.add(avatar)
+
+    def promote_agents(self, old_period: models.Period, new_period: models.Period):
+        db = object_session(old_period)
+        prev_env = None
+        for environment in self.template.environments(db):
+            # count new avatars already created by breeding or other process before this
+            new_avatar_count = new_period.avatars.filter(
+                models.Avatar.period == new_period
+            ).count()
+            total_zone_slots = environment.zones.with_entities(
+                func.sum(models.Zone.agent_slots)
+            ).scalar()
+            available_slots = total_zone_slots - new_avatar_count
+            logger.info(
+                "Environment %s (period %s) promoting agents to %s (period %s) to %s with %s slots",
+                prev_env.name,
+                old_period.index,
+                environment.name,
+                new_period.index,
+                available_slots,
+            )
+            new_agents = self.template.promote_agents(
+                from_env=prev_env,
+                to_env=environment,
+                period=old_period,
+                agent_count=available_slots,
+            )
+            logger.info(
+                "Environment %s promotes %s agents", environment.name, len(new_agents)
+            )
+            agent_index = 0
+            for zone in environment.zones:
+                agent = new_agents[agent_index]
+                agent_index += 1
+                avatar = models.Avatar(
+                    agent=agent,
+                    zone=zone,
+                    period=new_period,
+                )
+                db.add(avatar)
+            prev_env = environment

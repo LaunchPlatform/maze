@@ -10,7 +10,6 @@
 {% for period in zone.environment.experiment.periods %}
 <h2>Period: {{ period.index }}</h2>
 
-
 <table class="table table-striped">
   <thead>
     <tr>
@@ -20,7 +19,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for avatar in zone.avatars %}
+    {% for avatar in period.avatars %}
     <tr>
       <th scope="row">
         <a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a>

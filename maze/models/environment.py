@@ -10,6 +10,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import DynamicMapped
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -41,7 +42,7 @@ class Environment(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
-    zones: Mapped[list["Zone"]] = relationship(
+    zones: DynamicMapped["Zone"] = relationship(
         "Zone",
         back_populates="environment",
         order_by="Zone.index",

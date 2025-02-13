@@ -8,6 +8,7 @@ from sqlalchemy import func
 from sqlalchemy import Integer
 from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import DynamicMapped
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -39,7 +40,7 @@ class Zone(Base):
         back_populates="zones",
         uselist=False,
     )
-    avatars: Mapped[list["Avatar"]] = relationship(
+    avatars: DynamicMapped["Avatar"] = relationship(
         "Avatar",
         back_populates="zone",
     )
