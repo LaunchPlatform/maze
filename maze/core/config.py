@@ -7,6 +7,8 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    SITE_NAME: str = "MAZE"
+
     POSTGRES_SERVER: str = "localhost"
     POSTGRES_USER: str = "maze"
     POSTGRES_PASSWORD: str = ""
