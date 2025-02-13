@@ -144,7 +144,7 @@ class KingOfMnist(LinearEnvironment):
         logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
 
         credit = args.initial_credit
-        avatar.credit = args.initial_credit
+        avatar.initial_credit = args.initial_credit
         db.add(avatar)
 
         epoch_cost = avatar.agent.op_cost + args.basic_cost
