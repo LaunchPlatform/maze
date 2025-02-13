@@ -76,7 +76,7 @@ def view_zone(
                 models.Zone.id == zone.id,
             ),
         )
-        .outerjoin(
+        .join(
             models.Avatar,
             and_(
                 models.Avatar.period_id == models.Period.id,
