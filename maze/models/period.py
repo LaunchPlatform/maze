@@ -5,6 +5,7 @@ from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
 from sqlalchemy import func
 from sqlalchemy import Integer
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DynamicMapped
 from sqlalchemy.orm import Mapped
@@ -37,6 +38,13 @@ class Period(Base):
     avatars: DynamicMapped["Avatar"] = relationship(
         "Avatar",
         back_populates="period",
+    )
+    __table_args__ = (
+        UniqueConstraint(
+            "experiment_id",
+            "index",
+            name="idx_period_env_id_index_unique",
+        ),
     )
 
     def __repr__(self) -> str:
