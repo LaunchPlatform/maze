@@ -1,4 +1,5 @@
 import logging
+import random
 
 from sqlalchemy import func
 from sqlalchemy.orm import object_session
@@ -192,14 +193,21 @@ class Driver:
                 period=old_period,
                 agent_count=available_slots,
             )
+            random.shuffle(new_agents)
             agent_index = 0
             for zone in environment.zones:
+                used_slots = zone.avatars.filter(
+                    models.Avatar.period == new_period
+                ).count()
+                available_slots = zone.agent_slots - used_slots
+                if available_slots <= 0:
+                    continue
                 new_zone_agents = new_agents[
-                    agent_index : agent_index + zone.agent_slots
+                    agent_index : agent_index + available_slots
                 ]
-                agent_index += zone.agent_slots
-                if not new_agents:
+                if not new_zone_agents:
                     break
+                agent_index += available_slots
                 logger.info(
                     "Promoting %s agents to %s (period %s)",
                     len(new_zone_agents),
