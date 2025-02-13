@@ -217,7 +217,6 @@ class KingOfMnist(LinearEnvironment):
     def promote_agents(
         self,
         from_env: models.Environment | None,
-        to_env: models.Environment,
         period: models.Period,
         agent_count: int,
     ) -> list[models.Agent]:
@@ -252,6 +251,7 @@ class KingOfMnist(LinearEnvironment):
                 .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
                 .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
                 .filter(models.Zone.environment == from_env)
+                .filter(models.Avatar.period == period)
                 .filter(models.Avatar.credit > 0)
                 .order_by(models.Avatar.credit.desc())
             )

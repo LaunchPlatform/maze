@@ -184,7 +184,6 @@ class Driver:
             )
             new_agents = self.template.promote_agents(
                 from_env=prev_env,
-                to_env=environment,
                 period=old_period,
                 agent_count=available_slots,
             )
