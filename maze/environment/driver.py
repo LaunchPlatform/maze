@@ -1,7 +1,10 @@
+import collections
 import logging
 import random
 
+from sqlalchemy import and_
 from sqlalchemy import func
+from sqlalchemy import literal_column
 from sqlalchemy.orm import object_session
 
 from .. import models
@@ -193,32 +196,52 @@ class Driver:
                 period=old_period,
                 agent_count=available_slots,
             )
-            random.shuffle(new_agents)
-            agent_index = 0
-            for zone in environment.zones:
-                used_slots = zone.avatars.filter(
-                    models.Avatar.period == new_period
-                ).count()
-                available_slots = zone.agent_slots - used_slots
-                if available_slots <= 0:
-                    continue
-                new_zone_agents = new_agents[
-                    agent_index : agent_index + available_slots
-                ]
-                if not new_zone_agents:
+
+            available_slots_column = (
+                models.Zone.agent_slots - func.count(models.Avatar.id)
+            ).label("available_slots")
+            zone_available_slots = dict(
+                db.query(models.Zone, available_slots_column)
+                .outerjoin(
+                    models.Avatar,
+                    and_(
+                        models.Avatar.zone_id == models.Zone.id,
+                        models.Avatar.period == new_period,
+                    ),
+                )
+                .filter(models.Zone.environment == environment)
+                .having(available_slots_column > 0)
+                .group_by(models.Zone.id)
+            )
+
+            zone_counter = collections.defaultdict(int)
+            # randomly distribute agents into zones
+            for agent in new_agents:
+                if not zone_available_slots:
                     break
-                agent_index += available_slots
+                available_zones = list(zone_available_slots.keys())
+                zone = random.choice(available_zones)
+
+                zone_counter[zone] += 1
+                zone_available_slots[zone] -= 1
+                if not zone_available_slots[zone]:
+                    del zone_available_slots[zone]
+
+                avatar = models.Avatar(
+                    agent=agent,
+                    zone=zone,
+                    period=new_period,
+                )
+                db.add(avatar)
+
+            for zone in environment.zones:
+                agent_count = zone_counter.get(zone)
+                if not agent_count:
+                    continue
                 logger.info(
                     "Promoting %s agents to %s (period %s)",
-                    len(new_zone_agents),
+                    agent_count,
                     zone.display_name,
                     new_period.index,
                 )
-                for agent in new_zone_agents:
-                    avatar = models.Avatar(
-                        agent=agent,
-                        zone=zone,
-                        period=new_period,
-                    )
-                    db.add(avatar)
             prev_env = environment
