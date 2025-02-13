@@ -40,7 +40,7 @@ def test_build_lookup_table(
 
 
 @pytest.mark.parametrize(
-    "lookup_table, random_number, expected",
+    "lookup_table, random_number, return_index, expected",
     [
         (
             [
@@ -49,6 +49,7 @@ def test_build_lookup_table(
                 (78, SymbolType.LEAKY_RELU),
             ],
             0,
+            False,
             SymbolType.LINEAR,
         ),
         (
@@ -58,6 +59,7 @@ def test_build_lookup_table(
                 (78, SymbolType.LEAKY_RELU),
             ],
             1,
+            False,
             SymbolType.RELU,
         ),
         (
@@ -67,6 +69,7 @@ def test_build_lookup_table(
                 (78, SymbolType.LEAKY_RELU),
             ],
             2,
+            False,
             SymbolType.RELU,
         ),
         (
@@ -76,6 +79,7 @@ def test_build_lookup_table(
                 (78, SymbolType.LEAKY_RELU),
             ],
             31,
+            False,
             SymbolType.RELU,
         ),
         (
@@ -85,6 +89,7 @@ def test_build_lookup_table(
                 (78, SymbolType.LEAKY_RELU),
             ],
             32,
+            False,
             SymbolType.LEAKY_RELU,
         ),
         (
@@ -94,14 +99,42 @@ def test_build_lookup_table(
                 (78, SymbolType.LEAKY_RELU),
             ],
             77,
+            False,
             SymbolType.LEAKY_RELU,
+        ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            0,
+            True,
+            0,
+        ),
+        (
+            [
+                (1, SymbolType.LINEAR),
+                (32, SymbolType.RELU),
+                (78, SymbolType.LEAKY_RELU),
+            ],
+            1,
+            True,
+            1,
         ),
     ],
 )
 def test_random_lookup(
-    lookup_table: LookupTable, random_number: int, expected: SymbolType
+    lookup_table: LookupTable,
+    random_number: int,
+    return_index: bool,
+    expected: SymbolType | int,
 ):
     assert (
-        random_lookup(lookup_table=lookup_table, random_number=random_number)
+        random_lookup(
+            lookup_table=lookup_table,
+            random_number=random_number,
+            return_index=return_index,
+        )
         == expected
     )
