@@ -156,6 +156,6 @@ def generate_random_symbol(
 def generate_gene(
     symbol_table: dict[SymbolType, int], param_range: SymbolParameterRange, length: int
 ) -> typing.Generator[BaseSymbol, None, None]:
-    lookup_table = build_lookup_table(symbol_table)
+    lookup_table = build_lookup_table(symbol_table.items())
     for _ in range(length):
         yield generate_random_symbol(lookup_table=lookup_table, param_range=param_range)

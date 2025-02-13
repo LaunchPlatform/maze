@@ -68,7 +68,7 @@ class KingOfMnist(LinearEnvironment):
     def make_zones(self, index: int) -> list[models.Zone]:
         zone_count = [10, 5, 2, 1, 1][index]
         return [
-            models.Zone(agent_slots=3, index=zone_index)
+            models.Zone(agent_slots=30, index=zone_index)
             for zone_index in range(zone_count)
         ]
 
@@ -78,7 +78,7 @@ class KingOfMnist(LinearEnvironment):
         reward = to_millions([100, 90, 80, 70, 60])[index]
         return dataclasses.asdict(
             Arguments(
-                epoch=[1, 3, 5, 7, 9][index],
+                epoch=[10, 30, 50, 70, 90][index],
                 initial_credit=100 * mi,
                 basic_cost=basic_cost,
                 reward=reward,
@@ -158,7 +158,7 @@ class KingOfMnist(LinearEnvironment):
         ):
             epoch.cost = epoch_cost
             epoch.income = int(
-                args.reward * (epoch.test_correct_count / epoch.test_total_count)
+                args.reward * ((epoch.test_correct_count / epoch.test_total_count) ** 5)
             )
             credit += epoch.income - epoch.cost
             logger.info("Avatar remaining credit: %s", format_number(credit))
