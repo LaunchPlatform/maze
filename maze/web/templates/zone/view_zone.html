@@ -5,9 +5,24 @@
 {% endblock %}
 
 {% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('view_experiment', id=zone.environment.experiment_id) }}">Experiment {{ zone.environment.experiment.name }}</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{  url_for('view_environment', id=zone.environment_id) }}">Environment {{ zone.environment.name }}</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{ request.url }}">Zone {{ zone.index }}</a>
+    </li>
+  </ol>
+</nav>
+
 <h1>Zone: {{ zone.display_name }}</h1>
 
 {% for period in zone.environment.experiment.periods %}
+
 <h2>Period: {{ period.index }}</h2>
 
 <table class="table table-striped">

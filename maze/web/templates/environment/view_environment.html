@@ -5,6 +5,17 @@
 {% endblock %}
 
 {% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('view_experiment', id=environment.experiment_id) }}">Experiment {{ environment.experiment.name }}</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{ request.url }}">Environment {{ environment.name }}</a>
+    </li>
+  </ol>
+</nav>
+
 <h1>Environment: {{ environment.name }}</h1>
 
 <dl>
