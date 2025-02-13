@@ -5,6 +5,23 @@
 {% endblock %}
 
 {% block content %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{{ url_for('view_experiment', id=avatar.zone.environment.experiment_id) }}">Experiment {{ avatar.zone.environment.experiment.name }}</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{  url_for('view_environment', id=avatar.zone.environment_id) }}">Environment {{ avatar.zone.environment.name }}</a>
+    </li>
+    <li class="breadcrumb-item">
+      <a href="{{  url_for('view_zone', id=avatar.zone_id) }}">Zone {{ avatar.zone.index }}</a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      <a href="{{ request.url }}">Avatar {{ avatar.id }}</a>
+    </li>
+  </ol>
+</nav>
+
 <h1>Avatar: {{ avatar.id }}</h1>
 
 <dl>
