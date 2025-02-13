@@ -136,6 +136,11 @@ class Driver:
             logger.info("Avatar %s runs out of credit", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_CREDIT
             db.add(avatar)
+        except Exception as exc:
+            logger.error("Avatar %s encounters error", avatar.id, exc_info=True)
+            avatar.status = models.AvatarStatus.ERROR
+            avatar.error = str(exc)
+            db.add(avatar)
 
     def breed_next_gen(self, old_period: models.Period, new_period: models.Period):
         db = object_session(old_period)
