@@ -31,7 +31,6 @@ def random_lookup(
     lookup_table: LookupTable,
     random_number: int | None = None,
     return_index: bool = False,
-    exclude_indexes: list[int] | None = None,
 ) -> typing.Any:
     if random_number is None:
         upper_val = lookup_table[-1][0]

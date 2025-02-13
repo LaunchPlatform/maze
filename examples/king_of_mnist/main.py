@@ -167,7 +167,9 @@ class KingOfMnist(LinearEnvironment):
             yield epoch
 
     def breed_agents(
-        self, zone: models.Zone, period: models.Period,
+        self,
+        zone: models.Zone,
+        period: models.Period,
     ) -> list[models.Agent]:
         db = object_session(zone)
 
@@ -179,7 +181,7 @@ class KingOfMnist(LinearEnvironment):
             .filter(models.Avatar.status == models.AvatarStatus.DEAD)
             .filter(models.Avatar.period == period)
         ).all()
-        if not agent_credits:
+        if len(agent_credits) <= 1:
             return []
 
         lookup_table = build_lookup_table(agent_credits)
@@ -189,8 +191,13 @@ class KingOfMnist(LinearEnvironment):
         offspring_agents = []
         for _ in range(int(offspring_slots)):
             lhs = random_lookup(lookup_table)
-            # TODO: avoid self mating
-            rhs = random_lookup(lookup_table)
+
+            # TODO: well, this is not the most performant way to do it. could find a time to improve it later
+            excluded_agent_credits = list(
+                filter(lambda agent: agent != lhs, agent_credits)
+            )
+            excluded_lookup_table = build_lookup_table(excluded_agent_credits)
+            rhs = random_lookup(excluded_lookup_table)
             lhs_gene = lhs.agent_data.symbols
             rhs_gene = rhs.agent_data.symbols
             gene = list(merge_gene(lhs_gene, rhs_gene, jiter_config=JiterConfig()))
