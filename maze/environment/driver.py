@@ -192,21 +192,25 @@ class Driver:
                 period=old_period,
                 agent_count=available_slots,
             )
-            logger.info(
-                "Environment %s promoted %s agents to %s (period %s)",
-                prev_env.name,
-                len(new_agents),
-                environment.name,
-                new_period.index,
-            )
             agent_index = 0
             for zone in environment.zones:
-                for agent in new_agents[agent_index : agent_index + zone.agent_slots]:
+                new_zone_agents = new_agents[
+                    agent_index : agent_index + zone.agent_slots
+                ]
+                agent_index += zone.agent_slots
+                if not new_agents:
+                    break
+                logger.info(
+                    "Promoting %s agents to %s (period %s)",
+                    len(new_zone_agents),
+                    zone.display_name,
+                    new_period.index,
+                )
+                for agent in new_zone_agents:
                     avatar = models.Avatar(
                         agent=agent,
                         zone=zone,
                         period=new_period,
                     )
                     db.add(avatar)
-                agent_index += zone.agent_slots
             prev_env = environment
