@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+  View zone {{ zone.display_name }}
+{% endblock %}
+
+{% block content %}
+<h1>Zone: {{ zone.display_name }}</h1>
+
+{% for period in zone.environment.experiment.periods %}
+<h2>Period: {{ period.index }}</h2>
+
+Avatars:
+<ul>
+  {% for avatar in zone.avatars %}
+  <li>
+    <div>{{ avatar.id }}, status={{ avatar.status.value }}</div>
+  </li>
+  {% endfor %}
+</ul>
+{% endfor %}
+
+{% endblock content %}
