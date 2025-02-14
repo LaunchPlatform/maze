@@ -64,12 +64,19 @@ var render = new dagreD3.render();
 var svg = d3.select("svg#svg-canvas"),
     svgGroup = svg.append("g");
 
+// Set up zoom support
+var zoom = d3.zoom().on("zoom", function(event) {
+  svgGroup.attr("transform", event.transform);
+});
+svg.call(zoom);
+
 // Run the renderer. This is what draws the final graph.
 render(d3.select("svg g"), g);
 
 // Center the graph
-var xCenterOffset = (svg.attr("width") - g.graph().width) / 2;
-svgGroup.attr("transform", "translate(" + xCenterOffset + ", 20)");
+var initialScale = 0.75;
+svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - g.graph().width * initialScale) / 2, 20).scale(initialScale));
+
 svg.attr("height", g.graph().height + 40);
 </script>
 {% endblock %}
