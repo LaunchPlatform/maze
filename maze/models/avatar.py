@@ -81,6 +81,7 @@ class Avatar(Base):
     epoches: Mapped[list["Epoch"]] = relationship(
         "Epoch",
         back_populates="avatar",
+        order_by="Epoch.index",
     )
 
     def __repr__(self) -> str:
