@@ -193,7 +193,9 @@ class KingOfMnist(LinearEnvironment):
         if len(agent_credits) <= 1:
             return []
 
-        lookup_table = build_lookup_table(agent_credits)
+        lookup_table = build_lookup_table(
+            [(agent.id, credit) for agent, credit in agent_credits]
+        )
         total_slots = zone.agent_slots
         offspring_slots = total_slots * 0.7
 
@@ -205,8 +207,14 @@ class KingOfMnist(LinearEnvironment):
             excluded_agent_credits = list(
                 filter(lambda agent: agent != lhs, agent_credits)
             )
-            excluded_lookup_table = build_lookup_table(excluded_agent_credits)
+            excluded_lookup_table = build_lookup_table(
+                [(agent.id, credit) for agent, credit in excluded_agent_credits]
+            )
             rhs = random_lookup(excluded_lookup_table)
+
+            lhs = db.get(models.Agent, lhs)
+            rhs = db.get(models.Agent, rhs)
+
             lhs_gene = lhs.agent_data.symbols
             rhs_gene = rhs.agent_data.symbols
             gene = list(merge_gene(lhs_gene, rhs_gene, jiter_config=JiterConfig()))

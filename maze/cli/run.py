@@ -8,6 +8,7 @@ from .. import models
 from ..db.session import Session
 from ..environment.driver import Driver
 from ..environment.templates import EnvironmentTemplate
+from ..environment.vehicle import detect_device
 from .cli import cli
 from .environment import CliEnvironment
 from .environment import pass_env
@@ -28,6 +29,9 @@ def main(env: CliEnvironment, template_cls: str):
     driver = Driver(template)
     driver.initialize_db()
     driver.initialize_zones()
+
+    device = detect_device()
+    logger.info("Running with device: %s", device)
     with Session() as db:
         experiment = driver.get_experiment(db)
         period = experiment.current_period
