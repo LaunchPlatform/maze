@@ -3,6 +3,7 @@ import typing
 import pytest
 from torch import nn
 
+from maze.environment import torch_pipeline
 from maze.environment.torch_pipeline import build_pipeline
 from maze.gene import pipeline
 
@@ -12,6 +13,10 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
     match module_type:
         case nn.ReLU | nn.LeakyReLU | nn.Tanh | nn.Flatten | nn.Softmax:
             return module_type, {}
+        case torch_pipeline.Reshape:
+            return module_type, dict(
+                shape=module.shape,
+            )
         case nn.Linear:
             return module_type, dict(
                 in_features=module.in_features,
@@ -48,6 +53,12 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
         (
             pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
             nn.Flatten(),
+        ),
+        (
+            pipeline.Reshape(input_shape=(28, 28), output_shape=(28 * 28,)),
+            torch_pipeline.Reshape(
+                28 * 28,
+            ),
         ),
         (
             pipeline.Linear(

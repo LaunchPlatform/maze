@@ -40,19 +40,23 @@ def build_pipeline(module: pipeline.Module) -> nn.Module:
             return nn.Softmax()
         case pipeline.Flatten():
             return nn.Flatten()
-        case pipeline.Reshape(output_shape):
-            return Reshape(output_shape)
-        case pipeline.Linear(in_features, out_features, bias):
+        case pipeline.Reshape(output_shape=output_shape):
+            return Reshape(*output_shape)
+        case pipeline.Linear(
+            in_features=in_features, out_features=out_features, bias=bias
+        ):
             return nn.Linear(
-                bias=bias, in_features=in_features, out_features=out_features
+                bias=bias,
+                in_features=in_features,
+                out_features=out_features,
             )
         case pipeline.AdaptiveMaxPool1d(out_features):
             return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveAvgPool1d(out_features):
             return nn.AdaptiveAvgPool1d(out_features)
-        case pipeline.Sequential(modules):
+        case pipeline.Sequential(modules=modules):
             return nn.Sequential(*map(build_pipeline, modules))
-        case pipeline.Joint(branches):
+        case pipeline.Joint(branches=branches):
             return Joint(branch_modules=list(map(build_pipeline, branches)))
         case _:
             raise ValueError(f"Unknown module type {type(module)}")
