@@ -27,6 +27,10 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             return module_type, dict(
                 output_size=module.output_size,
             )
+        case nn.Sequential:
+            return module_type, dict(
+                modules=list(map(module_type_kwargs, list(module.modules())[1:]))
+            )
         case _:
             raise ValueError(f"Unexpected module type {module_type}")
 
@@ -81,6 +85,17 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 bias=True,
             ),
             nn.Linear(in_features=28 * 28, out_features=123, bias=True),
+        ),
+        (
+            pipeline.Sequential(
+                input_shape=(28, 28),
+                output_shape=(28, 28),
+                modules=[
+                    pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
+                    pipeline.Tanh(input_shape=(28, 28), output_shape=(28, 28)),
+                ],
+            ),
+            nn.Sequential(nn.ReLU(), nn.Tanh()),
         ),
     ],
 )
