@@ -76,7 +76,7 @@ class KingOfMnist(LinearEnvironment):
     def make_arguments(self, index: int) -> dict | None:
         mi = 1_000_000
         basic_cost = to_millions([1, 2, 3, 4, 5])[index]
-        reward = to_millions([100, 90, 80, 70, 60])[index]
+        reward = to_millions([100, 100, 100, 100, 100])[index]
         reward_difficulty = [5, 6, 7, 8, 9][index]
         return dataclasses.asdict(
             Arguments(
