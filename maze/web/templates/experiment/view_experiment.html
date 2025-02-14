@@ -7,20 +7,44 @@
 {% block content %}
 <h1>Experiment: {{ experiment.name }}</h1>
 
-<h2>Environments</h2>
-<ul>
-  {% for environment in experiment.environments %}
-  <li>
-    <div><a href="{{ url_for('view_environment', id=environment.id) }}">{{ environment.name }}</a></div>
-    Zones:
-    <ul>
+<h2>Environments/Zones</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Env</th>
+      <th scope="col">Zone #</th>
+      <th scope="col">Initialized</th>
+      <th scope="col" class="text-end">Slots</th>
+      <th scope="col">Progress (Period {{ experiment.current_period.index }})</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for environment in experiment.environments %}
+    <tr>
+      <th scope="row">
+        <a href="{{ url_for('view_environment', id=environment.id) }}">{{ environment.name }}</a>
+      </th>
+      <td></td>
+      <td></td>
+      <td class="text-end"></td>
+      <td></td>
+    </tr>
       {% for zone in environment.zones %}
-      <li><a href="{{ url_for('view_zone', id=zone.id) }}">{{ zone.display_name }}</a></li>
+      <tr>
+        <th scope="row">
+        </th>
+        <td>
+          <a href="{{ url_for('view_zone', id=zone.id) }}">{{ zone.index }}</a>
+        </td>
+        <td>{{ zone.initialized }}</td>
+        <td class="text-end">{{ zone.agent_slots | format_int }}</td>
+        <td></td>
+      </tr>
       {% endfor %}
-    </ul>
-  </li>
-  {% endfor %}
-</ul>
+    {% endfor %}
+  </tbody>
+</table>
 
 <h2>Periods</h2>
 <ul>
