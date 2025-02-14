@@ -165,13 +165,13 @@ def _do_build_models(
                     model.modules.extend(repeating_model.modules)
             case LinearSymbol(bias=bias, out_features=out_features):
                 if len(model.output_shape) > 1:
+                    in_features = math.prod(model.output_shape)
                     model.modules.append(
                         pipeline.Flatten(
                             input_shape=model.output_shape,
-                            output_shape=model.output_shape,
+                            output_shape=(in_features,),
                         )
                     )
-                    in_features = math.prod(model.output_shape)
                 elif len(model.output_shape) == 1:
                     in_features = model.output_shape[0]
                 else:
@@ -183,7 +183,7 @@ def _do_build_models(
 
                 model.modules.append(
                     pipeline.Linear(
-                        input_shape=model.output_shape,
+                        input_shape=(in_features,),
                         output_shape=(out_features,),
                         bias=bias,
                         in_features=in_features,

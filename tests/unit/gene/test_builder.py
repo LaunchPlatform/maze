@@ -95,9 +95,9 @@ def test_read_enclosure(
             (123,),
             28 * 28 * 123,
             [
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(123,),
                     bias=False,
                     in_features=28 * 28,
@@ -112,7 +112,7 @@ def test_read_enclosure(
             28 * 28 * 123,
             [
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(123,),
                     bias=False,
                     in_features=28 * 28,
@@ -132,9 +132,9 @@ def test_read_enclosure(
             (123,),
             (28 * 28 * 123) + (123 * 123) + (123 * 123),
             [
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(123,),
                     bias=False,
                     in_features=28 * 28,
@@ -169,9 +169,9 @@ def test_read_enclosure(
             (456,),
             (28 * 28 * 456) + 456 + (456 * 456) + 456 + (456 * 456) + 456,
             [
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(456,),
                     bias=True,
                     in_features=28 * 28,
@@ -210,9 +210,9 @@ def test_read_enclosure(
             (28 * 28) + (28 * 28 * 789) + 789 + 789 + (789 * 789) + 789 + 789 + 789,
             [
                 pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(789,),
                     bias=True,
                     in_features=28 * 28,
@@ -266,9 +266,9 @@ def test_read_enclosure(
             + 123,
             [
                 pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(789,),
                     bias=True,
                     in_features=28 * 28,
@@ -301,7 +301,7 @@ def test_read_enclosure(
                     in_features=789,
                     out_features=123,
                 ),
-                pipeline.Tanh(input_shape=(789,), output_shape=(123,)),
+                pipeline.Tanh(input_shape=(123,), output_shape=(123,)),
             ],
             id="nested-repeat",
         ),
@@ -326,16 +326,16 @@ def test_read_enclosure(
             (28 * 28) + (28 * 28 * 123) + 123,
             [
                 pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(123,),
                     bias=False,
                     in_features=28 * 28,
                     out_features=123,
                 ),
                 pipeline.Tanh(
-                    input_shape=(28, 28),
+                    input_shape=(123,),
                     output_shape=(123,),
                 ),
             ],
@@ -372,10 +372,10 @@ def test_read_enclosure(
                 ),
                 pipeline.Flatten(
                     input_shape=(28, 28),
-                    output_shape=(28, 28),
+                    output_shape=(28 * 28,),
                 ),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(123,),
                     bias=False,
                     in_features=28 * 28,
@@ -418,9 +418,9 @@ def test_read_enclosure(
             + 123,
             [
                 pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
-                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28 * 28,)),
                 pipeline.Linear(
-                    input_shape=(28, 28),
+                    input_shape=(28 * 28,),
                     output_shape=(789,),
                     bias=True,
                     in_features=28 * 28,
