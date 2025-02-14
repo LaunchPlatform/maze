@@ -7,7 +7,6 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-torch = "^2.6.0"
 sqlalchemy = "^2.0.37"
 fastapi = "^0.115.8"
 uvicorn = "^0.34.0"
