@@ -3,9 +3,7 @@ import functools
 import math
 import typing
 
-import torch
-from torch import nn
-
+from . import pipeline
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import is_symbol_type
@@ -42,34 +40,10 @@ class ModelCost:
 
 @dataclasses.dataclass
 class Model:
-    modules: list[nn.Module]
+    modules: list[pipeline.Module]
     # the output shape of the current model
     output_shape: typing.Tuple[int, ...]
     cost: ModelCost = dataclasses.field(default_factory=ModelCost)
-
-
-class Joint(nn.Module):
-    def __init__(self, branch_modules: list[nn.Module]):
-        super().__init__()
-        self.branch_modules = branch_modules
-        for i, module in enumerate(branch_modules):
-            self.register_module(str(i), module)
-
-    def forward(self, x):
-        # TODO: provide other ways of joining branches
-        return torch.cat(
-            list((module(x) for module in self.branch_modules)),
-            dim=1,
-        )
-
-
-class Reshape(nn.Module):
-    def __init__(self, *args):
-        super(Reshape, self).__init__()
-        self.shape = args
-
-    def forward(self, x):
-        return x.view(x.size(0), *self.shape)
 
 
 def read_enclosure(
@@ -141,7 +115,6 @@ def _do_build_models(
     input_shape: typing.Tuple[int, ...],
     starting_cost: ModelCost = None,
     budget: ModelCost | None = None,
-    dry_run: bool = False,
 ) -> Model:
     model = Model(modules=[], output_shape=input_shape)
     starting_cost = starting_cost or ModelCost()
@@ -182,7 +155,6 @@ def _do_build_models(
                         input_shape=model.output_shape,
                         starting_cost=starting_cost + model.cost,
                         budget=budget,
-                        dry_run=dry_run,
                     )
                     model.cost.operation += repeating_model.cost.operation
                     model.cost.build += repeating_model.cost.build
@@ -193,8 +165,12 @@ def _do_build_models(
                     model.modules.extend(repeating_model.modules)
             case LinearSymbol(bias=bias, out_features=out_features):
                 if len(model.output_shape) > 1:
-                    if not dry_run:
-                        model.modules.append(nn.Flatten())
+                    model.modules.append(
+                        pipeline.Flatten(
+                            input_shape=model.output_shape,
+                            output_shape=model.output_shape,
+                        )
+                    )
                     in_features = math.prod(model.output_shape)
                 elif len(model.output_shape) == 1:
                     in_features = model.output_shape[0]
@@ -205,33 +181,55 @@ def _do_build_models(
                 )
                 check_op_budget()
 
-                if not dry_run:
-                    model.modules.append(
-                        nn.Linear(
-                            bias=bias,
-                            in_features=in_features,
-                            out_features=out_features,
-                        )
+                model.modules.append(
+                    pipeline.Linear(
+                        input_shape=model.output_shape,
+                        output_shape=(out_features,),
+                        bias=bias,
+                        in_features=in_features,
+                        out_features=out_features,
                     )
+                )
                 model.output_shape = (out_features,)
             case (
                 AdaptiveMaxPool1DSymbol(out_features=out_features)
                 | AdaptiveAvgPool1DSymbol(out_features=out_features)
             ):
                 in_features = math.prod(model.output_shape)
-                if not dry_run:
-                    model.modules.append(Reshape(1, in_features))
-                    if is_symbol_type(
-                        symbol_type=SymbolType.ADAPTIVE_MAXPOOL1D, symbol=symbol
-                    ):
-                        model.modules.append(nn.AdaptiveMaxPool1d(out_features))
-                    elif is_symbol_type(
-                        symbol_type=SymbolType.ADAPTIVE_AVGPOOL1D, symbol=symbol
-                    ):
-                        model.modules.append(nn.AdaptiveAvgPool1d(out_features))
-                    else:
-                        raise ValueError("Unexpected symbol type")
-                    model.modules.append(nn.Flatten())
+                model.modules.append(
+                    pipeline.Reshape(
+                        input_shape=model.output_shape,
+                        output_shape=(1, in_features),
+                    )
+                )
+                if is_symbol_type(
+                    symbol_type=SymbolType.ADAPTIVE_MAXPOOL1D, symbol=symbol
+                ):
+                    model.modules.append(
+                        pipeline.AdaptiveMaxPool1d(
+                            input_shape=model.output_shape,
+                            output_shape=(out_features,),
+                            out_features=out_features,
+                        )
+                    )
+                elif is_symbol_type(
+                    symbol_type=SymbolType.ADAPTIVE_AVGPOOL1D, symbol=symbol
+                ):
+                    model.modules.append(
+                        pipeline.AdaptiveAvgPool1d(
+                            input_shape=model.output_shape,
+                            output_shape=(out_features,),
+                            out_features=out_features,
+                        )
+                    )
+                else:
+                    raise ValueError("Unexpected symbol type")
+                model.modules.append(
+                    pipeline.Flatten(
+                        input_shape=model.output_shape,
+                        output_shape=(out_features,),
+                    )
+                )
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
                 check_op_budget()
@@ -253,7 +251,6 @@ def _do_build_models(
                                 input_shape=model.output_shape,
                                 starting_cost=starting_cost + model.cost,
                                 budget=budget,
-                                dry_run=dry_run,
                             )
                             for segment_symbols in break_branch_segments(
                                 iter(branch_symbols)
@@ -266,8 +263,7 @@ def _do_build_models(
                         if len(segment_models) == 1:
                             # special case, only one branch seg exists
                             segment_model = segment_models[0]
-                            if not dry_run:
-                                model.modules.extend(segment_model.modules)
+                            model.modules.extend(segment_model.modules)
                             model.output_shape = segment_model.output_shape
                         elif len(segment_models) == 0:
                             # nvm, nothing in the segment
@@ -282,41 +278,65 @@ def _do_build_models(
                                 # TODO: make it possible to output different shape with a different joint mode,
                                 #       such as addition or stack
                                 if len(segment.output_shape) != 1:
-                                    if not dry_run:
-                                        segment_modules.append(nn.Flatten())
+                                    segment_modules.append(
+                                        pipeline.Flatten(
+                                            input_shape=model.output_shape,
+                                            output_shape=model.output_shape,
+                                        )
+                                    )
 
                                     segment.output_shape = (seg_output_size,)
-                                if not dry_run:
-                                    branch_modules.append(
-                                        nn.Sequential(*segment_modules)
-                                    )
-
-                            if not dry_run:
-                                model.modules.append(
-                                    Joint(
-                                        branch_modules=branch_modules,
-                                        # TODO: provide other joint mode like addition or stack as well
+                                branch_modules.append(
+                                    pipeline.Sequential(
+                                        input_shape=model.output_shape,
+                                        modules=segment_modules,
+                                        output_shape=(seg_output_size,),
                                     )
                                 )
+
+                            model.modules.append(
+                                pipeline.Joint(
+                                    input_shape=model.output_shape,
+                                    output_shape=(new_output_size,),
+                                    branches=branch_modules,
+                                    # TODO: provide other joint mode like addition or stack as well
+                                )
+                            )
                             model.output_shape = (new_output_size,)
                     case SymbolType.RELU:
-                        if not dry_run:
-                            model.modules.append(nn.ReLU())
+                        model.modules.append(
+                            pipeline.ReLU(
+                                input_shape=model.output_shape,
+                                output_shape=model.output_shape,
+                            )
+                        )
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.LEAKY_RELU:
-                        if not dry_run:
-                            model.modules.append(nn.LeakyReLU())
+                        model.modules.append(
+                            pipeline.LeakyReLU(
+                                input_shape=model.output_shape,
+                                output_shape=model.output_shape,
+                            )
+                        )
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.TANH:
-                        if not dry_run:
-                            model.modules.append(nn.Tanh())
+                        model.modules.append(
+                            pipeline.Tanh(
+                                input_shape=model.output_shape,
+                                output_shape=model.output_shape,
+                            )
+                        )
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
                     case SymbolType.SOFTMAX:
-                        if not dry_run:
-                            model.modules.append(nn.Softmax())
+                        model.modules.append(
+                            pipeline.Softmax(
+                                input_shape=model.output_shape,
+                                output_shape=model.output_shape,
+                            )
+                        )
                         model.cost.operation += math.prod(model.output_shape)
                         check_op_budget()
             case _:
@@ -343,5 +363,4 @@ def build_models(
         iter(filtered_symbols),
         input_shape=input_shape,
         budget=budget,
-        dry_run=False,
     )

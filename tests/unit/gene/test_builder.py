@@ -2,8 +2,8 @@ import functools
 import typing
 
 import pytest
-from torch import nn
 
+from maze.gene import pipeline
 from maze.gene.builder import break_branch_segments
 from maze.gene.builder import build_models
 from maze.gene.builder import ExceedOperationBudgetError
@@ -16,25 +16,6 @@ from maze.gene.symbols import RepeatStartSymbol
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import Symbol
 from maze.gene.symbols import SymbolType
-
-
-def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
-    module_type = type(module)
-    match module_type:
-        case nn.ReLU | nn.LeakyReLU | nn.Tanh | nn.Flatten | nn.Softmax:
-            return module_type, {}
-        case nn.Linear:
-            return module_type, dict(
-                in_features=module.in_features,
-                out_features=module.out_features,
-                bias=module.bias is not None,
-            )
-        case nn.AdaptiveAvgPool1d | nn.AdaptiveMaxPool1d:
-            return module_type, dict(
-                output_size=module.output_size,
-            )
-        case _:
-            raise ValueError(f"Unexpected module type {module_type}")
 
 
 @pytest.mark.parametrize(
@@ -85,28 +66,28 @@ def test_read_enclosure(
             [SimpleSymbol(type=SymbolType.RELU)],
             (28, 28),
             28 * 28,
-            [nn.ReLU()],
+            [pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28))],
         ),
         (
             (28, 28),
             [SimpleSymbol(type=SymbolType.LEAKY_RELU)],
             (28, 28),
             28 * 28,
-            [nn.LeakyReLU()],
+            [pipeline.LeakyReLU(input_shape=(28, 28), output_shape=(28, 28))],
         ),
         (
             (28, 28),
             [SimpleSymbol(type=SymbolType.TANH)],
             (28, 28),
             28 * 28,
-            [nn.Tanh()],
+            [pipeline.Tanh(input_shape=(28, 28), output_shape=(28, 28))],
         ),
         (
             (28, 28),
             [SimpleSymbol(type=SymbolType.SOFTMAX)],
             (28, 28),
             28 * 28,
-            [nn.Softmax()],
+            [pipeline.Softmax(input_shape=(28, 28), output_shape=(28, 28))],
         ),
         (
             (28, 28),
@@ -114,8 +95,14 @@ def test_read_enclosure(
             (123,),
             28 * 28 * 123,
             [
-                nn.Flatten(),
-                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=28 * 28,
+                    out_features=123,
+                ),
             ],
         ),
         (
@@ -123,7 +110,15 @@ def test_read_enclosure(
             [LinearSymbol(bias=False, out_features=123)],
             (123,),
             28 * 28 * 123,
-            [nn.Linear(bias=False, in_features=28 * 28, out_features=123)],
+            [
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=28 * 28,
+                    out_features=123,
+                )
+            ],
         ),
         (
             (28, 28),
@@ -137,10 +132,28 @@ def test_read_enclosure(
             (123,),
             (28 * 28 * 123) + (123 * 123) + (123 * 123),
             [
-                nn.Flatten(),
-                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
-                nn.Linear(bias=False, in_features=123, out_features=123),
-                nn.Linear(bias=False, in_features=123, out_features=123),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=28 * 28,
+                    out_features=123,
+                ),
+                pipeline.Linear(
+                    input_shape=(123,),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=123,
+                    out_features=123,
+                ),
+                pipeline.Linear(
+                    input_shape=(123,),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=123,
+                    out_features=123,
+                ),
             ],
         ),
         (
@@ -156,10 +169,28 @@ def test_read_enclosure(
             (456,),
             (28 * 28 * 456) + 456 + (456 * 456) + 456 + (456 * 456) + 456,
             [
-                nn.Flatten(),
-                nn.Linear(bias=True, in_features=28 * 28, out_features=456),
-                nn.Linear(bias=True, in_features=456, out_features=456),
-                nn.Linear(bias=True, in_features=456, out_features=456),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(456,),
+                    bias=True,
+                    in_features=28 * 28,
+                    out_features=456,
+                ),
+                pipeline.Linear(
+                    input_shape=(456,),
+                    output_shape=(456,),
+                    bias=True,
+                    in_features=456,
+                    out_features=456,
+                ),
+                pipeline.Linear(
+                    input_shape=(456,),
+                    output_shape=(456,),
+                    bias=True,
+                    in_features=456,
+                    out_features=456,
+                ),
             ],
         ),
         (
@@ -178,13 +209,25 @@ def test_read_enclosure(
             (789,),
             (28 * 28) + (28 * 28 * 789) + 789 + 789 + (789 * 789) + 789 + 789 + 789,
             [
-                nn.ReLU(),
-                nn.Flatten(),
-                nn.Linear(bias=True, in_features=28 * 28, out_features=789),
-                nn.LeakyReLU(),
-                nn.Linear(bias=True, in_features=789, out_features=789),
-                nn.LeakyReLU(),
-                nn.Tanh(),
+                pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(789,),
+                    bias=True,
+                    in_features=28 * 28,
+                    out_features=789,
+                ),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.Linear(
+                    input_shape=(789,),
+                    output_shape=(789,),
+                    bias=True,
+                    in_features=789,
+                    out_features=789,
+                ),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.Tanh(input_shape=(789,), output_shape=(789,)),
             ],
         ),
         pytest.param(
@@ -222,19 +265,43 @@ def test_read_enclosure(
             + (789 * 123)
             + 123,
             [
-                nn.ReLU(),
-                nn.Flatten(),
-                nn.Linear(bias=True, in_features=28 * 28, out_features=789),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.Linear(bias=False, in_features=789, out_features=123),
-                nn.Linear(bias=True, in_features=123, out_features=789),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.LeakyReLU(),
-                nn.Linear(bias=False, in_features=789, out_features=123),
-                nn.Tanh(),
+                pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(789,),
+                    bias=True,
+                    in_features=28 * 28,
+                    out_features=789,
+                ),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.Linear(
+                    input_shape=(789,),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=789,
+                    out_features=123,
+                ),
+                pipeline.Linear(
+                    input_shape=(123,),
+                    output_shape=(789,),
+                    bias=True,
+                    in_features=123,
+                    out_features=789,
+                ),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.Linear(
+                    input_shape=(789,),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=789,
+                    out_features=123,
+                ),
+                pipeline.Tanh(input_shape=(789,), output_shape=(123,)),
             ],
             id="nested-repeat",
         ),
@@ -258,10 +325,19 @@ def test_read_enclosure(
             (123,),
             (28 * 28) + (28 * 28 * 123) + 123,
             [
-                nn.ReLU(),
-                nn.Flatten(),
-                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
-                nn.Tanh(),
+                pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=28 * 28,
+                    out_features=123,
+                ),
+                pipeline.Tanh(
+                    input_shape=(28, 28),
+                    output_shape=(123,),
+                ),
             ],
             id="simple-deactivate",
         ),
@@ -290,10 +366,22 @@ def test_read_enclosure(
             (123,),
             (28 * 28) + (28 * 28 * 123) + 123,
             [
-                nn.ReLU(),
-                nn.Flatten(),
-                nn.Linear(bias=False, in_features=28 * 28, out_features=123),
-                nn.Tanh(),
+                pipeline.ReLU(
+                    input_shape=(28, 28),
+                    output_shape=(28, 28),
+                ),
+                pipeline.Flatten(
+                    input_shape=(28, 28),
+                    output_shape=(28, 28),
+                ),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=28 * 28,
+                    out_features=123,
+                ),
+                pipeline.Tanh(input_shape=(123,), output_shape=(123,)),
             ],
             id="repeating-deactivate",
         ),
@@ -329,14 +417,32 @@ def test_read_enclosure(
             + (789 * 123)
             + 123,
             [
-                nn.ReLU(),
-                nn.Flatten(),
-                nn.Linear(bias=True, in_features=28 * 28, out_features=789),
-                nn.LeakyReLU(),
-                nn.Linear(bias=True, in_features=789, out_features=789),
-                nn.LeakyReLU(),
-                nn.Linear(bias=False, in_features=789, out_features=123),
-                nn.Tanh(),
+                pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Flatten(input_shape=(28, 28), output_shape=(28, 28)),
+                pipeline.Linear(
+                    input_shape=(28, 28),
+                    output_shape=(789,),
+                    bias=True,
+                    in_features=28 * 28,
+                    out_features=789,
+                ),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.Linear(
+                    input_shape=(789,),
+                    output_shape=(789,),
+                    bias=True,
+                    in_features=789,
+                    out_features=789,
+                ),
+                pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
+                pipeline.Linear(
+                    input_shape=(789,),
+                    output_shape=(123,),
+                    bias=False,
+                    in_features=789,
+                    out_features=123,
+                ),
+                pipeline.Tanh(input_shape=(123,), output_shape=(123,)),
             ],
             id="deactivate-nested-repeat",
         ),
@@ -347,14 +453,12 @@ def test_build_models(
     symbols: list[SimpleSymbol],
     expected_output_shape: typing.Tuple[int, ...],
     expected_op_cost: int,
-    expected_modules: list[nn.Module],
+    expected_modules: list[pipeline.Module],
 ):
     model = build_models(symbols=iter(symbols), input_shape=input_shape)
     assert model.output_shape == expected_output_shape
     assert model.cost.operation == expected_op_cost
-    assert list(map(module_type_kwargs, model.modules)) == list(
-        map(module_type_kwargs, expected_modules)
-    )
+    assert model.modules == expected_modules
 
 
 def test_build_models_exceed_quota():
