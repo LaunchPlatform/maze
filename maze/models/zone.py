@@ -141,7 +141,7 @@ class Zone(Base):
                 and_(
                     aliased_avatar.zone_id == cls.id,
                     aliased_avatar.period_id == current_period_id,
-                    aliased_avatar.status == AvatarStatus.ALIVE,
+                    aliased_avatar.status != AvatarStatus.ALIVE,
                 )
             )
         ).scalar_subquery()

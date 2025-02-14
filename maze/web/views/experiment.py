@@ -26,7 +26,9 @@ def view_experiment(
             selectinload(models.Experiment.environments)
             .undefer(models.Environment.current_alive_avatars)
             .undefer(models.Environment.current_dead_avatars)
-            .selectinload(models.Environment.zones),
+            .selectinload(models.Environment.zones)
+            .undefer(models.Zone.current_alive_avatars)
+            .undefer(models.Zone.current_dead_avatars)
         ],
     )
     if experiment is None:

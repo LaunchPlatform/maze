@@ -42,7 +42,9 @@
         </td>
         <td>{{ zone.initialized }}</td>
         <td class="text-end">{{ zone.agent_slots | format_int }}</td>
-        <td></td>
+        <td>
+          {{ lib.progress_bar(zone.current_alive_avatars, zone.current_dead_avatars) }}
+        </td>
       </tr>
       {% endfor %}
     {% endfor %}
