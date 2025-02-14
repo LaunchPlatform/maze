@@ -4,6 +4,8 @@ from fastapi import APIRouter
 from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import HTTPException
+from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import undefer
 
 from .. import deps
 from ... import models
@@ -18,7 +20,15 @@ def view_experiment(
     db: deps.SessionDeps,
     id: uuid.UUID,
 ):
-    experiment = db.get(models.Experiment, id)
+    experiment = db.get(
+        models.Experiment,
+        id,
+        options=[
+            joinedload(models.Experiment.environments)
+            .undefer(models.Environment.current_alive_avatars)
+            .undefer(models.Environment.current_dead_avatars),
+        ],
+    )
     if experiment is None:
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return templates.TemplateResponse(

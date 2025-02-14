@@ -1,0 +1,10 @@
+{% macro progress_bar(alive_avatars, dead_avatars) -%}
+  {% if (alive_avatars + dead_avatars) > 0 %}
+    {% set progress = dead_avatars / (alive_avatars + dead_avatars) %}
+    <div class="progress" role="progressbar" aria-label="Period progress in the current zone" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar" style="width: {{ progress | percentage }}">{{ progress | percentage }}</div>
+    </div>
+  {% else %}
+    N/A
+  {% endif %}
+{% endmacro %}

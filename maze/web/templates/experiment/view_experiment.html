@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "macros.html" as lib with context %}
 
 {% block page_title %}
   View experiment {{ experiment.name }}
@@ -28,7 +29,9 @@
       <td></td>
       <td></td>
       <td class="text-end"></td>
-      <td></td>
+      <td>
+        {{ lib.progress_bar(environment.current_alive_avatars, environment.current_dead_avatars) }}
+      </td>
     </tr>
       {% for zone in environment.zones %}
       <tr>
