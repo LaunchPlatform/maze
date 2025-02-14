@@ -27,6 +27,18 @@
 
   <dt>Arguments</dt>
   <dd>{{ environment.arguments }}</dd>
+
+  <dt>Progress (Period {{ environment.experiment.current_period.index }})</dt>
+  <dd>
+    {% if alive_avatars + dead_avatars > 0 %}
+      {% set progress = dead_avatars / (alive_avatars + dead_avatars) %}
+      <div class="progress" role="progressbar" aria-label="Period progress in the current environment" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-bar" style="width: {{ progress | percentage }}">{{ progress | percentage }}</div>
+      </div>
+    {% else %}
+      N/A
+    {% endif %}
+  </dd>
 </dl>
 
 <h2>Zones</h2>
