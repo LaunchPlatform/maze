@@ -46,7 +46,7 @@ class Environment(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
-    zones: DynamicMapped["Zone"] = relationship(
+    zones: Mapped[list["Zone"]] = relationship(
         "Zone",
         back_populates="environment",
         order_by="Zone.index",
@@ -130,7 +130,7 @@ class Environment(Base):
                     aliased_avatar.status == AvatarStatus.ALIVE,
                 )
             )
-        )
+        ).scalar_subquery()
 
         aliased_avatar = aliased(Avatar)
         aliased_zone = aliased(Zone)
@@ -150,7 +150,7 @@ class Environment(Base):
                     aliased_avatar.status != AvatarStatus.ALIVE,
                 )
             )
-        )
+        ).scalar_subquery()
         cls.current_alive_avatars = column_property(
             alive_avatars,
             deferred=True,

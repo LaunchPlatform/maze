@@ -131,7 +131,7 @@ class Zone(Base):
                     aliased_avatar.status == AvatarStatus.ALIVE,
                 )
             )
-        )
+        ).scalar_subquery()
 
         cls.current_alive_avatars = column_property(
             alive_avatars,
