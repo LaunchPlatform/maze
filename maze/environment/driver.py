@@ -123,6 +123,8 @@ class Driver:
                     income=epoch_report.income,
                 )
                 db.add(epoch)
+                # flush to keep db session alive
+                db.flush()
                 # TODO: logs?
             # Am I a good agent?
             # Yes! You're a good agent.
