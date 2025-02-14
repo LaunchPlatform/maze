@@ -19,9 +19,6 @@
   <dt>ID</dt>
   <dd>{{ agent.id }}</dd>
 
-  <dt>Gene</dt>
-  <dd>{{ agent.gene }}</dd>
-
   <dt>Operation Cost</dt>
   <dd>{{ agent.op_cost | format_int }}</dd>
 
@@ -74,6 +71,11 @@
       <li><a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a></li>
     {% endfor %}
     </ul>
+  </dd>
+
+  <dt>Gene</dt>
+  <dd>
+    <pre><code>{{ agent.gene | tojson(2) }}</code></pre>
   </dd>
 </dl>
 
