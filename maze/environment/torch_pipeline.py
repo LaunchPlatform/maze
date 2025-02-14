@@ -50,9 +50,9 @@ def build_pipeline(module: pipeline.Module) -> nn.Module:
                 in_features=in_features,
                 out_features=out_features,
             )
-        case pipeline.AdaptiveMaxPool1d(out_features):
+        case pipeline.AdaptiveMaxPool1d(out_features=out_features):
             return nn.AdaptiveMaxPool1d(out_features)
-        case pipeline.AdaptiveAvgPool1d(out_features):
+        case pipeline.AdaptiveAvgPool1d(out_features=out_features):
             return nn.AdaptiveAvgPool1d(out_features)
         case pipeline.Sequential(modules=modules):
             return nn.Sequential(*map(build_pipeline, modules))

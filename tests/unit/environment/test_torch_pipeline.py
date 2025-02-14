@@ -61,6 +61,18 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             ),
         ),
         (
+            pipeline.AdaptiveAvgPool1d(
+                input_shape=(123,), output_shape=(456,), out_features=456
+            ),
+            nn.AdaptiveAvgPool1d(456),
+        ),
+        (
+            pipeline.AdaptiveMaxPool1d(
+                input_shape=(123,), output_shape=(456,), out_features=456
+            ),
+            nn.AdaptiveMaxPool1d(456),
+        ),
+        (
             pipeline.Linear(
                 input_shape=(28 * 28,),
                 output_shape=(123,),
