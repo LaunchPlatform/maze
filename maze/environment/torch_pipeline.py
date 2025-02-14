@@ -28,17 +28,17 @@ class Reshape(nn.Module):
         return x.view(x.size(0), *self.shape)
 
 
-def build_module(module: pipeline.Module) -> nn.Module:
+def build_pipeline(module: pipeline.Module) -> nn.Module:
     match module:
-        case pipeline.ReLU:
+        case pipeline.ReLU():
             return nn.ReLU()
-        case pipeline.LeakyReLU:
+        case pipeline.LeakyReLU():
             return nn.LeakyReLU()
-        case pipeline.Tanh:
+        case pipeline.Tanh():
             return nn.Tanh()
-        case pipeline.Softmax:
+        case pipeline.Softmax():
             return nn.Softmax()
-        case pipeline.Flatten:
+        case pipeline.Flatten():
             return nn.Flatten()
         case pipeline.Reshape(output_shape):
             return Reshape(output_shape)
@@ -51,8 +51,8 @@ def build_module(module: pipeline.Module) -> nn.Module:
         case pipeline.AdaptiveAvgPool1d(out_features):
             return nn.AdaptiveAvgPool1d(out_features)
         case pipeline.Sequential(modules):
-            return nn.Sequential(*map(build_module, modules))
+            return nn.Sequential(*map(build_pipeline, modules))
         case pipeline.Joint(branches):
-            return Joint(branch_modules=list(map(build_module, branches)))
+            return Joint(branch_modules=list(map(build_pipeline, branches)))
         case _:
             raise ValueError(f"Unknown module type {type(module)}")
