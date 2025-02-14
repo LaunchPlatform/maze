@@ -1,4 +1,5 @@
 import logging
+import time
 import typing
 
 import click
@@ -29,15 +30,11 @@ def main(env: CliEnvironment, template_cls: str):
     driver.initialize_zones()
     with Session() as db:
         experiment = driver.get_experiment(db)
-        period = (
-            experiment.periods.order_by(None)
-            .order_by(models.Period.index.desc())
-            .first()
-        )
+        period = experiment.current_period
         while True:
             logger.info("Processing period %s", period.display_name)
             while True:
-                avatar = (
+                avatar_query = (
                     db.query(models.Avatar)
                     .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
                     .join(
@@ -47,9 +44,16 @@ def main(env: CliEnvironment, template_cls: str):
                     .filter(models.Avatar.period == period)
                     .filter(models.Avatar.status == models.AvatarStatus.ALIVE)
                     .order_by(models.Environment.index, models.Zone.index)
-                    .with_for_update(of=models.Avatar, skip_locked=True)
+                )
+                avatar = (
+                    avatar_query.with_for_update(of=models.Avatar, skip_locked=True)
                 ).first()
                 if avatar is None:
+                    remaining_avatar = avatar_query.count()
+                    if remaining_avatar:
+                        logger.info("Waiting for all avatars to finish")
+                        time.sleep(10)
+                        continue
                     logger.info(
                         "No more alive avatar found for period %s", period.display_name
                     )
