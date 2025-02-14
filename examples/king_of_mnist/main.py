@@ -50,6 +50,7 @@ class Arguments:
     initial_credit: int
     basic_cost: int
     reward: int
+    reward_difficulty: int
 
 
 def format_number(value: int) -> str:
@@ -76,12 +77,14 @@ class KingOfMnist(LinearEnvironment):
         mi = 1_000_000
         basic_cost = to_millions([1, 2, 3, 4, 5])[index]
         reward = to_millions([100, 90, 80, 70, 60])[index]
+        reward_difficulty = [5, 6, 7, 8, 9][index]
         return dataclasses.asdict(
             Arguments(
                 epoch=[10, 30, 50, 70, 90][index],
                 initial_credit=100 * mi,
                 basic_cost=basic_cost,
                 reward=reward,
+                reward_difficulty=reward_difficulty,
             )
         )
 
@@ -158,7 +161,11 @@ class KingOfMnist(LinearEnvironment):
         ):
             epoch.cost = epoch_cost
             epoch.income = int(
-                args.reward * ((epoch.test_correct_count / epoch.test_total_count) ** 5)
+                args.reward
+                * (
+                    (epoch.test_correct_count / epoch.test_total_count)
+                    ** args.reward_difficulty
+                )
             )
             credit += epoch.income - epoch.cost
             logger.info("Avatar remaining credit: %s", format_number(credit))
