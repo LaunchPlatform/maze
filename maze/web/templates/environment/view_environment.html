@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "macros.html" as lib with context %}
 
 {% block page_title %}
   View Environment {{ environment.name }}
@@ -30,14 +31,7 @@
 
   <dt>Progress (Period {{ environment.experiment.current_period.index }})</dt>
   <dd>
-    {% if alive_avatars + dead_avatars > 0 %}
-      {% set progress = dead_avatars / (alive_avatars + dead_avatars) %}
-      <div class="progress" role="progressbar" aria-label="Period progress in the current environment" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
-        <div class="progress-bar" style="width: {{ progress | percentage }}">{{ progress | percentage }}</div>
-      </div>
-    {% else %}
-      N/A
-    {% endif %}
+    {{ lib.progress_bar(environment.current_alive_avatars, environment.current_dead_avatars) }}
   </dd>
 </dl>
 

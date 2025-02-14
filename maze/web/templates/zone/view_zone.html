@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "macros.html" as lib with context %}
 
 {% block page_title %}
   View zone {{ zone.display_name }}
@@ -25,12 +26,7 @@
 
 <h2>Period: {{ period_stats.period.index }}</h2>
 
-{% if (period_stats.alive_avatars + period_stats.dead_avatars) > 0 %}
-  {% set progress = period_stats.dead_avatars / (period_stats.alive_avatars + period_stats.dead_avatars) %}
-  <div class="progress" role="progressbar" aria-label="Period progress in the current zone" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
-    <div class="progress-bar" style="width: {{ progress | percentage }}">{{ progress | percentage }}</div>
-  </div>
-{% endif %}
+{{ lib.progress_bar(period_stats.alive_avatars, period_stats.dead_avatars) }}
 
 <table class="table table-striped">
   <thead>

@@ -133,7 +133,23 @@ class Zone(Base):
             )
         ).scalar_subquery()
 
+        aliased_avatar = aliased(Avatar)
+        dead_avatars = (
+            select(func.count())
+            .select_from(aliased_avatar)
+            .where(
+                and_(
+                    aliased_avatar.zone_id == cls.id,
+                    aliased_avatar.period_id == current_period_id,
+                    aliased_avatar.status == AvatarStatus.ALIVE,
+                )
+            )
+        ).scalar_subquery()
         cls.current_alive_avatars = column_property(
             alive_avatars,
+            deferred=True,
+        )
+        cls.current_dead_avatars = column_property(
+            dead_avatars,
             deferred=True,
         )
