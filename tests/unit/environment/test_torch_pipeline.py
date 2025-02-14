@@ -5,6 +5,7 @@ from torch import nn
 
 from maze.environment import torch_pipeline
 from maze.environment.torch_pipeline import build_pipeline
+from maze.environment.torch_pipeline import Joint
 from maze.gene import pipeline
 
 
@@ -16,6 +17,10 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
         case torch_pipeline.Reshape:
             return module_type, dict(
                 shape=module.shape,
+            )
+        case torch_pipeline.Joint:
+            return module_type, dict(
+                branches=list(map(module_type_kwargs, module.branch_modules)),
             )
         case nn.Linear:
             return module_type, dict(
@@ -96,6 +101,43 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 ],
             ),
             nn.Sequential(nn.ReLU(), nn.Tanh()),
+        ),
+        (
+            pipeline.Joint(
+                input_shape=(28, 28),
+                output_shape=(28, 28),
+                branches=[
+                    pipeline.Sequential(
+                        input_shape=(28, 28),
+                        output_shape=(28, 28),
+                        modules=[
+                            pipeline.ReLU(input_shape=(28, 28), output_shape=(28, 28)),
+                            pipeline.Tanh(input_shape=(28, 28), output_shape=(28, 28)),
+                        ],
+                    ),
+                    pipeline.Sequential(
+                        input_shape=(28, 28),
+                        output_shape=(28, 28),
+                        modules=[
+                            pipeline.Linear(
+                                input_shape=(28 * 28,),
+                                output_shape=(123,),
+                                in_features=28 * 28,
+                                out_features=123,
+                                bias=True,
+                            ),
+                        ],
+                    ),
+                ],
+            ),
+            Joint(
+                branch_modules=[
+                    nn.Sequential(nn.ReLU(), nn.Tanh()),
+                    nn.Sequential(
+                        nn.Linear(in_features=28 * 28, out_features=123, bias=True)
+                    ),
+                ]
+            ),
         ),
     ],
 )
