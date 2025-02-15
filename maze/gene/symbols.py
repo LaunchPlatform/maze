@@ -59,7 +59,6 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.BRANCH_START,
     SymbolType.BRANCH_SEGMENT_MARKER,
     SymbolType.BRANCH_STOP,
-    SymbolType.REPEAT_START,
     SymbolType.REPEAT_END,
     SymbolType.ACTIVATE,
     SymbolType.DEACTIVATE,
