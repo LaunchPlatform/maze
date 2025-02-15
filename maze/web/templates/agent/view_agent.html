@@ -210,7 +210,10 @@ text {
   <dd>
     <ul>
     {% for avatar in agent.avatars %}
-      <li><a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a></li>
+      <li>
+        <a href="{{ url_for('view_avatar', id=avatar.id) }}">{{ avatar.id }}</a>
+        (Zone: <a href="{{ url_for('view_zone', id=avatar.zone_id) }}">{{ avatar.zone.display_name }}</a>, Period: {{ avatar.period.index }})
+      </li>
     {% endfor %}
     </ul>
   </dd>
