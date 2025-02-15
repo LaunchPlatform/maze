@@ -9,6 +9,7 @@ from ..gene.builder import build_models
 from ..gene.builder import Model
 from ..gene.builder import ModelCost
 from .agentdata import AgentData
+from .torch_pipeline import build_pipeline
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,9 @@ class Vehicle:
             input_shape=self.agent.input_shape,
             budget=self.budget,
         )
-        self.torch_model = nn.Sequential(*self.model.modules).to(self.device)
+        self.torch_model = nn.Sequential(*map(build_pipeline, self.model.modules)).to(
+            self.device
+        )
         if not allow_no_parameters and not self.parameter_count():
             raise NoParametersError("PyTorch model has no parameter")
 
