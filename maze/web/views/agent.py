@@ -52,7 +52,9 @@ def view_agent(
             dag=dag,
         )
         output_node = dag.add_node(Node(name="OUTPUT"))
-        dag.add_edge(Edge(src=tail_node, dest=output_node))
+        dag.add_edge(
+            Edge(src=tail_node, dest=output_node, label=repr(model.output_shape))
+        )
     except (ExceedOperationBudgetError, ExceedBuildBudgetError):
         pass
 

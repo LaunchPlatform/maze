@@ -13,6 +13,7 @@ class Node:
 class Edge:
     src: int
     dest: int
+    label: str | None = None
 
 
 class DAG:
@@ -89,10 +90,11 @@ def build_dag(module: pipeline.Module, prev_node: int, dag: DAG) -> int:
                             module=branch_module, prev_node=prev_node, dag=dag
                         ),
                         dest=new_node,
+                        label=repr(branch_module.output_shape),
                     )
                 )
             return new_node
         case _:
             raise ValueError(f"Unknown module type {type(module)}")
-    dag.add_edge(Edge(src=prev_node, dest=new_node))
+    dag.add_edge(Edge(src=prev_node, dest=new_node, label=repr(module.output_shape)))
     return new_node

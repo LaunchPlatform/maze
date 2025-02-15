@@ -78,7 +78,8 @@ g.nodes().forEach(function(v) {
 });
 
 for (const edge of dag.edges) {
-    g.setEdge(edge.src, edge.dest);
+    const attrs = edge.label !== null ? { label: edge.label } : {};
+    g.setEdge(edge.src, edge.dest, attrs);
 }
 
 // Create the renderer
