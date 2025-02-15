@@ -176,7 +176,7 @@ text {
         <th scope="row">
         </th>
         <td>
-          <a href="{{ url_for('view_zone', id=zone.id) }}">{{ zone.index }}</a>
+          <a href="{{ url_for('view_zone', id=zone.id) }}">Zone {{ zone.index }}</a>
         </td>
         <td>{{ zone.initialized }}</td>
         <td class="text-end">{{ zone.agent_slots | format_int }}</td>
