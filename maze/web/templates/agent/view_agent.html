@@ -21,6 +21,10 @@
 </script>
 <script>
 
+function makeSimpleLabel(node) {
+   return `<span class="text-center"><strong>${node.name}</strong></span>`;
+}
+
 function makeNodeAttrRow(key, value) {
     return `<tr>
       <th scope="row">
@@ -34,7 +38,7 @@ function makeNodeAttrRow(key, value) {
 
 function makeNodeTable(node) {
     if (node.attributes.length === 0) {
-        return `<span class="text-center"><strong>${node.name}</strong></span>`;
+        return makeSimpleLabel(node);
     }
     return `<table class="table table-bordered model-node">
   <caption class="text-center"><strong>${node.name}</strong></caption>
@@ -51,21 +55,21 @@ var g = new dagreD3.graphlib.Graph()
 
 for (const [index, node] of dag.nodes.entries()) {
     let className;
-    let labelType = "html";
     let shape = "table";
+    let ioType = false;
     switch (node.name) {
         case "INPUT":
         case "OUTPUT":
             shape = "rect";
             className = "input"
-            labelType = undefined;
+            ioType = true;
             break;
     }
     g.setNode(
         index,
         {
-            label: labelType === "html" ? makeNodeTable(node) : node.name,
-            labelType,
+            label: ioType ? makeSimpleLabel(node) : makeNodeTable(node),
+            labelType: "html",
             class: className,
         }
     );
@@ -99,15 +103,19 @@ svg.call(zoom);
 render(d3.select("svg g"), g);
 
 // Center the graph
-var initialScale = 0.75;
+var initialScale = 0.85;
 svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - g.graph().width * initialScale) / 2, 20).scale(initialScale));
 
-svg.attr("height", g.graph().height + 40);
+svg.attr("height", g.graph().height + 10);
 </script>
 {% endblock %}
 
 {% block css %}
 <style>
+
+svg#svg-canvas {
+  background-color: #eee;
+}
 
 g.input > rect, g.output > rect {
   fill: #aaa;
