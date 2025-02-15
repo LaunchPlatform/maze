@@ -55,19 +55,19 @@ for (const edge of dag.edges) {
 var render = new dagreD3.render();
 
 render.shapes().table = (parent, bbox, node) => {
-  var shapeSvg = parent.insert("rect", ":first-child")
-    .attr("rx", node.rx)
-    .attr("ry", node.ry)
-    .attr("x", -bbox.width / 2)
-    .attr("y", -bbox.height / 2)
-    .attr("width", bbox.width)
-    .attr("height", bbox.height);
+    var shapeSvg = parent.insert("rect", ":first-child")
+      .attr("rx", node.rx)
+      .attr("ry", node.ry)
+      .attr("x", -bbox.width / 2)
+      .attr("y", -bbox.height / 2)
+      .attr("width", bbox.width)
+      .attr("height", bbox.height);
 
-  node.intersect = function(point) {
-    return dagreD3.intersect.rect(node, point);
-  };
+    node.intersect = function(point) {
+      return dagreD3.intersect.rect(node, point);
+    };
 
-  return shapeSvg;
+    return shapeSvg;
 }
 
 // Set up an SVG group so that we can translate the final graph.
