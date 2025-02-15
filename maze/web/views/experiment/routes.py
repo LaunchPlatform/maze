@@ -1,4 +1,5 @@
 import dataclasses
+import functools
 import uuid
 
 from fastapi import APIRouter
@@ -40,6 +41,16 @@ def view_experiment(
         dict(
             request=request,
             experiment=experiment,
-            dag=dataclasses.asdict(build_dag(experiment)),
+            dag=dataclasses.asdict(
+                build_dag(
+                    experiment,
+                    make_env_url=lambda env_id: str(
+                        request.url_for("view_environment", id=env_id)
+                    ),
+                    make_zone_url=lambda zone_id: str(
+                        request.url_for("view_zone", id=zone_id)
+                    ),
+                )
+            ),
         ),
     )

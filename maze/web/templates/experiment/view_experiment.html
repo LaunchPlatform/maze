@@ -14,13 +14,13 @@
 <script>
 
 function makeZoneLabel(zone) {
-    return `<li>Zone ${zone.index}</li>`;
+    return `<li><a href="${zone.link}">Zone ${zone.index}</a></li>`;
 }
 
 function makeEnvLabel(node) {
     return `
     <div class="env-node">
-      <div class="title">${node.name}</div>
+      <div class="title"><a href="${node.link}">${node.name}</a></div>
       <ul>
       ${node.zones.map(makeZoneLabel).join('\n')}
       </ul>
