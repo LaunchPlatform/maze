@@ -1,10 +1,10 @@
 import pytest
 
 from maze.gene import pipeline
-from maze.web.dag import build_dag
-from maze.web.dag import DAG
-from maze.web.dag import Edge
-from maze.web.dag import Node
+from maze.gene.dag import build_dag
+from maze.gene.dag import DAG
+from maze.gene.dag import Edge
+from maze.gene.dag import Node
 
 
 @pytest.mark.parametrize(

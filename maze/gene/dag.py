@@ -1,6 +1,6 @@
 import dataclasses
 
-from ..gene import pipeline
+from . import pipeline
 
 
 @dataclasses.dataclass(frozen=True)
