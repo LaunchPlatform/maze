@@ -35,9 +35,14 @@ class Period(Base):
         back_populates="periods",
         uselist=False,
     )
-    avatars: DynamicMapped["Avatar"] = relationship(
+    avatars: Mapped[list["Avatar"]] = relationship(
         "Avatar",
         back_populates="period",
+    )
+    query_avatars: DynamicMapped["Avatar"] = relationship(
+        "Avatar",
+        back_populates="period",
+        viewonly=True,
     )
     __table_args__ = (
         UniqueConstraint(

@@ -1,7 +1,6 @@
 import dataclasses
 import itertools
 import uuid
-from collections import OrderedDict
 
 from fastapi import APIRouter
 from fastapi import Request
@@ -11,6 +10,7 @@ from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import select
 from sqlalchemy.orm import aliased
+from sqlalchemy.orm import selectinload
 
 from .. import deps
 from ... import models
@@ -65,6 +65,11 @@ def view_zone(
     period_avatars_query = (
         db.query(models.Period, alive_avatar_count, dead_avatar_count, models.Avatar)
         .select_from(models.Period)
+        .options(
+            selectinload(models.Period.avatars)
+            .undefer(models.Avatar.credit)
+            .selectinload(models.Avatar.agent)
+        )
         .join(models.Experiment, models.Period.experiment_id == models.Experiment.id)
         .join(
             models.Environment, models.Environment.experiment_id == models.Experiment.id

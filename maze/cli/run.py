@@ -65,7 +65,7 @@ def main(env: CliEnvironment, template_cls: str):
                 driver.run_avatar(avatar)
                 db.commit()
 
-            if not period.avatars.count():
+            if not period.query_avatars.count():
                 logger.info("Did not process any avatar, nothing to run")
                 break
             # lock period
