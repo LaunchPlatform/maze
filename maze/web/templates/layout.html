@@ -7,6 +7,7 @@
   <title>{{ settings.SITE_NAME }} - {% block page_title %}{% endblock %}</title>
 
   <link href="{{ url_for('static', path='vendors/bootstrap-5.3.3/css/bootstrap.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', path='vendors/bootstrap-icons-1.11.3/bootstrap-icons.min.css') }}" rel="stylesheet">
   {% block headers %}{% endblock %}
 
   {% block css %}{% endblock %}
@@ -25,13 +26,14 @@
       <a class="navbar-brand" href="{{ url_for('home') }}">MAZE</a>
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">
+            <i class="bi bi-house"></i> Home
+          </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+          <a class="nav-link" href="https://github.com/LaunchPlatform/maze">
+            <i class="bi bi-github"></i> GitHub Repo
+          </a>
         </li>
       </ul>
     </div>
@@ -48,7 +50,7 @@
         </div>
         <div class="offcanvas-body d-md-flex flex-column p-0 pt-lg-3 overflow-y-auto">
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
-            <span>Articles</span>
+            <span><i class="bi bi-files"></i> Articles</span>
           </h6>
           <ul class="nav flex-column mb-auto">
             <li class="nav-item">
@@ -61,7 +63,7 @@
           <hr class="my-3">
 
           <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
-            <span>Experiments</span>
+            <span><i class="bi bi-bar-chart-line"></i> Experiments</span>
           </h6>
           <ul class="nav flex-column mb-auto">
             {% for experiment in experiments %}
