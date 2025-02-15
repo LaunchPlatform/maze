@@ -6,8 +6,8 @@ from fastapi import status
 from fastapi.exceptions import HTTPException
 from sqlalchemy.orm import selectinload
 
-from .. import deps
-from ... import models
+from ... import deps
+from .... import models
 
 router = APIRouter(tags=["experiment"])
 

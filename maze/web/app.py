@@ -5,7 +5,7 @@ from ..core import constants
 from .views.agent import router as agent_router
 from .views.avatar import router as avatar_router
 from .views.environment import router as environment_router
-from .views.experiment import router as experiment_router
+from .views.experiment.routes import router as experiment_router
 from .views.home import router as home_router
 from .views.zone import router as zone_router
 
