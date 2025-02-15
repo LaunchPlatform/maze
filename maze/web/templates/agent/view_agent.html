@@ -103,10 +103,15 @@ svg.call(zoom);
 render(d3.select("svg g"), g);
 
 // Center the graph
-var initialScale = 0.85;
-svg.call(zoom.transform, d3.zoomIdentity.translate((svg.attr("width") - g.graph().width * initialScale) / 2, 20).scale(initialScale));
+var initialScale = 1.0;
+svg.call(
+    zoom.transform,
+    d3.zoomIdentity.translate(
+        (svg.attr("width") - g.graph().width * initialScale) / 2, 10
+    ).scale(initialScale)
+);
 
-svg.attr("height", g.graph().height + 10);
+svg.attr("height", g.graph().height + 20);
 </script>
 {% endblock %}
 
