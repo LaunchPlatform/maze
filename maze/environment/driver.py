@@ -4,7 +4,6 @@ import random
 
 from sqlalchemy import and_
 from sqlalchemy import func
-from sqlalchemy import literal_column
 from sqlalchemy.orm import object_session
 
 from .. import models
