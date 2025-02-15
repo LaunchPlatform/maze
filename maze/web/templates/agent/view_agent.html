@@ -33,7 +33,7 @@ function makeNodeAttrRow(key, value) {
 }
 
 function makeNodeTable(node) {
-    return `<table class="table">
+    return `<table class="table model-node">
   <caption class="text-center"><strong>${node.name}</strong></caption>
   <tbody>
     ${ node.attributes.map(([key, value]) => makeNodeAttrRow(key, value)).join("\n") }
@@ -124,6 +124,10 @@ text {
 .edgePath path {
   stroke: #333;
   stroke-width: 1.5px;
+}
+
+.model-node {
+  caption-side: top;
 }
 
 </style>
