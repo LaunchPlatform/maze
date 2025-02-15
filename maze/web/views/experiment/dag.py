@@ -17,6 +17,7 @@ class EnvironmentNode:
     id: str
     link: str
     name: str
+    progress: float | None
     zones: list[Zone]
 
 
@@ -50,11 +51,18 @@ def build_dag(
             zones.append(
                 Zone(index=zone.index, progress=progress, link=make_zone_url(zone.id))
             )
+        progress = None
+        total_avatars = (
+            environment.current_alive_avatars + environment.current_dead_avatars
+        )
+        if total_avatars > 0:
+            progress = environment.current_dead_avatars / total_avatars
         dag.nodes.append(
             EnvironmentNode(
                 id=str(environment.id),
                 link=make_env_url(environment.id),
                 name=environment.name,
+                progress=progress,
                 zones=zones,
             )
         )

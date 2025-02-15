@@ -29,9 +29,10 @@ function makeZoneLabel(zone) {
 }
 
 function makeEnvLabel(node) {
+    const style = makeProgressBgStyle(node.progress, "#E9F2FF");
     return `
     <div class="env-node">
-      <div class="title"><a href="${node.link}">${node.name}</a></div>
+      <div class="title" style="${style}"><a href="${node.link}">${node.name}</a></div>
       <ul>
       ${node.zones.map(makeZoneLabel).join('\n')}
       </ul>
