@@ -4,16 +4,16 @@ from .... import models
 
 
 @dataclasses.dataclass(frozen=True)
-class ZoneNode:
-    id: str
-    parent_env_id: str
-    name: str
+class Zone:
+    index: str
+    progress: float | None
 
 
 @dataclasses.dataclass(frozen=True)
 class EnvironmentNode:
     id: str
     name: str
+    zones: list[Zone]
 
 
 @dataclasses.dataclass(frozen=True)
@@ -24,8 +24,7 @@ class Edge:
 
 @dataclasses.dataclass
 class DAG:
-    zone_nodes: list[ZoneNode] = dataclasses.field(default_factory=list)
-    env_nodes: list[EnvironmentNode] = dataclasses.field(default_factory=list)
+    nodes: list[EnvironmentNode] = dataclasses.field(default_factory=list)
     edges: list[Edge] = dataclasses.field(default_factory=list)
 
 
@@ -34,17 +33,20 @@ def build_dag(experiment: models.Experiment) -> DAG:
     # TODO: we only have linear environment for now, let's support free form of env connections in the future
     prev_env = None
     for environment in experiment.environments:
-        dag.env_nodes.append(
-            EnvironmentNode(id=str(environment.id), name=environment.name)
-        )
+        zones = []
         for zone in environment.zones:
-            dag.zone_nodes.append(
-                ZoneNode(
-                    id=str(zone.id),
-                    name=f"Zone {zone.index}",
-                    parent_env_id=str(environment.id),
-                )
+            progress = None
+            total_avatars = zone.current_alive_avatars + zone.current_dead_avatars
+            if total_avatars > 0:
+                progress = zone.current_dead_avatars / total_avatars
+            zones.append(Zone(index=zone.index, progress=progress))
+        dag.nodes.append(
+            EnvironmentNode(
+                id=str(environment.id),
+                name=environment.name,
+                zones=zones,
             )
+        )
         if prev_env is not None:
             dag.edges.append(Edge(src=str(prev_env.id), dest=str(environment.id)))
         prev_env = environment

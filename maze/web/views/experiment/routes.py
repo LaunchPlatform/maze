@@ -1,3 +1,4 @@
+import dataclasses
 import uuid
 
 from fastapi import APIRouter
@@ -8,6 +9,7 @@ from sqlalchemy.orm import selectinload
 
 from ... import deps
 from .... import models
+from .dag import build_dag
 
 router = APIRouter(tags=["experiment"])
 
@@ -38,5 +40,6 @@ def view_experiment(
         dict(
             request=request,
             experiment=experiment,
+            dag=dataclasses.asdict(build_dag(experiment)),
         ),
     )
