@@ -16,13 +16,11 @@ class Edge:
 
 class DAG:
     def __init__(self):
-        self.sn = 0
         self.nodes: list[Node] = []
         self.edges: list[Edge] = []
 
     def add_node(self, node: Node) -> int:
-        sn = self.sn
-        self.sn += 1
+        sn = len(self.nodes)
         self.nodes.append(node)
         return sn
 
@@ -56,10 +54,9 @@ def build_dag(module: pipeline.Module, prev_node: int, dag: DAG) -> int:
             new_node = dag.add_node(Node(name="AdaptiveAvgPool1d"))
         # TODO:
         case pipeline.Sequential(modules=modules):
-            current_node = prev_node
             for module in modules:
-                current_node = build_dag(module=module, prev_node=current_node, dag=dag)
-            new_node = current_node
+                prev_node = build_dag(module=module, prev_node=prev_node, dag=dag)
+            return prev_node
         case pipeline.Joint(branches=branches):
             new_node = dag.add_node(Node(name="Joint"))
             for branch_module in branches:
