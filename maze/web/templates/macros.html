@@ -1,3 +1,12 @@
+{% macro dagre_js_libs() -%}
+<script src="{{ url_for('static', path='vendors/dagre/lodash-4.17.15.js') }}"></script>
+<script src="{{ url_for('static', path='vendors/dagre/graphlib-2.1.3.min.js') }}"></script>
+<script src="{{ url_for('static', path='vendors/dagre/d3.v7.min.js') }}"></script>
+<script src="{{ url_for('static', path='vendors/dagre/dagre-1.0.4.min.js') }}"></script>
+<script src="{{ url_for('static', path='vendors/dagre/dagre-d3.core-0.6.4.min.js') }}"></script>
+<script src="{{ url_for('static', path='vendors/dagre/dagre-d3-0.6.4.min.js') }}"></script>
+{% endmacro %}
+
 {% macro progress_bar(alive_avatars, dead_avatars) -%}
   {% if (alive_avatars + dead_avatars) > 0 %}
     {% set progress = dead_avatars / (alive_avatars + dead_avatars) %}
