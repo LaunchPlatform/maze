@@ -1,4 +1,7 @@
+import dataclasses
 import decimal
+
+from ..gene.dag import DAG
 
 
 def format_int(number: int | None) -> str | None:
@@ -17,3 +20,10 @@ def percentage(number: float | decimal.Decimal | None) -> str | None:
     if number is None:
         return
     return f"{number * 100.0:,.2f}%"
+
+
+def dump_dag(dag: DAG) -> dict:
+    return dict(
+        nodes=list(map(dataclasses.asdict, dag.nodes)),
+        edges=list(map(dataclasses.asdict, dag.edges)),
+    )

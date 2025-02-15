@@ -8,6 +8,7 @@ from .. import models
 from ..core import constants
 from ..core.config import settings
 from ..db.session import Session
+from .filters import dump_dag
 from .filters import format_float
 from .filters import format_int
 from .filters import percentage
@@ -28,6 +29,7 @@ def get_templates(request: Request, db: Session = Depends(get_db)) -> Jinja2Temp
     templates.env.filters["format_int"] = format_int
     templates.env.filters["format_float"] = format_float
     templates.env.filters["percentage"] = percentage
+    templates.env.filters["dump_dag"] = dump_dag
     return templates
 
 
