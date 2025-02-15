@@ -2,7 +2,7 @@
 {% import "macros.html" as lib with context %}
 
 {% block page_title %}
-  View experiment {{ experiment.name }}
+  View experiment {{ experiment.name }} (Period: {{ experiment.current_period.index }})
 {% endblock %}
 
 {% block js %}
@@ -13,8 +13,19 @@
 </script>
 <script>
 
+function makeProgressBgStyle(progress, color) {
+    if (progress === null) {
+        return "";
+    }
+    const percentage = `${progress * 100}%`;
+    return `background: linear-gradient(90deg, ${color} ${percentage}, #FFFFFF ${percentage});`;
+}
+
 function makeZoneLabel(zone) {
-    return `<li><a href="${zone.link}">Zone ${zone.index}</a></li>`;
+    const style = makeProgressBgStyle(zone.progress, "#BCD7FF");
+    return `<li style="${style}">
+      <a href="${zone.link}">Zone ${zone.index}</a>
+    </li>`;
 }
 
 function makeEnvLabel(node) {
@@ -128,7 +139,7 @@ text {
 
 
 {% block content %}
-<h1>Experiment: {{ experiment.name }}</h1>
+<h1>Experiment: {{ experiment.name }} (Period: {{ experiment.current_period.index }})</h1>
 
 <svg id="svg-canvas" width="100%" height="600"></svg>
 
