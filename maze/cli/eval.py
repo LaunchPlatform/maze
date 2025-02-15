@@ -58,17 +58,16 @@ def main(
         if agent is None:
             logger.error("Agent %s not found", agent_id)
             sys.exit(-1)
+    vehicle = Vehicle(
+        agent=agent.agent_data,
+        loss_fn=nn.CrossEntropyLoss(),
+    )
+    vehicle.build_models()
+    logger.info("Torch Model:\n%s", vehicle.torch_model)
 
-        vehicle = Vehicle(
-            agent=agent.agent_data,
-            loss_fn=nn.CrossEntropyLoss(),
-        )
-        vehicle.build_models()
-        logger.info("Torch Model:\n%s", vehicle.torch_model)
-
-        for epoch in range(epoches):
-            logger.info("Running epoch %s", epoch)
-            for loss, progress in vehicle.train(train_dataloader):
-                pass
-            vehicle.test(test_dataloader)
+    for epoch in range(epoches):
+        logger.info("Running epoch %s", epoch)
+        for loss, progress in vehicle.train(train_dataloader):
+            pass
+        vehicle.test(test_dataloader)
     logger.info("Done")
