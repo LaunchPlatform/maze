@@ -53,7 +53,7 @@ def view_agent(
         )
         output_node = dag.add_node(Node(name="OUTPUT"))
         dag.add_edge(Edge(src=tail_node, dest=output_node))
-    except ExceedOperationBudgetError | ExceedBuildBudgetError:
+    except (ExceedOperationBudgetError, ExceedBuildBudgetError):
         pass
 
     return templates.TemplateResponse(

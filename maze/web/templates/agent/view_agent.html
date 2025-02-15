@@ -20,6 +20,27 @@
 {% endif %}
 </script>
 <script>
+
+function makeNodeAttrRow(key, value) {
+    return `<tr>
+      <th scope="row">
+        ${key}
+      </th>
+      <td>
+        ${value}
+      </td>
+    </tr>`;
+}
+
+function makeNodeTable(node) {
+    return `<table class="table table-striped">
+  <caption>${node.name}</caption>
+  <tbody>
+    ${node.attributes.map(([key, value]) => makeNodeAttrRow(key, value)) }
+  </tbody>
+</table>`;
+}
+
 // Create the input graph
 var g = new dagreD3.graphlib.Graph()
   .setGraph({})
@@ -27,18 +48,24 @@ var g = new dagreD3.graphlib.Graph()
 
 for (const [index, node] of dag.nodes.entries()) {
     let className;
+    let labelType = "html";
     let shape = "table";
     switch (node.name) {
         case "INPUT":
-            shape = "rect";
-            className = "input"
-            break;
         case "OUTPUT":
             shape = "rect";
-            className = "output"
+            className = "input"
+            labelType = undefined;
             break;
     }
-    g.setNode(index, { label: node.name, class: className, shape });
+    g.setNode(
+        index,
+        {
+            label: labelType === "html" ? makeNodeTable(node) : node.name,
+            labelType,
+            class: className,
+        }
+    );
 }
 
 g.nodes().forEach(function(v) {
@@ -53,22 +80,6 @@ for (const edge of dag.edges) {
 
 // Create the renderer
 var render = new dagreD3.render();
-
-render.shapes().table = (parent, bbox, node) => {
-    var shapeSvg = parent.insert("rect", ":first-child")
-      .attr("rx", node.rx)
-      .attr("ry", node.ry)
-      .attr("x", -bbox.width / 2)
-      .attr("y", -bbox.height / 2)
-      .attr("width", bbox.width)
-      .attr("height", bbox.height);
-
-    node.intersect = function(point) {
-      return dagreD3.intersect.rect(node, point);
-    };
-
-    return shapeSvg;
-}
 
 // Set up an SVG group so that we can translate the final graph.
 var svg = d3.select("svg#svg-canvas"),
