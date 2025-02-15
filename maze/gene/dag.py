@@ -34,10 +34,7 @@ def format_int(value: int) -> str:
 
 
 def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
-    attrs = [
-        ("input_shape", repr(module.input_shape)),
-        ("output_shape", repr(module.output_shape)),
-    ]
+    attrs = []
     match module:
         case (
             pipeline.ReLU()
