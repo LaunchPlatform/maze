@@ -29,6 +29,13 @@ logger = logging.getLogger(__name__)
 def main(
     env: CliEnvironment, agent_id: str, epoches: int, dataset: str, batch_size: int
 ):
+    logger.info(
+        "Evaluating agent %s, epoches=%s, dataset=%s, batch_size=%s",
+        agent_id,
+        epoches,
+        dataset,
+        batch_size,
+    )
     logger.info("Loading dataset %s", dataset)
     dataset_cls = getattr(datasets, dataset)
     training_data = dataset_cls(
@@ -37,7 +44,6 @@ def main(
         download=True,
         transform=ToTensor(),
     )
-
     test_data = dataset_cls(
         root="data",
         train=False,
@@ -58,9 +64,11 @@ def main(
             loss_fn=nn.CrossEntropyLoss(),
         )
         vehicle.build_models()
+        logger.info("Torch Model:\n%s", vehicle.torch_model)
 
         for epoch in range(epoches):
             logger.info("Running epoch %s", epoch)
-            vehicle.train(train_dataloader)
+            for loss, progress in vehicle.train(train_dataloader):
+                pass
             vehicle.test(test_dataloader)
     logger.info("Done")
