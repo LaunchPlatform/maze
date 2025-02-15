@@ -42,7 +42,9 @@ class Vehicle:
         self.loss_fn = loss_fn
         self.device = device if device is not None else detect_device()
         self.budget = (
-            budget if budget is None else ModelCost(operation=100_000_000, build=1_000)
+            budget
+            if budget is not None
+            else ModelCost(operation=100_000_000, build=1_000)
         )
         self.model: Model | None = None
         self.torch_model: nn.Module | None = None

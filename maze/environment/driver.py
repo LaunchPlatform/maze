@@ -103,8 +103,9 @@ class Driver:
     def run_avatar(self, avatar: models.Avatar):
         db = object_session(avatar)
         logger.info(
-            "Running avatar %s in zone %s, arguments=%s",
+            "Running avatar %s (agent %s) in zone %s, arguments=%s",
             avatar.id,
+            avatar.agent_id,
             avatar.zone.display_name,
             avatar.zone.environment.arguments,
         )
