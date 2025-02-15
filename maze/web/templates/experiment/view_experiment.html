@@ -42,7 +42,7 @@ function makeEnvLabel(node) {
 
 // Create the input graph
 var g = new dagreD3.graphlib.Graph({compound:true})
-  .setGraph({ })
+  .setGraph({ rankdir: "LR" })
   .setDefaultEdgeLabel(function() { return {}; });
 
 for (let envNode of dag.nodes) {
@@ -125,6 +125,7 @@ text {
 .env-node > ul {
     list-style: none;
     display: flex;
+    flex-direction: column;
     margin-top: 1em;
     justify-content: center;
     padding: 0;
