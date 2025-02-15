@@ -33,10 +33,10 @@ function makeNodeAttrRow(key, value) {
 }
 
 function makeNodeTable(node) {
-    return `<table class="table table-striped">
-  <caption>${node.name}</caption>
+    return `<table class="table">
+  <caption class="text-center"><strong>${node.name}</strong></caption>
   <tbody>
-    ${node.attributes.map(([key, value]) => makeNodeAttrRow(key, value)) }
+    ${ node.attributes.map(([key, value]) => makeNodeAttrRow(key, value)).join("\n") }
   </tbody>
 </table>`;
 }
