@@ -5,6 +5,9 @@ description = ""
 authors = ["Fang-Pen Lin <hello@fangpenlin.com>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+maze = "maze.main:cli"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 sqlalchemy = "^2.0.37"
