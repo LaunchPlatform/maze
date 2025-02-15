@@ -51,6 +51,12 @@ class Environment(Base):
         back_populates="environment",
         order_by="Zone.index",
     )
+    query_zones: DynamicMapped["Zone"] = relationship(
+        "Zone",
+        back_populates="environment",
+        order_by="Zone.index",
+        viewonly=True,
+    )
     experiment: Mapped["Experiment"] = relationship(
         "Experiment",
         back_populates="environments",

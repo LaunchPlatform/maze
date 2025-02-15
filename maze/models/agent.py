@@ -27,11 +27,13 @@ class Agent(Base):
         UUID(as_uuid=True),
         ForeignKey("agent.id"),
         nullable=True,
+        index=True,
     )
     rhs_parent_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("agent.id"),
         nullable=True,
+        index=True,
     )
     input_shape: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     gene: Mapped[list] = mapped_column(JSONB, nullable=False)

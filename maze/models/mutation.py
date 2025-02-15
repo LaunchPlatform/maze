@@ -30,6 +30,7 @@ class Mutation(Base):
         UUID(as_uuid=True),
         ForeignKey("agent.id"),
         nullable=False,
+        index=True,
     )
     type: Mapped[MutationType] = mapped_column(Enum(MutationType), nullable=False)
     order: Mapped[int] = mapped_column(Integer, nullable=False)

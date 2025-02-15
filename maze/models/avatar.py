@@ -38,16 +38,19 @@ class Avatar(Base):
         UUID(as_uuid=True),
         ForeignKey("agent.id"),
         nullable=False,
+        index=True,
     )
     zone_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("zone.id"),
         nullable=False,
+        index=True,
     )
     period_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("period.id"),
         nullable=False,
+        index=True,
     )
     status: Mapped[AvatarStatus] = mapped_column(
         Enum(AvatarStatus),

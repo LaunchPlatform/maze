@@ -25,6 +25,7 @@ class Epoch(Base):
         UUID(as_uuid=True),
         ForeignKey("avatar.id"),
         nullable=False,
+        index=True,
     )
     index: Mapped[int] = mapped_column(Integer, nullable=False)
     train_loss: Mapped[list[float]] = mapped_column(ARRAY(Float), nullable=False)
