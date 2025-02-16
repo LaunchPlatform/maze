@@ -7,8 +7,10 @@
 
 {% block js %}
 {{ lib.dagre_js_libs() }}
+<script src="{{ url_for('static', path='vendors/filesaver.js-2.0.4/FileSaver.min.js') }}"></script>
 
 <script>
+const agent_id = {{ agent.id | string | tojson }};
 {% if dag is not none %}
   const dag = {{ dag | dump_dag | tojson }};
 {% else %}
@@ -116,6 +118,24 @@ function makeDag() {
 if (dag !== null) {
     makeDag();
 }
+
+function downloadSVG() {
+  const svg = document.getElementById("svg-canvas");
+  const serializer = new XMLSerializer();
+  let source = serializer.serializeToString(svg);
+
+  if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+      source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+  }
+
+  source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+  const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
+  saveAs(blob, `${agent_id}-torch-model.svg`);
+  return false;
+}
 </script>
 {% endblock %}
 
@@ -126,29 +146,13 @@ svg#svg-canvas {
   background-color: #eee;
 }
 
-g.input > rect, g.output > rect {
-  fill: #aaa;
+.dag-container {
+    position: relative;
 }
-
-text {
-  font-weight: 300;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-}
-
-.node rect {
-  stroke: #999;
-  fill: #fff;
-  stroke-width: 1.5px;
-}
-
-.edgePath path {
-  stroke: #333;
-  stroke-width: 1.5px;
-}
-
-.model-node {
-  caption-side: top;
+.dag-tools {
+    position: absolute;
+    left: 10px;
+    top: 10px;
 }
 
 </style>
@@ -220,7 +224,45 @@ text {
 
   <dt>PyTorch Model</dt>
     {% if dag is not none %}
-      <svg id="svg-canvas" width=960 height=600></svg>
+      <div class="dag-container">
+        <div class="dag-tools">
+          <button
+            class="btn btn-outline-secondary"
+            title="Download as a SVG file"
+            onclick="return downloadSVG();"
+          >
+            <i class="bi bi-download"></i>
+          </button>
+        </div>
+        <svg id="svg-canvas" width=960 height=600>
+          <style>
+            g.input > rect, g.output > rect {
+              fill: #aaa;
+            }
+
+            text {
+              font-weight: 300;
+              font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+              font-size: 14px;
+            }
+
+            .node rect {
+              stroke: #999;
+              fill: #fff;
+              stroke-width: 1.5px;
+            }
+
+            .edgePath path {
+              stroke: #333;
+              stroke-width: 1.5px;
+            }
+
+            .model-node {
+              caption-side: top;
+            }
+          </style>
+        </svg>
+      </div>
     {% else %}
       N/A
     {% endif %}
