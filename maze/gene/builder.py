@@ -196,6 +196,8 @@ def _do_build_models(
                 | AdaptiveAvgPool1DSymbol(out_features=out_features)
             ):
                 in_features = math.prod(model.output_shape)
+                # TODO: currently let's assume there's only one channel in the input, it should support multiple
+                #       channels in the future
                 pool_input_shape = (1, in_features)
                 model.modules.append(
                     pipeline.Reshape(
@@ -225,9 +227,12 @@ def _do_build_models(
                     )
                 else:
                     raise ValueError("Unexpected symbol type")
+                # TODO: flatten back to 1D for now as we assume one channel at this moment.
+                # TODO: currently let's assume there's only one channel in the input, it should support multiple
+                #       channels in the future
                 model.modules.append(
                     pipeline.Flatten(
-                        input_shape=model.output_shape,
+                        input_shape=(1, out_features),
                         output_shape=(out_features,),
                     )
                 )
