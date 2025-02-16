@@ -119,22 +119,36 @@ if (dag !== null) {
     makeDag();
 }
 
-function downloadSVG() {
-  const svg = document.getElementById("svg-canvas");
-  const serializer = new XMLSerializer();
-  let source = serializer.serializeToString(svg);
+function downloadPNG() {
+    const imgScale = 2;
+    const svg = document.getElementById("svg-canvas");
+    const canvas = new OffscreenCanvas(svg.clientWidth, svg.clientHeight);
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width * imgScale, canvas.height * imgScale);
 
-  if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
-      source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
-  }
-  if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
-      source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
-  }
+    const img = new Image()
+    img.onload = () => {
+      ctx.save();
+      ctx.scale(imgScale, imgScale);
+      ctx.drawImage(img, 0, 0);
+      ctx.restore();
+      canvas.convertToBlob().then((imageBlob) => {
+        saveAs(imageBlob, `${agent_id}-torch-model.png`)
+      }).catch(error => {
+          console.error("Failed to convert to blob", error)
+      });
+    }
 
-  source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
-  const blob = new Blob([source], {type: "image/svg+xml;charset=utf-8"});
-  saveAs(blob, `${agent_id}-torch-model.svg`);
-  return false;
+    const serializer = new XMLSerializer();
+    let source = serializer.serializeToString(svg);
+    if(!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)){
+        source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+    }
+    if(!source.match(/^<svg[^>]+"http\:\/\/www\.w3\.org\/1999\/xlink"/)){
+        source = source.replace(/^<svg/, '<svg xmlns:xlink="http://www.w3.org/1999/xlink"');
+    }
+    source = '<?xml version="1.0" standalone="no"?>\r\n' + source;
+    img.src = "data:image/svg+xml;charset=utf-8,"+encodeURIComponent(source);
 }
 </script>
 {% endblock %}
@@ -228,8 +242,8 @@ svg#svg-canvas {
         <div class="dag-tools">
           <button
             class="btn btn-outline-secondary"
-            title="Download as a SVG file"
-            onclick="return downloadSVG();"
+            title="Download as a PNG file"
+            onclick="return downloadPNG();"
           >
             <i class="bi bi-download"></i>
           </button>
