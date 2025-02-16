@@ -236,14 +236,51 @@ svg#svg-canvas {
         </div>
         <svg id="svg-canvas" width=960 height=600>
           <style>
-            g.input > rect, g.output > rect {
-              fill: #aaa;
+            div, span, table, text {
+                font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                font-size: 16px;
+            }
+            table {
+              border-collapse: collapse;
+            }
+            tbody {
+              border-color: inherit;
+              border-style: solid;
+              border-width: 0;
+            }
+            .table {
+              width: 100%;
+              margin-bottom: 1rem;
+              vertical-align: top;
+              border-color: #dee2e6;
+            }
+            thead, tbody, tfoot, tr, td, th {
+              border-color: inherit;
+              border-style: solid;
+            }
+            .table > :not(caption) > * > * {
+                padding: 0.5rem 0.5rem;
+            }
+            .table-bordered > :not(caption) > * {
+              border-width: 1px 0;
+            }
+            .table-bordered > :not(caption) > * > * {
+              border-width: 0 1px;
+            }
+            caption {
+              padding-top: 0.5rem;
+              padding-bottom: 0.5rem;
+              color: rgba(33, 37, 41, 0.75);
+            }
+            strong {
+              font-weight: bolder;
+            }
+            .text-center {
+              text-align: center !important;
             }
 
-            text {
-              font-weight: 300;
-              font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-              font-size: 14px;
+            g.input > rect, g.output > rect {
+              fill: #aaa;
             }
 
             .node rect {
