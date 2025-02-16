@@ -196,10 +196,11 @@ def _do_build_models(
                 | AdaptiveAvgPool1DSymbol(out_features=out_features)
             ):
                 in_features = math.prod(model.output_shape)
+                pool_input_shape = (1, in_features)
                 model.modules.append(
                     pipeline.Reshape(
                         input_shape=model.output_shape,
-                        output_shape=(1, in_features),
+                        output_shape=pool_input_shape,
                     )
                 )
                 if is_symbol_type(
@@ -207,7 +208,7 @@ def _do_build_models(
                 ):
                     model.modules.append(
                         pipeline.AdaptiveMaxPool1d(
-                            input_shape=model.output_shape,
+                            input_shape=pool_input_shape,
                             output_shape=(out_features,),
                             out_features=out_features,
                         )
@@ -217,7 +218,7 @@ def _do_build_models(
                 ):
                     model.modules.append(
                         pipeline.AdaptiveAvgPool1d(
-                            input_shape=model.output_shape,
+                            input_shape=pool_input_shape,
                             output_shape=(out_features,),
                             out_features=out_features,
                         )
