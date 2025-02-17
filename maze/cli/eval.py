@@ -2,6 +2,7 @@ import logging
 import sys
 
 import click
+import torch
 from torch import nn
 from torch.utils.data import DataLoader
 from torchvision import datasets
@@ -25,9 +26,20 @@ logger = logging.getLogger(__name__)
 @click.option("-e", "--epoches", type=int, default=100, help="Number of epoches.")
 @click.option("-d", "--dataset", type=str, default="MNIST", help="Dataset to use.")
 @click.option("-b", "--batch-size", type=int, default=64, help="Size of batch.")
+@click.option(
+    "-s",
+    "--save-state",
+    type=click.Path(dir_okay=False, writable=True),
+    help="Save state_dict as a file to the given path",
+)
 @pass_env
 def main(
-    env: CliEnvironment, agent_id: str, epoches: int, dataset: str, batch_size: int
+    env: CliEnvironment,
+    agent_id: str,
+    epoches: int,
+    dataset: str,
+    batch_size: int,
+    save_state: str | None,
 ):
     logger.info(
         "Evaluating agent %s, epoches=%s, dataset=%s, batch_size=%s",
@@ -70,4 +82,7 @@ def main(
         for loss, progress in vehicle.train(train_dataloader):
             pass
         vehicle.test(test_dataloader)
+    if save_state is not None:
+        logger.info("Save model state dict to %s", save_state)
+        torch.save(vehicle.torch_model.state_dict(), save_state)
     logger.info("Done")
