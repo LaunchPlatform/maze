@@ -56,6 +56,9 @@ def main(
         im = im.convert("L")
         tensor = ToTensor()(im).to(vehicle.device)
         pred = vehicle.torch_model(tensor)
-        logger.info("Predicted number: %s", pred.argmax(1))
+        logger.info("Predicted number: %s", pred.argmax(1)[0])
+        torch.set_printoptions(profile="full")
+        logger.info("Pred: %s", pred)
+        torch.set_printoptions(profile="default")  # reset
 
     logger.info("Done")
