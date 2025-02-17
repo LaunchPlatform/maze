@@ -30,7 +30,13 @@ logger = logging.getLogger(__name__)
     "-s",
     "--save-state",
     type=click.Path(dir_okay=False, writable=True),
-    help="Save state_dict as a file to the given path",
+    help="Save state_dict as a file to the given path after running eval",
+)
+@click.option(
+    "-l",
+    "--load-state",
+    type=click.Path(dir_okay=False, writable=True),
+    help="Load a state_dict file from the given path before running eval",
 )
 @pass_env
 def main(
@@ -40,6 +46,7 @@ def main(
     dataset: str,
     batch_size: int,
     save_state: str | None,
+    load_state: str | None,
 ):
     logger.info(
         "Evaluating agent %s, epoches=%s, dataset=%s, batch_size=%s",
@@ -76,6 +83,10 @@ def main(
     )
     vehicle.build_models()
     logger.info("Torch Model:\n%s", vehicle.torch_model)
+
+    if load_state is not None:
+        logger.info("Loading state dict from %s", load_state)
+        vehicle.torch_model.load_state_dict(torch.load(load_state, weights_only=True))
 
     for epoch in range(epoches):
         logger.info("Running epoch %s", epoch)
