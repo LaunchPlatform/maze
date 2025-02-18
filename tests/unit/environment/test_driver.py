@@ -62,7 +62,7 @@ def test_initialize_db(db: Session, env_template: EnvironmentTemplate):
             db.query(models.Environment).filter_by(name=env_template.name(index)).one()
         )
         expected_zone_count = expected_zone_counts[index]
-        assert env.zones.count() == expected_zone_count
+        assert env.query_zones.count() == expected_zone_count
         assert env.experiment == experiment
 
 
@@ -74,7 +74,7 @@ def test_initialize_zones(db: Session, env_template: EnvironmentTemplate):
 
     first_env = envs[0]
     for zone in first_env.zones:
-        assert zone.avatars.count() == zone.agent_slots
+        assert zone.query_avatars.count() == zone.agent_slots
     for env in envs[1:]:
         for zone in env.zones:
             assert not zone.avatars
