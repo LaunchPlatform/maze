@@ -74,7 +74,7 @@ def test_initialize_zones(db: Session, env_template: EnvironmentTemplate):
 
     first_env = envs[0]
     for zone in first_env.zones:
-        assert zone.query_avatars.count() == zone.agent_slots
+        assert zone.avatars.count() == zone.agent_slots
     for env in envs[1:]:
         for zone in env.zones:
-            assert not zone.avatars
+            assert not zone.avatars.count()
