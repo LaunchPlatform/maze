@@ -15,9 +15,11 @@ jobs:
           POSTGRES_DB: maze_test
     steps:
       - checkout
-      - python/install-packages:
-          pkg-manager: uv
-          args: --extra torch-cpu
+      - run:
+          name: Install deps
+          command: |
+            curl -LsSf https://astral.sh/uv/install.sh | sh
+            uv sync --extra torch-cpu
       - run:
           name: Run test
           command: poetry run python -m pytest ./tests -svvvv
