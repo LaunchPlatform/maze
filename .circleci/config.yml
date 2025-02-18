@@ -22,12 +22,13 @@ jobs:
             uv sync --extra torch-cpu
       - run:
           name: Run test
-          command: poetry run python -m pytest ./tests -svvvv
+          command: uv run python -m pytest ./tests -svvvv
   build-and-publish:
     docker:
       - image: cimg/python:3.11.11
     steps:
       - checkout
+      # TODO: fix the below with uv instead
       - python/install-packages:
           pkg-manager: poetry
           args: --all-extras
