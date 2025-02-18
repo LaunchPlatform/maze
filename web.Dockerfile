@@ -26,6 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-project
 
 COPY . /app/
+EXPOSE 8080
 
 # Sync the project
 RUN --mount=type=cache,target=/root/.cache/uv \
