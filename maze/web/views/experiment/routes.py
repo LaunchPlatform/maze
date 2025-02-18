@@ -1,5 +1,4 @@
 import dataclasses
-import functools
 import uuid
 
 from fastapi import APIRouter
