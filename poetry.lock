@@ -272,13 +272,13 @@ files = [
 
 [[package]]
 name = "humanize"
-version = "4.11.0"
+version = "4.12.0"
 description = "Python humanize utilities"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "humanize-4.11.0-py3-none-any.whl", hash = "sha256:b53caaec8532bcb2fff70c8826f904c35943f8cecaca29d272d9df38092736c0"},
-    {file = "humanize-4.11.0.tar.gz", hash = "sha256:e66f36020a2d5a974c504bd2555cf770621dbdbb6d82f94a6857c0b1ea2608be"},
+    {file = "humanize-4.12.0-py3-none-any.whl", hash = "sha256:106a7436a2d545d742c147c469716b3a08424aa143a82103630147c489a89f48"},
+    {file = "humanize-4.12.0.tar.gz", hash = "sha256:87ff7b43591370b12a1d103c9405849d911d4b039ed22d80b718b62c76eec8a3"},
 ]
 
 [package.extras]
@@ -981,6 +981,22 @@ anyio = ">=3.6.2,<5"
 full = ["httpx (>=0.27.0,<0.29.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.18)", "pyyaml"]
 
 [[package]]
+name = "torch"
+version = "2.6.0+cu126"
+description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
+optional = true
+python-versions = "*"
+files = []
+
+[[package]]
+name = "torchvision"
+version = "0.21.0+cu126"
+description = "image and video datasets and models for torch deep learning"
+optional = true
+python-versions = "*"
+files = []
+
+[[package]]
 name = "typing-extensions"
 version = "4.12.2"
 description = "Backported and Experimental Type Hints for Python 3.8+"
@@ -1035,7 +1051,10 @@ files = [
     {file = "wcwidth-0.2.13.tar.gz", hash = "sha256:72ea0c06399eb286d978fdedb6923a9eb47e1c486ce63e9b4e64fc18303972b5"},
 ]
 
+[extras]
+torch = ["torch", "torchvision"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "fa34f7bdde97c22cde34c42d7a9bb7c69b7abc160fed4855b87ed09296e36bbe"
+content-hash = "e5109d38d83df6f307bbd580a85338132dfac1bded24b7f7978111380bb29435"

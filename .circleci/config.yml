@@ -19,13 +19,6 @@ jobs:
           pkg-manager: poetry
           args: --all-extras
       - run:
-          name: Install pytorch
-          # We don't put pytorch in poetry file otherwise somehow it will break things.
-          # So need to install it here in CI
-          command: |
-            eval $(poetry env activate)
-            pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
-      - run:
           name: Run test
           command: poetry run python -m pytest ./tests -svvvv
   build-and-publish:
