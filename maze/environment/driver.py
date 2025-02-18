@@ -8,6 +8,7 @@ from sqlalchemy.orm import object_session
 
 from .. import models
 from ..db.session import Session
+from ..gene.builder import ExceedActivationBudgetError
 from ..gene.builder import ExceedBuildBudgetError
 from ..gene.builder import ExceedOperationBudgetError
 from .templates import EnvironmentTemplate
@@ -133,7 +134,7 @@ class Driver:
         except NoParametersError:
             logger.info("Avatar %s has no parameter", avatar.id)
             avatar.status = models.AvatarStatus.NO_PARAMETERS
-        except ExceedOperationBudgetError:
+        except (ExceedOperationBudgetError, ExceedActivationBudgetError):
             logger.info("Avatar %s exceed op budget", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_OP_BUDGET
         except ExceedBuildBudgetError:

@@ -26,10 +26,15 @@ class ExceedBuildBudgetError(BuildError):
     pass
 
 
+class ExceedActivationBudgetError(BuildError):
+    pass
+
+
 @dataclasses.dataclass
 class ModelCost:
     operation: int = 0
     build: int = 0
+    activation: int = 0
 
     def __add__(self, other: typing.Self) -> typing.Self:
         return ModelCost(
@@ -119,14 +124,21 @@ def _do_build_models(
     model = Model(modules=[], output_shape=input_shape)
     starting_cost = starting_cost or ModelCost()
 
-    def check_op_budget():
-        if budget is None or budget.operation == 0:
+    def check_budget():
+        if budget is None:
             return
-        total_operation_cost = starting_cost.operation + model.cost.operation
-        if total_operation_cost > budget.operation:
-            raise ExceedOperationBudgetError(
-                f"The current operation cost {total_operation_cost:,} already exceeds operation budget {budget.operation:,}"
-            )
+        if budget.operation != 0:
+            total_operation_cost = starting_cost.operation + model.cost.operation
+            if total_operation_cost > budget.operation:
+                raise ExceedOperationBudgetError(
+                    f"The current operation cost {total_operation_cost:,} already exceeds operation budget {budget.operation:,}"
+                )
+        if budget.activation != 0:
+            activation_size = math.prod(model.output_shape)
+            if activation_size > budget.activation:
+                raise ExceedActivationBudgetError(
+                    f"The current operation cost {activation_size:,} already exceeds activation budget {budget.activation:,}"
+                )
 
     while True:
         try:
@@ -160,7 +172,7 @@ def _do_build_models(
                     model.cost.build += repeating_model.cost.build
                     # TODO: maybe we should estimate the cost and check with budget to stop the building process
                     #       earlier if it's going to exceed the limit any way.
-                    check_op_budget()
+                    check_budget()
                     model.output_shape = repeating_model.output_shape
                     model.modules.extend(repeating_model.modules)
             case LinearSymbol(bias=bias, out_features=out_features):
@@ -179,7 +191,7 @@ def _do_build_models(
                 model.cost.operation += in_features * out_features + (
                     out_features if bias else 0
                 )
-                check_op_budget()
+                check_budget()
 
                 model.modules.append(
                     pipeline.Linear(
@@ -238,7 +250,7 @@ def _do_build_models(
                 )
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
-                check_op_budget()
+                check_budget()
             case SimpleSymbol(type=symbol_type):
                 match symbol_type:
                     case SymbolType.BRANCH_START:
@@ -265,7 +277,7 @@ def _do_build_models(
                         for segment_model in segment_models:
                             model.cost.operation += segment_model.cost.operation
                             model.cost.build += segment_model.cost.build
-                            check_op_budget()
+                            check_budget()
                         if len(segment_models) == 1:
                             # special case, only one branch seg exists
                             segment_model = segment_models[0]
@@ -317,7 +329,7 @@ def _do_build_models(
                             )
                         )
                         model.cost.operation += math.prod(model.output_shape)
-                        check_op_budget()
+                        check_budget()
                     case SymbolType.LEAKY_RELU:
                         model.modules.append(
                             pipeline.LeakyReLU(
@@ -326,7 +338,7 @@ def _do_build_models(
                             )
                         )
                         model.cost.operation += math.prod(model.output_shape)
-                        check_op_budget()
+                        check_budget()
                     case SymbolType.TANH:
                         model.modules.append(
                             pipeline.Tanh(
@@ -335,7 +347,7 @@ def _do_build_models(
                             )
                         )
                         model.cost.operation += math.prod(model.output_shape)
-                        check_op_budget()
+                        check_budget()
                     case SymbolType.SOFTMAX:
                         model.modules.append(
                             pipeline.Softmax(
@@ -344,7 +356,7 @@ def _do_build_models(
                             )
                         )
                         model.cost.operation += math.prod(model.output_shape)
-                        check_op_budget()
+                        check_budget()
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
     return model

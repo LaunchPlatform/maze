@@ -44,7 +44,7 @@ class Vehicle:
         self.budget = (
             budget
             if budget is not None
-            else ModelCost(operation=100_000_000, build=1_000)
+            else ModelCost(operation=100_000_000, build=1_000, activation=10_000_000)
         )
         self.model: Model | None = None
         self.torch_model: nn.Module | None = None
