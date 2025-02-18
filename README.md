@@ -7,7 +7,7 @@ Please read the articles we published to learn more:
 
 - [Article00 - How I would build AGI](https://fangpenlin.com/posts/2025/02/06/maze-how-i-would-build-agi/)
 - [Article01 - My AI models are finally evolving!](http://fangpenlin.com/posts/2025/02/18/maze-my-ai-models-are-finally-evolving/)
-- 
+
 # Getting started
 
 You can visit https://article01.mazeai.io and click experiments on the left-hand side menu to explore the experiment and the agents in it.
