@@ -1,42 +1,64 @@
-[tool.poetry]
+[project]
 name = "maze"
 version = "0.1.0"
 description = ""
 authors = ["Fang-Pen Lin <hello@fangpenlin.com>"]
 readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+   "sqlalchemy >= 2.0.37, < 2.1.0",
+   "fastapi >=0.115.8, <0.116",
+   "uvicorn >=0.34.0, <0.35",
+   "pydantic-settings>=2.7.1, <3.0.0",
+   "alembic>=1.14.1, <2.0",
+   "psycopg2-binary>=2.9.10, <2.10",
+   "pydantic>=2.10.6, <2.11",
+   "click>=8.1.8, <9.0",
+   "rich>=13.9.4, <14.0",
+   "jinja2>=3.1.5, <3.2",
+]
 
-[tool.poetry.scripts]
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-dotenv>=0.5.2",
+]
+
+[project.scripts]
 maze = "maze.main:cli"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-sqlalchemy = "^2.0.37"
-fastapi = "^0.115.8"
-uvicorn = "^0.34.0"
-pydantic-settings = "^2.7.1"
-alembic = "^1.14.1"
-psycopg2-binary = "^2.9.10"
-beanqueue = "^1.1.6"
-pydantic = "^2.10.6"
-pytest-dotenv = "^0.5.2"
-click = "^8.1.8"
-rich = "^13.9.4"
-jinja2 = "^3.1.5"
+[project.optional-dependencies]
+torch-cpu = [
+   "torch==2.6.0",
+   "torchvision==2.6.0",
+]
+torch-gpu = [
+   "torch==2.6.0+cu126",
+   "torchvision==2.6.0+cu126",
+]
 
-torch = { version = "==2.6.0+cu126", optional = true, source = "pytorch-cuda" }
-torchvision = { version = "==0.21.0+cu126", optional = true, source = "pytorch-cuda" }
+[too.uv]
+package = true
+conflicts = [
+    [
+      { extra = "torch-cpu" },
+      { extra = "torch-gpu" },
+    ],
+]
 
-[tool.poetry.extras]
-torch = ["torch", "torchvision"]
+[tool.uv.sources]
+torch = [
+  { index = "torch-cpu", extra = "torch-cpu" },
+  { index = "torch-gpu", extra = "torch-gpu" },
+]
 
-[[tool.poetry.source]]
-name = "pytorch-cuda"
+[[tool.uv.index]]
+name = "torch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "torch-gpu"
 url = "https://download.pytorch.org/whl/cu126"
-priority = "explicit"
+explicit = true
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
