@@ -4,9 +4,55 @@
   Home
 {% endblock %}
 
-{% block content %}
-<h1>Welcome to MAZE</h1>
+{% block css %}
+<style>
+    .gallery {
+        display: flex;
+        align-content: start;
+    }
+    .gallery img {
+        max-width: 450px;
+    }
+</style>
+{% endblock %}
 
-TODO:
+{% block content %}
+{{
+"""
+# MAZE
+MAZE (Massive Argumented Zonal Environments) machine learning framework
+
+This is a machine learning framework plus a research pet project aimed at generating neuron network models based on genes of agents merging and mutating in a series of controlled environments.
+
+Please read the articles we published to learn more:
+
+- [Article00 - How I would build AGI](https://fangpenlin.com/posts/2025/02/06/maze-how-i-would-build-agi/)
+- [Article01 - My AI models are finally evolving!](http://fangpenlin.com/posts/2025/02/18/maze-my-ai-models-are-finally-evolving/)
+
+# Getting started
+
+You can click experiments on the left-hand side menu to explore the experiment and the agents in it.
+This is an open-source project, you can also find the source code on GitHub:
+
+[https://github.com/LaunchPlatform/maze](https://github.com/LaunchPlatform/maze)
+
+# Gallery
+
+Neuron networks evolve organically in MAZE, so they come in with different strange shapes, here are some interesting ones:
+
+""" | unsafe_markdown | safe
+}}
+
+<div class="gallery">
+  {% for img_file in [
+    "1991f96a-2c17-4726-9bad-6f9395bff161-torch-model.png",
+    "64047649-90e9-4507-b990-865bdc8ac3b4-torch-model.png",
+    "a6a2f7e6-f813-4166-ae63-8cd0a5fd676e-torch-model.png",
+  ] %}
+    <a href="{{ url_for('static', path='/images/gallery/' + img_file) }}" target="_blank">
+      <img src="{{ url_for('static', path='/images/gallery/' + img_file) }}">
+    </a>
+  {% endfor %}
+</div>
 
 {% endblock content %}
