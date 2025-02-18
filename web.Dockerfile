@@ -16,3 +16,5 @@ WORKDIR /app
 RUN pip install poetry
 RUN poetry config virtualenvs.create false && \
     poetry install --no-interaction --no-ansi
+
+CMD ["uvicorn", "--factory", "maze.web.app:make_app", "--port=8080", "--host=0.0.0.0"]
