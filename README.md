@@ -17,13 +17,13 @@ You can visit https://article01.mazeai.io and click experiments on the left-hand
 Neuron networks evolve organically in MAZE, so they come in with different strange shapes, here are some interesting ones:
 
 <div class="gallery">
-    <a href="/static/images/gallery/1991f96a-2c17-4726-9bad-6f9395bff161-torch-model.png" target="_blank">
-      <img src="/static/images/gallery/1991f96a-2c17-4726-9bad-6f9395bff161-torch-model.png">
+    <a href="maze/web/static/images/gallery/1991f96a-2c17-4726-9bad-6f9395bff161-torch-model.png" target="_blank">
+      <img src="maze/web/static/images/gallery/1991f96a-2c17-4726-9bad-6f9395bff161-torch-model.png">
     </a>
-    <a href="/static/images/gallery/64047649-90e9-4507-b990-865bdc8ac3b4-torch-model.png" target="_blank">
-      <img src="/static/images/gallery/64047649-90e9-4507-b990-865bdc8ac3b4-torch-model.png">
+    <a href="maze/web/static/images/gallery/64047649-90e9-4507-b990-865bdc8ac3b4-torch-model.png" target="_blank">
+      <img src="maze/web/static/images/gallery/64047649-90e9-4507-b990-865bdc8ac3b4-torch-model.png">
     </a>
-    <a href="/static/images/gallery/a6a2f7e6-f813-4166-ae63-8cd0a5fd676e-torch-model.png" target="_blank">
-      <img src="/static/images/gallery/a6a2f7e6-f813-4166-ae63-8cd0a5fd676e-torch-model.png">
+    <a href="maze/web/static/images/gallery/a6a2f7e6-f813-4166-ae63-8cd0a5fd676e-torch-model.png" target="_blank">
+      <img src="maze/web/static/images/gallery/a6a2f7e6-f813-4166-ae63-8cd0a5fd676e-torch-model.png">
     </a>
 </div>
