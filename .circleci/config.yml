@@ -16,8 +16,8 @@ jobs:
     steps:
       - checkout
       - python/install-packages:
-          pkg-manager: poetry
-          args: --all-extras
+          pkg-manager: uv
+          args: --extra torch-cpu
       - run:
           name: Run test
           command: poetry run python -m pytest ./tests -svvvv
