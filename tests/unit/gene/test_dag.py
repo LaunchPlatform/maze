@@ -39,15 +39,31 @@ from maze.gene.dag import Node
             [
                 Node(name="INPUT"),
                 Node(name="Flatten"),
-                Node(name="Linear"),
+                Node(
+                    name="Linear",
+                    attributes=[
+                        (
+                            "in_features",
+                            "784",
+                        ),
+                        (
+                            "out_features",
+                            "123",
+                        ),
+                        (
+                            "bias",
+                            "True",
+                        ),
+                    ],
+                ),
                 Node(name="Tanh"),
-                Node(name="ReLu"),
+                Node(name="ReLU"),
             ],
             [
-                Edge(src=0, dest=1),
-                Edge(src=1, dest=2),
-                Edge(src=2, dest=3),
-                Edge(src=3, dest=4),
+                Edge(src=0, dest=1, label=repr((28, 28))),
+                Edge(src=1, dest=2, label=repr((784,))),
+                Edge(src=2, dest=3, label=repr((123,))),
+                Edge(src=3, dest=4, label=repr((123,))),
             ],
         ),
         (
@@ -83,13 +99,29 @@ from maze.gene.dag import Node
                 Node(name="INPUT"),
                 Node(name="Joint"),
                 Node(name="Flatten"),
-                Node(name="Linear"),
+                Node(
+                    name="Linear",
+                    attributes=[
+                        (
+                            "in_features",
+                            "784",
+                        ),
+                        (
+                            "out_features",
+                            "123",
+                        ),
+                        (
+                            "bias",
+                            "True",
+                        ),
+                    ],
+                ),
             ],
             [
-                Edge(src=0, dest=2),
-                Edge(src=2, dest=3),
-                Edge(src=3, dest=1),
-                Edge(src=0, dest=1),
+                Edge(src=0, dest=2, label=repr((28, 28))),
+                Edge(src=2, dest=3, label=repr((784,))),
+                Edge(src=3, dest=1, label=repr((784,))),
+                Edge(src=0, dest=1, label=repr((28, 28))),
             ],
         ),
     ],
