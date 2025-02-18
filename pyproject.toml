@@ -18,26 +18,26 @@ dependencies = [
    "jinja2>=3.1.5, <3.2",
 ]
 
-[dependency-groups]
-dev = [
-    "pytest>=8.3.4",
-    "pytest-dotenv>=0.5.2",
-]
-
 [project.scripts]
 maze = "maze.main:cli"
 
 [project.optional-dependencies]
 torch-cpu = [
    "torch==2.6.0",
-   "torchvision==2.6.0",
+   "torchvision==0.21.0",
 ]
 torch-gpu = [
    "torch==2.6.0+cu126",
-   "torchvision==2.6.0+cu126",
+   "torchvision==0.21.0+cu126",
 ]
 
-[too.uv]
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-dotenv>=0.5.2",
+]
+
+[tool.uv]
 package = true
 conflicts = [
     [
