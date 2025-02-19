@@ -111,7 +111,7 @@ def build_pipeline(
                 *map(
                     functools.partial(
                         build_pipeline,
-                        output_learning_parameters=module_learning_parameters,
+                        module_learning_parameters=module_learning_parameters,
                     ),
                     modules,
                 )
@@ -122,7 +122,7 @@ def build_pipeline(
                     map(
                         functools.partial(
                             build_pipeline,
-                            output_learning_parameters=module_learning_parameters,
+                            module_learning_parameters=module_learning_parameters,
                         ),
                         branches,
                     )
