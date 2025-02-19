@@ -1,6 +1,7 @@
 import dataclasses
 
 from .symbols import JointType
+from .symbols import LearningParameters
 
 
 @dataclasses.dataclass(frozen=True)
@@ -55,6 +56,7 @@ class Linear(Module):
     bias: bool
     in_features: int
     out_features: int
+    learning_parameters: LearningParameters
 
 
 @dataclasses.dataclass(frozen=True)

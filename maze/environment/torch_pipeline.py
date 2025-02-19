@@ -64,7 +64,10 @@ class Reshape(nn.Module):
         return x.view(x.size(0), *self.shape)
 
 
-def build_pipeline(module: pipeline.Module) -> nn.Module:
+def build_pipeline(
+    module: pipeline.Module,
+    output_learning_parameters: list[dict[str, typing.Any]] | None = None,
+) -> nn.Module:
     match module:
         case pipeline.ReLU():
             return nn.ReLU()
@@ -79,13 +82,27 @@ def build_pipeline(module: pipeline.Module) -> nn.Module:
         case pipeline.Reshape(output_shape=output_shape):
             return Reshape(*output_shape)
         case pipeline.Linear(
-            in_features=in_features, out_features=out_features, bias=bias
+            in_features=in_features,
+            out_features=out_features,
+            bias=bias,
+            learning_parameters=learning_parameters,
         ):
-            return nn.Linear(
+            result = nn.Linear(
                 bias=bias,
                 in_features=in_features,
                 out_features=out_features,
             )
+            if output_learning_parameters is not None:
+                output_learning_parameters.append(
+                    dict(
+                        params=result.parameters(),
+                        lr=learning_parameters.lr,
+                        momentum=learning_parameters.momentum,
+                        dampening=learning_parameters.dampening,
+                        weight_decay=learning_parameters.weight_decay,
+                    )
+                )
+            return result
         case pipeline.AdaptiveMaxPool1d(out_features=out_features):
             return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):

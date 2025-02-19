@@ -34,6 +34,10 @@ def format_int(value: int) -> str:
     return f"{value:,}"
 
 
+def format_float(value: float) -> str:
+    return f"{value:,.2E}"
+
+
 def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
     attrs = []
     match module:
@@ -47,11 +51,20 @@ def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
         ):
             pass
         case pipeline.Linear(
-            in_features=in_features, out_features=out_features, bias=bias
+            in_features=in_features,
+            out_features=out_features,
+            bias=bias,
+            learning_parameters=learning_parameters,
         ):
             attrs.append(("in_features", format_int(in_features)))
             attrs.append(("out_features", format_int(out_features)))
             attrs.append(("bias", str(bias)))
+            attrs.append(("lr", format_float(learning_parameters.lr)))
+            attrs.append(("momentum", format_float(learning_parameters.momentum)))
+            attrs.append(("dampening", format_float(learning_parameters.dampening)))
+            attrs.append(
+                ("weight_decay", format_float(learning_parameters.weight_decay))
+            )
         case pipeline.AdaptiveMaxPool1d(out_features=out_features):
             attrs.append(("out_features", format_int(out_features)))
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
