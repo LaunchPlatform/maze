@@ -7,6 +7,7 @@ from maze.environment import torch_pipeline
 from maze.environment.torch_pipeline import build_pipeline
 from maze.environment.torch_pipeline import Joint
 from maze.gene import pipeline
+from maze.gene.symbols import JointType
 
 
 def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
@@ -21,6 +22,7 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
         case torch_pipeline.Joint:
             return module_type, dict(
                 branches=list(map(module_type_kwargs, module.branch_modules)),
+                joint_type=module.joint_type,
             )
         case nn.Linear:
             return module_type, dict(
@@ -106,6 +108,7 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
             pipeline.Joint(
                 input_shape=(28, 28),
                 output_shape=(28, 28),
+                joint_type=JointType.ADD,
                 branches=[
                     pipeline.Sequential(
                         input_shape=(28, 28),
@@ -131,12 +134,13 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 ],
             ),
             Joint(
+                joint_type=JointType.ADD,
                 branch_modules=[
                     nn.Sequential(nn.ReLU(), nn.Tanh()),
                     nn.Sequential(
                         nn.Linear(in_features=28 * 28, out_features=123, bias=True)
                     ),
-                ]
+                ],
             ),
         ),
     ],
