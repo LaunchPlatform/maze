@@ -177,7 +177,11 @@ def _do_build_models(
                     check_budget()
                     model.output_shape = repeating_model.output_shape
                     model.modules.extend(repeating_model.modules)
-            case LinearSymbol(bias=bias, out_features=out_features):
+            case LinearSymbol(
+                bias=bias,
+                out_features=out_features,
+                learning_parameters=learning_parameters,
+            ):
                 if len(model.output_shape) > 1:
                     in_features = math.prod(model.output_shape)
                     model.modules.append(
@@ -202,6 +206,7 @@ def _do_build_models(
                         bias=bias,
                         in_features=in_features,
                         out_features=out_features,
+                        learning_parameters=learning_parameters,
                     )
                 )
                 model.output_shape = (out_features,)
