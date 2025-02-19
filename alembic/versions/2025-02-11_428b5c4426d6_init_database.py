@@ -147,6 +147,7 @@ def upgrade() -> None:
                 "ALIVE",
                 "OUT_OF_OP_BUDGET",
                 "OUT_OF_BUILD_BUDGET",
+                "OUT_OF_ACTIVATION_BUDGET",
                 "OUT_OF_CREDIT",
                 "NO_PARAMETERS",
                 "ERROR",

@@ -134,9 +134,12 @@ class Driver:
         except NoParametersError:
             logger.info("Avatar %s has no parameter", avatar.id)
             avatar.status = models.AvatarStatus.NO_PARAMETERS
-        except (ExceedOperationBudgetError, ExceedActivationBudgetError):
+        except ExceedOperationBudgetError:
             logger.info("Avatar %s exceed op budget", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_OP_BUDGET
+        except ExceedActivationBudgetError:
+            logger.info("Avatar %s exceed activation budget", avatar.id)
+            avatar.status = models.AvatarStatus.OUT_OF_ACTIVATION_BUDGET
         except ExceedBuildBudgetError:
             logger.info("Avatar %s exceed build budget", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_BUILD_BUDGET
