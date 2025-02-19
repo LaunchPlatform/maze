@@ -27,11 +27,6 @@ from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
 
 JITTER = 0.1
-DEFAULT_MUTATION_PROBABILITIES = {
-    MutationType.DUPLICATE: 0.01,
-    MutationType.DELETE: 0.01,
-    MutationType.REVERSE: 0.01,
-}
 MUTATION_LENGTH_RANGE = {
     MutationType.DUPLICATE: [1, 3],
     MutationType.DELETE: [1, 3],
@@ -66,6 +61,14 @@ class Arguments:
     reward_difficulty: int
 
 
+def make_mutation_probabilities() -> dict:
+    return {
+        MutationType.DUPLICATE: random.uniform(0.01, 0.05),
+        MutationType.DELETE: random.uniform(0.01, 0.05),
+        MutationType.REVERSE: random.uniform(0.01, 0.05),
+    }
+
+
 def format_number(value: int) -> str:
     return f"{value:,}"
 
@@ -84,7 +87,7 @@ class KingOfMnistV2(LinearEnvironment):
     experiment = "king-of-mnist"
 
     def make_zones(self, index: int) -> list[models.Zone]:
-        zone_count = [10, 5, 2, 1, 1][index]
+        zone_count = [1, 5, 2, 1, 1][index]
         return [
             models.Zone(agent_slots=30, index=zone_index)
             for zone_index in range(zone_count)
@@ -122,7 +125,7 @@ class KingOfMnistV2(LinearEnvironment):
             agent = models.Agent(
                 gene=symbols_adapter.dump_python(symbols, mode="json"),
                 input_shape=[28, 28],
-                mutation_probabilities=enum_key_to_str(DEFAULT_MUTATION_PROBABILITIES),
+                mutation_probabilities=enum_key_to_str(make_mutation_probabilities()),
             )
             db.add(agent)
             avatar = models.Avatar(
@@ -289,7 +292,7 @@ class KingOfMnistV2(LinearEnvironment):
                     gene=symbols_adapter.dump_python(symbols, mode="json"),
                     input_shape=[28, 28],
                     mutation_probabilities=enum_key_to_str(
-                        DEFAULT_MUTATION_PROBABILITIES
+                        make_mutation_probabilities()
                     ),
                 )
                 agents.append(agent)
