@@ -220,7 +220,7 @@ class KingOfMnistV2(LinearEnvironment):
 
             # TODO: well, this is not the most performant way to do it. could find a time to improve it later
             excluded_agent_credits = list(
-                filter(lambda agent: agent != lhs, agent_credits)
+                filter(lambda item: item[0] != lhs, agent_credits)
             )
             excluded_lookup_table = build_lookup_table(
                 [(agent.id, credit) for agent, credit in excluded_agent_credits]
