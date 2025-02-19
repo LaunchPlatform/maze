@@ -59,6 +59,14 @@ class JointType(enum.StrEnum):
     MUL = "MUL"
 
 
+@dataclasses.dataclass(frozen=True)
+class LearningParameters:
+    lr: float
+    momentum: float
+    dampening: float
+    weight_decay: float
+
+
 class BaseSymbol(BaseModel):
     pass
 
@@ -94,6 +102,7 @@ class LinearSymbol(BaseSymbol):
     type: typing.Literal[SymbolType.LINEAR] = SymbolType.LINEAR
     bias: bool
     out_features: int
+    learning_parameters: LearningParameters
 
 
 class AdaptiveMaxPool1DSymbol(BaseSymbol):
@@ -155,6 +164,12 @@ def generate_random_symbol(
         return LinearSymbol(
             out_features=random.randrange(*param_range.linear_out_features),
             bias=random.choice(param_range.linear_bias),
+            learning_parameters=LearningParameters(
+                lr=random.uniform(1e-3, 5e-2),
+                momentum=random.uniform(1e-3, 9e-1),
+                dampening=random.uniform(1e-3, 9e-1),
+                weight_decay=random.uniform(1e-3, 9e-1),
+            ),
         )
     elif symbol_type == SymbolType.ADAPTIVE_MAXPOOL1D:
         return AdaptiveMaxPool1DSymbol(
