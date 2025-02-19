@@ -168,7 +168,7 @@ def generate_random_symbol(
                 lr=random.uniform(1e-3, 5e-2),
                 momentum=random.uniform(1e-3, 9e-1),
                 dampening=random.uniform(1e-3, 9e-1),
-                weight_decay=random.uniform(1e-3, 9e-1),
+                weight_decay=random.uniform(1e-4, 3e-4),
             ),
         )
     elif symbol_type == SymbolType.ADAPTIVE_MAXPOOL1D:
