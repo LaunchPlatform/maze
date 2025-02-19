@@ -56,6 +56,9 @@ def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
             attrs.append(("out_features", format_int(out_features)))
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
             attrs.append(("out_features", format_int(out_features)))
+        case pipeline.Joint(joint_type=joint_type):
+            attrs.append(("joint_type", joint_type.value))
+
         case _:
             raise ValueError(f"Unknown module type {type(module)}")
     return attrs
@@ -82,7 +85,9 @@ def build_dag(module: pipeline.Module, prev_node: int, dag: DAG) -> int:
                 prev_node = build_dag(module=module, prev_node=prev_node, dag=dag)
             return prev_node
         case pipeline.Joint(branches=branches):
-            new_node = dag.add_node(Node(name="Joint"))
+            new_node = dag.add_node(
+                Node(name="Joint", attributes=extract_attrs(module))
+            )
             for branch_module in branches:
                 dag.add_edge(
                     Edge(

@@ -140,7 +140,7 @@ def generate_random_symbol(
         random_number = random.randrange(0, upper_val)
         symbol_type = random_lookup(lookup_table, random_number=random_number)
     else:
-        symbol_type = random.choice(SymbolType)
+        symbol_type = random.choice(list(SymbolType))
     if symbol_type in ALL_SIMPLE_TYPES:
         return SimpleSymbol(type=symbol_type)
     elif symbol_type == SymbolType.REPEAT_START:
@@ -149,7 +149,7 @@ def generate_random_symbol(
         )
     elif symbol_type == SymbolType.BRANCH_START:
         return BranchStartSymbol(
-            joint_type=random.choice(JointType),
+            joint_type=random.choice(list(JointType)),
         )
     elif symbol_type == SymbolType.LINEAR:
         return LinearSymbol(
