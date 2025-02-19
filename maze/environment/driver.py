@@ -148,7 +148,10 @@ class Driver:
             avatar.status = models.AvatarStatus.OUT_OF_CREDIT
             db.add(avatar)
         except RuntimeError as exc:
-            logger.error("Avatar %s encounters error", avatar.id, exc_info=True)
+            if exc.args[0].startswith("CUDA error:"):
+                logger.error("CUDA error, crash the app", exc_info=True)
+                raise
+            logger.error("Avatar %s encounters runtime error", avatar.id, exc_info=True)
             avatar.status = models.AvatarStatus.ERROR
             avatar.error = str(exc)
             db.add(avatar)
