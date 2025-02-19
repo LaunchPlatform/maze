@@ -1,5 +1,6 @@
 import dataclasses
 import logging
+import math
 import random
 import typing
 
@@ -147,6 +148,10 @@ class KingOfMnistV2(LinearEnvironment):
             loss_fn=nn.CrossEntropyLoss(),
         )
         vehicle.build_models()
+
+        if math.prod(vehicle.model.output_shape) < 10:
+            # TODO: maybe this should be a special kind of error status?
+            raise ValueError("No enough output")
 
         # TODO: DRY these?
         avatar.agent.op_cost = vehicle.model.cost.operation
