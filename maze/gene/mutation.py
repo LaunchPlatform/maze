@@ -16,6 +16,7 @@ class MutationType(enum.Enum):
 
 @dataclasses.dataclass
 class MutationRecord:
+    type: MutationType
     position: int
     length: int
 
@@ -39,7 +40,9 @@ def mutate_delete(
     length = random.randrange(*length_range)
     prefix = symbols[:pos]
     suffix = symbols[pos + length :]
-    return MutationRecord(position=pos, length=length), prefix + suffix
+    return MutationRecord(
+        type=MutationType.DELETE, position=pos, length=length
+    ), prefix + suffix
 
 
 def mutate_duplicate(
@@ -51,7 +54,7 @@ def mutate_duplicate(
     duplicating = symbols[pos : pos + length]
     suffix = symbols[pos + length :]
     return MutationRecord(
-        position=pos, length=length
+        type=MutationType.DUPLICATE, position=pos, length=length
     ), prefix + duplicating + duplicating + suffix
 
 
@@ -63,7 +66,9 @@ def mutate_reverse(
     prefix = symbols[:pos]
     reversing = symbols[pos : pos + length][::-1]
     suffix = symbols[pos + length :]
-    return MutationRecord(position=pos, length=length), prefix + reversing + suffix
+    return MutationRecord(
+        type=MutationType.REVERSE, position=pos, length=length
+    ), prefix + reversing + suffix
 
 
 def mutate(

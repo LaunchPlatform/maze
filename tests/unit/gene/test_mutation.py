@@ -105,6 +105,7 @@ def test_mutate_delete(symbols: list[Symbol], length_range: tuple[int, int]):
         record, mutated_symbols = mutate_delete(
             symbols=symbols, length_range=length_range
         )
+        assert record.type == MutationType.DELETE
         assert record.position >= 0 and record.position < len(symbols)
         start, end = length_range
         assert record.length >= start and record.length < end
@@ -140,6 +141,7 @@ def test_mutate_duplicate(symbols: list[Symbol], length_range: tuple[int, int]):
         record, mutated_symbols = mutate_duplicate(
             symbols=symbols, length_range=length_range
         )
+        assert record.type == MutationType.DUPLICATE
         assert record.position >= 0 and record.position < len(symbols)
         start, end = length_range
         assert record.length >= start and record.length < end
@@ -187,6 +189,7 @@ def test_mutate_reverse(symbols: list[Symbol], length_range: tuple[int, int]):
         record, mutated_symbols = mutate_reverse(
             symbols=symbols, length_range=length_range
         )
+        assert record.type == MutationType.REVERSE
         assert record.position >= 0 and record.position < len(symbols)
         start, end = length_range
         assert record.length >= start and record.length < end

@@ -74,6 +74,10 @@ def to_millions(l: list[int]) -> list[int]:
     return list(map(lambda x: x * 1_000_000, l))
 
 
+def enum_key_to_str(value: dict) -> dict:
+    return {key.value: value for key, value in value.items()}
+
+
 class KingOfMnistV2(LinearEnvironment):
     count = 5
     group = "king-of-mnist"
@@ -118,7 +122,7 @@ class KingOfMnistV2(LinearEnvironment):
             agent = models.Agent(
                 gene=symbols_adapter.dump_python(symbols, mode="json"),
                 input_shape=[28, 28],
-                mutation_probabilities=DEFAULT_MUTATION_PROBABILITIES,
+                mutation_probabilities=enum_key_to_str(DEFAULT_MUTATION_PROBABILITIES),
             )
             db.add(agent)
             avatar = models.Avatar(
@@ -249,6 +253,12 @@ class KingOfMnistV2(LinearEnvironment):
                 mutation_probabilities={
                     key.value: value for key, value in mutation_probabilities.items()
                 },
+                mutations=[
+                    models.Mutation(
+                        type=record.type,
+                    )
+                    for record in mutation_records
+                ],
             )
             offspring_agents.append(new_agent)
         return offspring_agents
@@ -275,7 +285,9 @@ class KingOfMnistV2(LinearEnvironment):
                 agent = models.Agent(
                     gene=symbols_adapter.dump_python(symbols, mode="json"),
                     input_shape=[28, 28],
-                    mutation_probabilities=DEFAULT_MUTATION_PROBABILITIES,
+                    mutation_probabilities=enum_key_to_str(
+                        DEFAULT_MUTATION_PROBABILITIES
+                    ),
                 )
                 agents.append(agent)
             return agents
