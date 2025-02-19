@@ -43,12 +43,12 @@ def merge_value(
             f"Expected lhs and rhs to be the same type but got {type(lhs)} and {type(rhs)} instead"
         )
     match lhs:
+        case bool():
+            return merge_bool(lhs, rhs)
         case int():
             return merge_int(lhs, rhs, jitter=jitter)
         case float():
             return merge_float(lhs, rhs, jitter=jitter)
-        case bool():
-            return merge_bool(lhs, rhs)
         case _:
             raise ValueError(f"Unknown type {type(lhs)}")
 
