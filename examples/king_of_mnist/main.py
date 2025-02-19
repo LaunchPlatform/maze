@@ -225,12 +225,15 @@ class KingOfMnistV2(LinearEnvironment):
 
             # TODO: well, this is not the most performant way to do it. could find a time to improve it later
             excluded_agent_credits = list(
-                filter(lambda item: item[0] != lhs, agent_credits)
+                filter(lambda item: item[0].id != lhs, agent_credits)
             )
             excluded_lookup_table = build_lookup_table(
                 [(agent.id, credit) for agent, credit in excluded_agent_credits]
             )
             rhs = random_lookup(excluded_lookup_table)
+
+            if lhs == rhs:
+                raise ValueError("Self breeding is not allowed")
 
             lhs = db.get(models.Agent, lhs)
             rhs = db.get(models.Agent, rhs)
