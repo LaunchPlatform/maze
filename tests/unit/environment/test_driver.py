@@ -33,7 +33,6 @@ def env_template() -> EnvironmentTemplate:
             for _ in range(zone.agent_slots):
                 agent = models.Agent(
                     gene=[SimpleSymbol(type=SymbolType.RELU).model_dump(mode="json")],
-                    symbol_table={},
                     input_shape=[28, 28],
                 )
                 db.add(agent)
