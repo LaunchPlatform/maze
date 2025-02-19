@@ -6,8 +6,8 @@ import typing
 from . import pipeline
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
+from .symbols import BranchStartSymbol
 from .symbols import is_symbol_type
-from .symbols import JointType
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
@@ -252,78 +252,74 @@ def _do_build_models(
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
                 check_budget()
+            case BranchStartSymbol(joint_type=joint_type):
+                branch_symbols, _ = read_enclosure(
+                    symbols=symbols,
+                    start_symbol=functools.partial(
+                        is_symbol_type, SymbolType.BRANCH_START
+                    ),
+                    end_symbol=functools.partial(
+                        is_symbol_type, SymbolType.BRANCH_STOP
+                    ),
+                )
+                segment_models = [
+                    _do_build_models(
+                        symbols=iter(segment_symbols),
+                        input_shape=model.output_shape,
+                        starting_cost=starting_cost + model.cost,
+                        budget=budget,
+                    )
+                    for segment_symbols in break_branch_segments(iter(branch_symbols))
+                ]
+                for segment_model in segment_models:
+                    model.cost.operation += segment_model.cost.operation
+                    model.cost.build += segment_model.cost.build
+                    check_budget()
+                if len(segment_models) == 1:
+                    # special case, only one branch seg exists
+                    segment_model = segment_models[0]
+                    model.modules.extend(segment_model.modules)
+                    model.output_shape = segment_model.output_shape
+                elif len(segment_models) == 0:
+                    # nvm, nothing in the segment
+                    pass
+                else:
+                    branch_modules = []
+                    new_output_size = 0
+                    for segment in segment_models:
+                        segment_modules = segment.modules
+                        seg_output_size = math.prod(segment.output_shape)
+                        new_output_size += seg_output_size
+                        # TODO: make it possible to output different shape with a different joint mode,
+                        #       such as addition or stack
+                        if len(segment.output_shape) != 1:
+                            segment_modules.append(
+                                pipeline.Flatten(
+                                    input_shape=model.output_shape,
+                                    output_shape=model.output_shape,
+                                )
+                            )
+
+                            segment.output_shape = (seg_output_size,)
+                        branch_modules.append(
+                            pipeline.Sequential(
+                                input_shape=model.output_shape,
+                                modules=segment_modules,
+                                output_shape=(seg_output_size,),
+                            )
+                        )
+
+                    model.modules.append(
+                        pipeline.Joint(
+                            input_shape=model.output_shape,
+                            output_shape=(new_output_size,),
+                            branches=branch_modules,
+                            type=joint_type,
+                        )
+                    )
+                    model.output_shape = (new_output_size,)
             case SimpleSymbol(type=symbol_type):
                 match symbol_type:
-                    case SymbolType.BRANCH_START:
-                        branch_symbols, branch_end = read_enclosure(
-                            symbols=symbols,
-                            start_symbol=functools.partial(
-                                is_symbol_type, SymbolType.BRANCH_START
-                            ),
-                            end_symbol=functools.partial(
-                                is_symbol_type, SymbolType.BRANCH_STOP
-                            ),
-                        )
-                        segment_models = [
-                            _do_build_models(
-                                symbols=iter(segment_symbols),
-                                input_shape=model.output_shape,
-                                starting_cost=starting_cost + model.cost,
-                                budget=budget,
-                            )
-                            for segment_symbols in break_branch_segments(
-                                iter(branch_symbols)
-                            )
-                        ]
-                        for segment_model in segment_models:
-                            model.cost.operation += segment_model.cost.operation
-                            model.cost.build += segment_model.cost.build
-                            check_budget()
-                        if len(segment_models) == 1:
-                            # special case, only one branch seg exists
-                            segment_model = segment_models[0]
-                            model.modules.extend(segment_model.modules)
-                            model.output_shape = segment_model.output_shape
-                        elif len(segment_models) == 0:
-                            # nvm, nothing in the segment
-                            pass
-                        else:
-                            branch_modules = []
-                            new_output_size = 0
-                            for segment in segment_models:
-                                segment_modules = segment.modules
-                                seg_output_size = math.prod(segment.output_shape)
-                                new_output_size += seg_output_size
-                                # TODO: make it possible to output different shape with a different joint mode,
-                                #       such as addition or stack
-                                if len(segment.output_shape) != 1:
-                                    segment_modules.append(
-                                        pipeline.Flatten(
-                                            input_shape=model.output_shape,
-                                            output_shape=model.output_shape,
-                                        )
-                                    )
-
-                                    segment.output_shape = (seg_output_size,)
-                                branch_modules.append(
-                                    pipeline.Sequential(
-                                        input_shape=model.output_shape,
-                                        modules=segment_modules,
-                                        output_shape=(seg_output_size,),
-                                    )
-                                )
-
-                            model.modules.append(
-                                pipeline.Joint(
-                                    input_shape=model.output_shape,
-                                    output_shape=(new_output_size,),
-                                    branches=branch_modules,
-                                    type=branch_end.joint_type
-                                    if branch_end is not None
-                                    else JointType.ADD,
-                                )
-                            )
-                            model.output_shape = (new_output_size,)
                     case SymbolType.RELU:
                         model.modules.append(
                             pipeline.ReLU(

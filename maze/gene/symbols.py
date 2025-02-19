@@ -64,8 +64,8 @@ class BaseSymbol(BaseModel):
 
 
 ALL_SIMPLE_TYPES: list[SymbolType] = [
-    SymbolType.BRANCH_START,
     SymbolType.BRANCH_SEGMENT_MARKER,
+    SymbolType.BRANCH_STOP,
     SymbolType.REPEAT_END,
     SymbolType.ACTIVATE,
     SymbolType.DEACTIVATE,
@@ -85,8 +85,8 @@ class RepeatStartSymbol(BaseSymbol):
     times: int
 
 
-class BranchStopSymbol(BaseSymbol):
-    type: typing.Literal[SymbolType.BRANCH_STOP] = SymbolType.BRANCH_STOP
+class BranchStartSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.BRANCH_START] = SymbolType.BRANCH_START
     joint_type: JointType
 
 
@@ -109,7 +109,7 @@ class AdaptiveAvgPool1DSymbol(BaseSymbol):
 Symbol = (
     SimpleSymbol
     | RepeatStartSymbol
-    | BranchStopSymbol
+    | BranchStartSymbol
     | LinearSymbol
     | AdaptiveMaxPool1DSymbol
     | AdaptiveAvgPool1DSymbol
@@ -147,8 +147,8 @@ def generate_random_symbol(
         return RepeatStartSymbol(
             times=random.randrange(*param_range.repeat_times),
         )
-    elif symbol_type == SymbolType.BRANCH_STOP:
-        return BranchStopSymbol(
+    elif symbol_type == SymbolType.BRANCH_START:
+        return BranchStartSymbol(
             joint_type=random.choice(JointType),
         )
     elif symbol_type == SymbolType.LINEAR:
