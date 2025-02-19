@@ -1,9 +1,11 @@
+import dataclasses
 import itertools
 import random
 
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BranchStartSymbol
+from .symbols import LearningParameters
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
@@ -94,6 +96,13 @@ def merge_liner(lhs: LinearSymbol, rhs: LinearSymbol, jitter: float) -> LinearSy
         bias=merge_bool(lhs.bias, rhs.bias),
         out_features=max(
             1, merge_int(lhs.out_features, rhs.out_features, jitter=jitter)
+        ),
+        learning_parameters=LearningParameters(
+            **merge_parameter_dict(
+                lhs=dataclasses.asdict(lhs.learning_parameters),
+                rhs=dataclasses.asdict(rhs.learning_parameters),
+                jitter=jitter,
+            )
         ),
     )
 
