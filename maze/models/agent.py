@@ -15,6 +15,7 @@ from sqlalchemy.orm import relationship
 
 from ..db.base import Base
 from ..environment.agentdata import AgentData
+from ..gene.mutation import MutationType
 from ..gene.symbols import symbols_adapter
 from .helpers import make_repr_attrs
 
@@ -37,10 +38,11 @@ class Agent(Base):
     )
     input_shape: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     gene: Mapped[list] = mapped_column(JSONB, nullable=False)
-    symbol_table: Mapped[dict] = mapped_column(JSONB, nullable=False)
     life_span: Mapped[int] = mapped_column(Integer, nullable=True)
     op_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
     build_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
+    mutation_probabilities: Mapped[dict] = mapped_column(JSONB, nullable=False)
+    mutation_length_range: Mapped[dict] = mapped_column(JSONB, nullable=False)
     parameters_count: Mapped[int] = mapped_column(BigInteger, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
@@ -93,3 +95,17 @@ class Agent(Base):
             symbols=symbols_adapter.validate_python(self.gene),
             input_shape=tuple(self.input_shape),
         )
+
+    @property
+    def enum_mutation_probabilities(self) -> dict[MutationType, float]:
+        return {
+            MutationType[key]: value
+            for key, value in self.mutation_probabilities.items()
+        }
+
+    @property
+    def enum_mutation_length_range(self) -> dict[MutationType, list[int]]:
+        return {
+            MutationType[key]: value
+            for key, value in self.mutation_length_range.items()
+        }

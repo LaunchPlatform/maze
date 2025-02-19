@@ -18,13 +18,16 @@ from maze.environment.zone import OutOfCreditError
 from maze.gene.freq_table import build_lookup_table
 from maze.gene.freq_table import gen_freq_table
 from maze.gene.freq_table import random_lookup
-from maze.gene.merge import JiterConfig
 from maze.gene.merge import merge_gene
+from maze.gene.merge import merge_parameter_dict
+from maze.gene.mutation import decide_mutations
+from maze.gene.mutation import mutate
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
 from maze.gene.symbols import SymbolType
 
+JITTER = 0.1
 training_data = datasets.MNIST(
     root="data",
     train=True,
@@ -217,15 +220,35 @@ class KingOfMnist(LinearEnvironment):
 
             lhs_gene = lhs.agent_data.symbols
             rhs_gene = rhs.agent_data.symbols
-            gene = list(merge_gene(lhs_gene, rhs_gene, jiter_config=JiterConfig()))
+
+            gene = list(merge_gene(lhs_gene, rhs_gene, jitter=JITTER))
+            mutation_probabilities = merge_parameter_dict(
+                lhs=lhs.enum_mutation_probabilities,
+                rhs=rhs.enum_mutation_probabilities,
+                jitter=JITTER,
+            )
+            mutation_length_range = merge_parameter_dict(
+                lhs=lhs.enum_mutation_length_range,
+                rhs=rhs.enum_mutation_length_range,
+                jitter=JITTER,
+            )
+            mutation_types = decide_mutations(
+                probabilities=mutation_probabilities, gene_length=len(gene)
+            )
+            mutation_records, mutated_gene = mutate(
+                symbols=gene,
+                mutations=mutation_types,
+                length_ranges=mutation_length_range,
+            )
+
             # TODO: mutations
             new_agent = models.Agent(
                 lhs_parent=lhs,
                 rhs_parent=rhs,
-                gene=symbols_adapter.dump_python(gene, mode="json"),
+                gene=symbols_adapter.dump_python(mutated_gene, mode="json"),
                 input_shape=lhs.input_shape,
-                # TODO: remove this?
-                symbol_table={},
+                mutation_probabilities=mutation_probabilities,
+                mutation_length_range=mutation_length_range,
             )
             offspring_agents.append(new_agent)
         return offspring_agents

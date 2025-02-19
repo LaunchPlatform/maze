@@ -42,15 +42,13 @@ def merge_value(
         raise TypeError(
             f"Expected lhs and rhs to be the same type but got {type(lhs)} and {type(rhs)} instead"
         )
-    match lhs:
-        case bool():
-            return merge_bool(lhs, rhs)
-        case int():
-            return merge_int(lhs, rhs, jitter=jitter)
-        case float():
-            return merge_float(lhs, rhs, jitter=jitter)
-        case _:
-            raise ValueError(f"Unknown type {type(lhs)}")
+    if isinstance(lhs, bool):
+        return merge_bool(lhs, rhs)
+    elif isinstance(lhs, int):
+        return merge_int(lhs, rhs, jitter=jitter)
+    elif isinstance(lhs, float):
+        return merge_float(lhs, rhs, jitter=jitter)
+    raise ValueError(f"Unknown type {type(lhs)}")
 
 
 def merge_repeat(
