@@ -31,7 +31,6 @@ def upgrade() -> None:
         sa.Column("rhs_parent_id", sa.UUID(), nullable=True),
         sa.Column("input_shape", sa.ARRAY(sa.Integer()), nullable=False),
         sa.Column("gene", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("life_span", sa.Integer(), nullable=True),
         sa.Column("op_cost", sa.BigInteger(), nullable=True),
         sa.Column("build_cost", sa.BigInteger(), nullable=True),
         sa.Column(
@@ -94,9 +93,7 @@ def upgrade() -> None:
         sa.Column("agent_id", sa.UUID(), nullable=False),
         sa.Column(
             "type",
-            sa.Enum(
-                "INVERSION", "DUPLICATION", "SHIFT", "FLIT_BIT", name="mutationtype"
-            ),
+            sa.Enum("DELETE", "DUPLICATE", "REVERSE", name="mutationtype"),
             nullable=False,
         ),
         sa.Column("order", sa.Integer(), nullable=False),

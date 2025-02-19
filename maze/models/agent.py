@@ -38,7 +38,6 @@ class Agent(Base):
     )
     input_shape: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     gene: Mapped[list] = mapped_column(JSONB, nullable=False)
-    life_span: Mapped[int] = mapped_column(Integer, nullable=True)
     op_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
     build_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
     mutation_probabilities: Mapped[dict] = mapped_column(JSONB, nullable=False)

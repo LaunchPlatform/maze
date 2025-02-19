@@ -1,4 +1,3 @@
-import enum
 import uuid
 
 from sqlalchemy import Enum
@@ -11,15 +10,8 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from ..db.base import Base
+from ..gene.mutation import MutationType
 from .helpers import make_repr_attrs
-
-
-@enum.unique
-class MutationType(enum.Enum):
-    INVERSION = "INVERSION"
-    DUPLICATION = "DUPLICATION"
-    SHIFT = "SHIFT"
-    FLIT_BIT = "FLIT_BIT"
 
 
 class Mutation(Base):
