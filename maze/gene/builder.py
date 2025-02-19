@@ -7,6 +7,7 @@ from . import pipeline
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import is_symbol_type
+from .symbols import JointType
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
@@ -254,7 +255,7 @@ def _do_build_models(
             case SimpleSymbol(type=symbol_type):
                 match symbol_type:
                     case SymbolType.BRANCH_START:
-                        branch_symbols, _ = read_enclosure(
+                        branch_symbols, branch_end = read_enclosure(
                             symbols=symbols,
                             start_symbol=functools.partial(
                                 is_symbol_type, SymbolType.BRANCH_START
@@ -317,7 +318,9 @@ def _do_build_models(
                                     input_shape=model.output_shape,
                                     output_shape=(new_output_size,),
                                     branches=branch_modules,
-                                    # TODO: provide other joint mode like addition or stack as well
+                                    type=branch_end.joint_type
+                                    if branch_end is not None
+                                    else JointType.ADD,
                                 )
                             )
                             model.output_shape = (new_output_size,)

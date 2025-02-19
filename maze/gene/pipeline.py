@@ -1,5 +1,7 @@
 import dataclasses
 
+from .symbols import JointType
+
 
 @dataclasses.dataclass(frozen=True)
 class Module:
@@ -25,6 +27,7 @@ class Reshape(Module):
 @dataclasses.dataclass(frozen=True)
 class Joint(Module):
     branches: list[Module]
+    type: JointType
 
 
 @dataclasses.dataclass(frozen=True)
