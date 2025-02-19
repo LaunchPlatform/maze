@@ -51,6 +51,14 @@ class SymbolType(enum.StrEnum):
     # CONV3D = "CONV3D"
 
 
+@enum.unique
+class JointType(enum.StrEnum):
+    CONCAT = "CONCAT"
+    ADD = "ADD"
+    SUB = "SUB"
+    MUL = "MUL"
+
+
 class BaseSymbol(BaseModel):
     pass
 
@@ -58,7 +66,6 @@ class BaseSymbol(BaseModel):
 ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.BRANCH_START,
     SymbolType.BRANCH_SEGMENT_MARKER,
-    SymbolType.BRANCH_STOP,
     SymbolType.REPEAT_END,
     SymbolType.ACTIVATE,
     SymbolType.DEACTIVATE,
@@ -76,6 +83,11 @@ class SimpleSymbol(BaseSymbol):
 class RepeatStartSymbol(BaseSymbol):
     type: typing.Literal[SymbolType.REPEAT_START] = SymbolType.REPEAT_START
     times: int
+
+
+class BranchStopSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.BRANCH_STOP] = SymbolType.BRANCH_STOP
+    joint_type: JointType
 
 
 class LinearSymbol(BaseSymbol):
@@ -97,6 +109,7 @@ class AdaptiveAvgPool1DSymbol(BaseSymbol):
 Symbol = (
     SimpleSymbol
     | RepeatStartSymbol
+    | BranchStopSymbol
     | LinearSymbol
     | AdaptiveMaxPool1DSymbol
     | AdaptiveAvgPool1DSymbol
@@ -127,12 +140,16 @@ def generate_random_symbol(
         random_number = random.randrange(0, upper_val)
         symbol_type = random_lookup(lookup_table, random_number=random_number)
     else:
-        symbol_type = random.choice(list(SymbolType))
+        symbol_type = random.choice(SymbolType)
     if symbol_type in ALL_SIMPLE_TYPES:
         return SimpleSymbol(type=symbol_type)
     elif symbol_type == SymbolType.REPEAT_START:
         return RepeatStartSymbol(
             times=random.randrange(*param_range.repeat_times),
+        )
+    elif symbol_type == SymbolType.BRANCH_STOP:
+        return BranchStopSymbol(
+            joint_type=random.choice(JointType),
         )
     elif symbol_type == SymbolType.LINEAR:
         return LinearSymbol(
