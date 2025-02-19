@@ -82,17 +82,17 @@ def mutate(
         match mutation_type:
             case MutationType.DELETE:
                 record, current_symbols = mutate_delete(
-                    symbols, length_ranges[mutation_type]
+                    current_symbols, length_ranges[mutation_type]
                 )
                 mutation_records.append(record)
             case MutationType.REVERSE:
                 record, current_symbols = mutate_reverse(
-                    symbols, length_ranges[mutation_type]
+                    current_symbols, length_ranges[mutation_type]
                 )
                 mutation_records.append(record)
             case MutationType.DUPLICATE:
                 record, current_symbols = mutate_duplicate(
-                    symbols, length_ranges[mutation_type]
+                    current_symbols, length_ranges[mutation_type]
                 )
                 mutation_records.append(record)
             case _:
