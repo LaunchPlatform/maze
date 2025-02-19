@@ -188,6 +188,18 @@ svg#svg-canvas {
   <dt>Parameters</dt>
   <dd>{{ agent.parameters_count | format_int }}</dd>
 
+  <dt>Mutation Probabilities</dt>
+  <dd>{{ agent.mutation_probabilities | tojson }}</dd>
+
+  <dt>Mutations</dt>
+  <dd>
+    <ol>
+    {% for mutation in agent.mutations %}
+      <li>{{ mutation.type }}, position={{ mutation.position }}, length={{ mutation.length }}</li>
+    {% endfor %}
+    </ol>
+  </dd>
+
   <dt>LHS Parent</dt>
   <dd>
     {% if agent.lhs_parent is none %}

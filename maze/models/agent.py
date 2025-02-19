@@ -46,7 +46,7 @@ class Agent(Base):
         DateTime, nullable=False, default=datetime.datetime.utcnow
     )
 
-    mutations: Mapped["Mutation"] = relationship(
+    mutations: Mapped[list["Mutation"]] = relationship(
         "Mutation",
         back_populates="agent",
     )
