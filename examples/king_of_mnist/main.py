@@ -74,7 +74,7 @@ def to_millions(l: list[int]) -> list[int]:
     return list(map(lambda x: x * 1_000_000, l))
 
 
-class KingOfMnist(LinearEnvironment):
+class KingOfMnistV2(LinearEnvironment):
     count = 5
     group = "king-of-mnist"
     experiment = "king-of-mnist"
