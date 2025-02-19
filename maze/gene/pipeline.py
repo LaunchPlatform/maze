@@ -27,7 +27,7 @@ class Reshape(Module):
 @dataclasses.dataclass(frozen=True)
 class Joint(Module):
     branches: list[Module]
-    type: JointType
+    joint_type: JointType
 
 
 @dataclasses.dataclass(frozen=True)

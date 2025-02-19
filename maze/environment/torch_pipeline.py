@@ -1,8 +1,18 @@
+import typing
+from functools import reduce
+
 import torch
 from torch import nn
+from torch.nn import functional
 
 from ..gene import pipeline
 from ..gene.symbols import JointType
+
+JOINT_OP_FUNC_MAP: dict[JointType, typing.Callable] = {
+    JointType.ADD: torch.add,
+    JointType.SUB: torch.sub,
+    JointType.MUL: torch.mul,
+}
 
 
 class Joint(nn.Module):
@@ -15,10 +25,23 @@ class Joint(nn.Module):
 
     def forward(self, x):
         # TODO: provide other ways of joining branches
-        return torch.cat(
-            list((module(x) for module in self.branch_modules)),
-            dim=1,
-        )
+        tensors = list((module(x) for module in self.branch_modules))
+        if self.joint_type == JointType.CONCAT:
+            return torch.cat(
+                tensors,
+                dim=1,
+            )
+        else:
+            max_length = max(*map(lambda t: t.size(1), tensors))
+            padded_tensors = []
+            for tensor in tensors:
+                if tensor.size(1) == max_length:
+                    padded_tensors.append(tensor)
+                    continue
+                delta = max_length - tensor.size(1)
+                padded_tensors.append(functional.pad(tensor, (0, delta), "constant", 0))
+            op_func = JOINT_OP_FUNC_MAP[self.joint_type]
+            return reduce(op_func, padded_tensors[1:], padded_tensors[0])
 
 
 class Reshape(nn.Module):
@@ -58,7 +81,7 @@ def build_pipeline(module: pipeline.Module) -> nn.Module:
             return nn.AdaptiveAvgPool1d(out_features)
         case pipeline.Sequential(modules=modules):
             return nn.Sequential(*map(build_pipeline, modules))
-        case pipeline.Joint(branches=branches, type=joint_type):
+        case pipeline.Joint(branches=branches, joint_type=joint_type):
             return Joint(
                 branch_modules=list(map(build_pipeline, branches)),
                 joint_type=joint_type,

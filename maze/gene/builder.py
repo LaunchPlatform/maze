@@ -318,7 +318,7 @@ def _do_build_models(
                             input_shape=model.output_shape,
                             output_shape=(new_output_size,),
                             branches=branch_modules,
-                            type=joint_type,
+                            joint_type=joint_type,
                         )
                     )
                     model.output_shape = (new_output_size,)
