@@ -23,6 +23,9 @@ class Joint(nn.Module):
         for i, module in enumerate(branch_modules):
             self.register_module(str(i), module)
 
+    def extra_repr(self) -> str:
+        return f"joint_type={self.joint_type.value}"
+
     def forward(self, x):
         tensors = list((module(x) for module in self.branch_modules))
         if self.joint_type == JointType.CONCAT:
@@ -53,6 +56,9 @@ class Reshape(nn.Module):
     def __init__(self, *args):
         super(Reshape, self).__init__()
         self.shape = args
+
+    def extra_repr(self) -> str:
+        return f"shape={self.shape}"
 
     def forward(self, x):
         return x.view(x.size(0), *self.shape)
