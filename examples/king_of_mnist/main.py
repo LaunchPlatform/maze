@@ -16,18 +16,28 @@ from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
 from maze.environment.zone import OutOfCreditError
 from maze.gene.freq_table import build_lookup_table
-from maze.gene.freq_table import gen_freq_table
 from maze.gene.freq_table import random_lookup
 from maze.gene.merge import merge_gene
 from maze.gene.merge import merge_parameter_dict
 from maze.gene.mutation import decide_mutations
 from maze.gene.mutation import mutate
+from maze.gene.mutation import MutationType
 from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
-from maze.gene.symbols import SymbolType
 
 JITTER = 0.1
+DEFAULT_MUTATION_PROBABILITIES = {
+    MutationType.DUPLICATE: 0.01,
+    MutationType.DELETE: 0.01,
+    MutationType.REVERSE: 0.01,
+}
+MUTATION_LENGTH_RANGE = {
+    MutationType.DUPLICATE: [1, 3],
+    MutationType.DELETE: [1, 3],
+    MutationType.REVERSE: [1, 3],
+}
+
 training_data = datasets.MNIST(
     root="data",
     train=True,
@@ -98,22 +108,17 @@ class KingOfMnist(LinearEnvironment):
             return
         db = object_session(zone)
         for _ in range(zone.agent_slots):
-            # TODO: do we really need this?
-            symbol_table = gen_freq_table(
-                symbols=list(SymbolType), random_range=(1, 1024)
-            )
             gene_length = random.randint(5, 100)
             symbols = list(
                 generate_gene(
-                    symbol_table=symbol_table,
                     length=gene_length,
                     param_range=SymbolParameterRange(),
                 )
             )
             agent = models.Agent(
                 gene=symbols_adapter.dump_python(symbols, mode="json"),
-                symbol_table={},
                 input_shape=[28, 28],
+                mutation_probabilities=DEFAULT_MUTATION_PROBABILITIES,
             )
             db.add(agent)
             avatar = models.Avatar(
@@ -200,7 +205,7 @@ class KingOfMnist(LinearEnvironment):
             [(agent.id, credit) for agent, credit in agent_credits]
         )
         total_slots = zone.agent_slots
-        offspring_slots = total_slots * 0.7
+        offspring_slots = total_slots * 0.6
 
         offspring_agents = []
         for _ in range(int(offspring_slots)):
@@ -227,28 +232,23 @@ class KingOfMnist(LinearEnvironment):
                 rhs=rhs.enum_mutation_probabilities,
                 jitter=JITTER,
             )
-            mutation_length_range = merge_parameter_dict(
-                lhs=lhs.enum_mutation_length_range,
-                rhs=rhs.enum_mutation_length_range,
-                jitter=JITTER,
-            )
             mutation_types = decide_mutations(
-                probabilities=mutation_probabilities, gene_length=len(gene)
+                probabilities=mutation_probabilities,
+                gene_length=len(gene),
             )
             mutation_records, mutated_gene = mutate(
                 symbols=gene,
                 mutations=mutation_types,
-                length_ranges=mutation_length_range,
+                length_ranges=MUTATION_LENGTH_RANGE,
             )
-
-            # TODO: mutations
             new_agent = models.Agent(
                 lhs_parent=lhs,
                 rhs_parent=rhs,
                 gene=symbols_adapter.dump_python(mutated_gene, mode="json"),
                 input_shape=lhs.input_shape,
-                mutation_probabilities=mutation_probabilities,
-                mutation_length_range=mutation_length_range,
+                mutation_probabilities={
+                    key.value: value for key, value in mutation_probabilities.items()
+                },
             )
             offspring_agents.append(new_agent)
         return offspring_agents
@@ -265,22 +265,17 @@ class KingOfMnist(LinearEnvironment):
             # no source env, it means this is the first env.
             # let's fill the slots with random new ones
             for _ in range(agent_count):
-                # TODO: do we really need this?
-                symbol_table = gen_freq_table(
-                    symbols=list(SymbolType), random_range=(1, 1024)
-                )
                 gene_length = random.randint(5, 100)
                 symbols = list(
                     generate_gene(
-                        symbol_table=symbol_table,
                         length=gene_length,
                         param_range=SymbolParameterRange(),
                     )
                 )
                 agent = models.Agent(
                     gene=symbols_adapter.dump_python(symbols, mode="json"),
-                    symbol_table={},
                     input_shape=[28, 28],
+                    mutation_probabilities=DEFAULT_MUTATION_PROBABILITIES,
                 )
                 agents.append(agent)
             return agents

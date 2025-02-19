@@ -120,11 +120,14 @@ def is_symbol_type(symbol_type: SymbolType, symbol: Symbol) -> bool:
 
 
 def generate_random_symbol(
-    lookup_table: LookupTable, param_range: SymbolParameterRange
+    param_range: SymbolParameterRange, lookup_table: LookupTable | None = None
 ) -> BaseSymbol:
-    upper_val = lookup_table[-1][0]
-    random_number = random.randrange(0, upper_val)
-    symbol_type = random_lookup(lookup_table, random_number=random_number)
+    if lookup_table is not None:
+        upper_val = lookup_table[-1][0]
+        random_number = random.randrange(0, upper_val)
+        symbol_type = random_lookup(lookup_table, random_number=random_number)
+    else:
+        symbol_type = random.choice(list(SymbolType))
     if symbol_type in ALL_SIMPLE_TYPES:
         return SimpleSymbol(type=symbol_type)
     elif symbol_type == SymbolType.REPEAT_START:
@@ -153,8 +156,12 @@ def generate_random_symbol(
 
 
 def generate_gene(
-    symbol_table: dict[SymbolType, int], param_range: SymbolParameterRange, length: int
+    param_range: SymbolParameterRange,
+    length: int,
+    symbol_table: dict[SymbolType, int] | None = None,
 ) -> typing.Generator[BaseSymbol, None, None]:
-    lookup_table = build_lookup_table(symbol_table.items())
+    lookup_table = None
+    if symbol_table is not None:
+        lookup_table = build_lookup_table(symbol_table.items())
     for _ in range(length):
         yield generate_random_symbol(lookup_table=lookup_table, param_range=param_range)

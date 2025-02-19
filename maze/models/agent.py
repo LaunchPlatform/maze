@@ -42,7 +42,6 @@ class Agent(Base):
     op_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
     build_cost: Mapped[int] = mapped_column(BigInteger, nullable=True)
     mutation_probabilities: Mapped[dict] = mapped_column(JSONB, nullable=False)
-    mutation_length_range: Mapped[dict] = mapped_column(JSONB, nullable=False)
     parameters_count: Mapped[int] = mapped_column(BigInteger, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.datetime.utcnow
@@ -101,11 +100,4 @@ class Agent(Base):
         return {
             MutationType[key]: value
             for key, value in self.mutation_probabilities.items()
-        }
-
-    @property
-    def enum_mutation_length_range(self) -> dict[MutationType, list[int]]:
-        return {
-            MutationType[key]: value
-            for key, value in self.mutation_length_range.items()
         }
