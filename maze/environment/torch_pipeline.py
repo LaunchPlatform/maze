@@ -1,9 +1,10 @@
+import functools
 import typing
 from functools import reduce
 
 import torch
 from torch import nn
-from torch.nn import functional
+from torch.nn import functional as fn
 
 from ..gene import pipeline
 from ..gene.symbols import JointType
@@ -45,9 +46,7 @@ class Joint(nn.Module):
                     padded_tensors.append(tensor)
                     continue
                 delta = max_length - tensor.size(1)
-                padded_tensors.append(
-                    functional.pad(tensor, (0, delta), "constant", pad_value)
-                )
+                padded_tensors.append(fn.pad(tensor, (0, delta), "constant", pad_value))
             op_func = JOINT_OP_FUNC_MAP[self.joint_type]
             return reduce(op_func, padded_tensors[1:], padded_tensors[0])
 
@@ -108,10 +107,26 @@ def build_pipeline(
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
             return nn.AdaptiveAvgPool1d(out_features)
         case pipeline.Sequential(modules=modules):
-            return nn.Sequential(*map(build_pipeline, modules))
+            return nn.Sequential(
+                *map(
+                    functools.partial(
+                        build_pipeline,
+                        output_learning_parameters=output_learning_parameters,
+                    ),
+                    modules,
+                )
+            )
         case pipeline.Joint(branches=branches, joint_type=joint_type):
             return Joint(
-                branch_modules=list(map(build_pipeline, branches)),
+                branch_modules=list(
+                    map(
+                        functools.partial(
+                            build_pipeline,
+                            output_learning_parameters=output_learning_parameters,
+                        ),
+                        branches,
+                    )
+                ),
                 joint_type=joint_type,
             )
         case _:
