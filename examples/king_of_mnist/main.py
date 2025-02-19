@@ -255,9 +255,12 @@ class KingOfMnistV2(LinearEnvironment):
                 },
                 mutations=[
                     models.Mutation(
+                        order=index,
                         type=record.type,
+                        position=record.position,
+                        length=record.length,
                     )
-                    for record in mutation_records
+                    for index, record in enumerate(mutation_records)
                 ],
             )
             offspring_agents.append(new_agent)
