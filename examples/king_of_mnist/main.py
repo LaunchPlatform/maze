@@ -84,10 +84,10 @@ def enum_key_to_str(value: dict) -> dict:
 class KingOfMnistV2(LinearEnvironment):
     count = 5
     group = "king-of-mnist"
-    experiment = "king-of-mnist"
+    experiment = "king-of-mnist-v2"
 
     def make_zones(self, index: int) -> list[models.Zone]:
-        zone_count = [1, 5, 2, 1, 1][index]
+        zone_count = [10, 5, 2, 1, 1][index]
         return [
             models.Zone(agent_slots=30, index=zone_index)
             for zone_index in range(zone_count)
@@ -97,7 +97,7 @@ class KingOfMnistV2(LinearEnvironment):
         mi = 1_000_000
         basic_cost = to_millions([1, 2, 3, 4, 5])[index]
         reward = to_millions([100, 100, 100, 100, 100])[index]
-        reward_difficulty = [5, 6, 7, 8, 9][index]
+        reward_difficulty = [3, 5, 7, 9, 11][index]
         epoch = [10, 25, 50, 75, 100][index]
         return dataclasses.asdict(
             Arguments(
