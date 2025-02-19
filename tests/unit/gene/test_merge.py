@@ -3,7 +3,6 @@ from collections import Counter
 
 import pytest
 
-from maze.gene.merge import JiterConfig
 from maze.gene.merge import merge_bool
 from maze.gene.merge import merge_float
 from maze.gene.merge import merge_gene
@@ -18,24 +17,24 @@ def cal_expected_stdev(start: int | float, end: int | float) -> float:
 
 
 @pytest.mark.parametrize(
-    "lhs, rhs, jiter, expected",
+    "lhs, rhs, jitter, expected",
     [
         (
             [SimpleSymbol(type=SymbolType.RELU)],
             [SimpleSymbol(type=SymbolType.RELU)],
-            None,
+            0.0,
             [[SimpleSymbol(type=SymbolType.RELU)]],
         ),
         (
             [SimpleSymbol(type=SymbolType.RELU)],
             [],
-            None,
+            0.0,
             [[SimpleSymbol(type=SymbolType.RELU)]],
         ),
         (
             [],
             [SimpleSymbol(type=SymbolType.RELU)],
-            None,
+            0.0,
             [[SimpleSymbol(type=SymbolType.RELU)]],
         ),
         (
@@ -44,7 +43,7 @@ def cal_expected_stdev(start: int | float, end: int | float) -> float:
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
             ],
             [SimpleSymbol(type=SymbolType.RELU), SimpleSymbol(type=SymbolType.SOFTMAX)],
-            None,
+            0.0,
             [
                 [SimpleSymbol(type=SymbolType.RELU)],
                 [
@@ -58,13 +57,11 @@ def cal_expected_stdev(start: int | float, end: int | float) -> float:
 def test_merge_gene(
     lhs: list[Symbol],
     rhs: list[Symbol],
-    jiter: JiterConfig | None,
+    jitter: float | None,
     expected: list[Symbol],
 ):
-    if jiter is None:
-        jiter = JiterConfig()
     for _ in range(100):
-        output_symbols = list(merge_gene(lhs, rhs, jiter_config=jiter))
+        output_symbols = list(merge_gene(lhs, rhs, jitter=jitter))
         assert len(output_symbols) == len(expected)
         for symbol, expected_symbols in zip(output_symbols, expected):
             # TODO: handle parameter merging
@@ -93,22 +90,22 @@ def test_merge_bool(lhs: bool, rhs: bool, expected: list[bool, ...]):
 
 
 @pytest.mark.parametrize(
-    "lhs, rhs, jiter, expected_range, expected_stdev",
+    "lhs, rhs, jitter, expected_range, expected_stdev",
     [
-        (0, 99, 0, (0, 100), cal_expected_stdev(0, 99)),
-        (99, 0, 0, (0, 100), cal_expected_stdev(0, 99)),
-        (10, 20, 5, (5, 26), cal_expected_stdev(5, 26)),
+        (0, 99, 0.0, (0, 100), cal_expected_stdev(0, 99)),
+        (99, 0, 0.0, (0, 100), cal_expected_stdev(0, 99)),
+        (10, 19, 0.5, (5, 25), cal_expected_stdev(5, 25)),
     ],
 )
 def test_merge_int(
     lhs: int,
     rhs: int,
-    jiter: int,
+    jitter: float,
     expected_range: tuple[int, int],
     expected_stdev: float,
 ):
     total = 100000
-    result_values = [merge_int(lhs, rhs, jiter=jiter) for _ in range(total)]
+    result_values = [merge_int(lhs, rhs, jitter=jitter) for _ in range(total)]
     start, end = expected_range
     for value in result_values:
         assert value >= start and value < end
@@ -118,22 +115,22 @@ def test_merge_int(
 
 
 @pytest.mark.parametrize(
-    "lhs, rhs, jiter, expected_range, expected_stdev",
+    "lhs, rhs, jitter, expected_range, expected_stdev",
     [
-        (12.34, 56.78, 0, (12.34, 56.78), cal_expected_stdev(12.34, 56.78)),
-        (56.78, 12.34, 0, (12.34, 56.78), cal_expected_stdev(12.34, 56.78)),
-        (12.34, 56.78, 2.34, (10.00, 59.12), cal_expected_stdev(10.00, 59.12)),
+        (12.34, 56.78, 0.0, (12.34, 56.78), cal_expected_stdev(12.34, 56.78)),
+        (56.78, 12.34, 0.0, (12.34, 56.78), cal_expected_stdev(12.34, 56.78)),
+        (12.34, 56.78, 0.052, (10.00, 59.12), cal_expected_stdev(10.00, 59.12)),
     ],
 )
 def test_merge_float(
     lhs: float,
     rhs: float,
-    jiter: float,
+    jitter: float,
     expected_range: tuple[float, float],
     expected_stdev: float,
 ):
     total = 100000
-    result_values = [merge_float(lhs, rhs, jiter=jiter) for _ in range(total)]
+    result_values = [merge_float(lhs, rhs, jitter=jitter) for _ in range(total)]
     start, end = expected_range
     for value in result_values:
         assert value >= start and value < end
