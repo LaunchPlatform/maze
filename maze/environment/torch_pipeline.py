@@ -65,7 +65,7 @@ class Reshape(nn.Module):
 
 def build_pipeline(
     module: pipeline.Module,
-    output_learning_parameters: list[dict[str, typing.Any]] | None = None,
+    module_learning_parameters: list[dict[str, typing.Any]] | None = None,
 ) -> nn.Module:
     match module:
         case pipeline.ReLU():
@@ -91,8 +91,8 @@ def build_pipeline(
                 in_features=in_features,
                 out_features=out_features,
             )
-            if output_learning_parameters is not None:
-                output_learning_parameters.append(
+            if module_learning_parameters is not None:
+                module_learning_parameters.append(
                     dict(
                         params=result.parameters(),
                         lr=learning_parameters.lr,
@@ -111,7 +111,7 @@ def build_pipeline(
                 *map(
                     functools.partial(
                         build_pipeline,
-                        output_learning_parameters=output_learning_parameters,
+                        output_learning_parameters=module_learning_parameters,
                     ),
                     modules,
                 )
@@ -122,7 +122,7 @@ def build_pipeline(
                     map(
                         functools.partial(
                             build_pipeline,
-                            output_learning_parameters=output_learning_parameters,
+                            output_learning_parameters=module_learning_parameters,
                         ),
                         branches,
                     )

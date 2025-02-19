@@ -1,3 +1,4 @@
+import functools
 import logging
 import typing
 
@@ -48,6 +49,7 @@ class Vehicle:
         )
         self.model: Model | None = None
         self.torch_model: nn.Module | None = None
+        self.module_learning_parameters: list[dict[str, typing.Any]] | None = None
 
     def build_models(self, allow_no_parameters: bool = False):
         self.model = build_models(
@@ -55,9 +57,16 @@ class Vehicle:
             input_shape=self.agent.input_shape,
             budget=self.budget,
         )
-        self.torch_model = nn.Sequential(*map(build_pipeline, self.model.modules)).to(
-            self.device
-        )
+        self.module_learning_parameters = []
+        self.torch_model = nn.Sequential(
+            *map(
+                functools.partial(
+                    build_pipeline,
+                    module_learning_parameters=self.module_learning_parameters,
+                ),
+                self.model.modules,
+            )
+        ).to(self.device)
         if not allow_no_parameters and not self.parameter_count():
             raise NoParametersError("PyTorch model has no parameter")
 
@@ -67,11 +76,8 @@ class Vehicle:
     def train(
         self, data_loader: DataLoader
     ) -> typing.Generator[typing.Tuple[float, int], None, None]:
-        # TODO: optimizer parameters or which one to use should also be decided by the agent instead
         try:
-            optimizer = torch.optim.SGD(
-                self.torch_model.parameters(), lr=1e-3, momentum=0.9
-            )
+            optimizer = torch.optim.SGD(self.module_learning_parameters)
         except ValueError:
             # TODO: in the future, we may have weight & bias baked into the gene, maybe it makes sense to have a model
             #       without parameters?
