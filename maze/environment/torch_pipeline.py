@@ -33,12 +33,18 @@ class Joint(nn.Module):
         else:
             max_length = max(*map(lambda t: t.size(1), tensors))
             padded_tensors = []
+            pad_value = 0
+            if self.joint_type == JointType.MUL:
+                # pad 1 for mul to keep values from the other branches
+                pad_value = 1
             for tensor in tensors:
                 if tensor.size(1) == max_length:
                     padded_tensors.append(tensor)
                     continue
                 delta = max_length - tensor.size(1)
-                padded_tensors.append(functional.pad(tensor, (0, delta), "constant", 0))
+                padded_tensors.append(
+                    functional.pad(tensor, (0, delta), "constant", pad_value)
+                )
             op_func = JOINT_OP_FUNC_MAP[self.joint_type]
             return reduce(op_func, padded_tensors[1:], padded_tensors[0])
 
