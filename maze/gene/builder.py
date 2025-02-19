@@ -8,6 +8,7 @@ from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BranchStartSymbol
 from .symbols import is_symbol_type
+from .symbols import JointType
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
@@ -289,7 +290,10 @@ def _do_build_models(
                     for segment in segment_models:
                         segment_modules = segment.modules
                         seg_output_size = math.prod(segment.output_shape)
-                        new_output_size += seg_output_size
+                        if joint_type == JointType.CONCAT:
+                            new_output_size += seg_output_size
+                        else:
+                            new_output_size = max(new_output_size, seg_output_size)
                         # TODO: make it possible to output different shape with a different joint mode,
                         #       such as addition or stack
                         if len(segment.output_shape) != 1:

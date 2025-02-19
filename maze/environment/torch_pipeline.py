@@ -2,11 +2,13 @@ import torch
 from torch import nn
 
 from ..gene import pipeline
+from ..gene.symbols import JointType
 
 
 class Joint(nn.Module):
-    def __init__(self, branch_modules: list[nn.Module]):
+    def __init__(self, branch_modules: list[nn.Module], joint_type: JointType):
         super().__init__()
+        self.joint_type = joint_type
         self.branch_modules = branch_modules
         for i, module in enumerate(branch_modules):
             self.register_module(str(i), module)
@@ -56,7 +58,10 @@ def build_pipeline(module: pipeline.Module) -> nn.Module:
             return nn.AdaptiveAvgPool1d(out_features)
         case pipeline.Sequential(modules=modules):
             return nn.Sequential(*map(build_pipeline, modules))
-        case pipeline.Joint(branches=branches):
-            return Joint(branch_modules=list(map(build_pipeline, branches)))
+        case pipeline.Joint(branches=branches, type=joint_type):
+            return Joint(
+                branch_modules=list(map(build_pipeline, branches)),
+                joint_type=joint_type,
+            )
         case _:
             raise ValueError(f"Unknown module type {type(module)}")
