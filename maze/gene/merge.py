@@ -3,6 +3,7 @@ import random
 
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
+from .symbols import BranchStartSymbol
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
 from .symbols import SimpleSymbol
@@ -59,6 +60,15 @@ def merge_repeat(
     )
 
 
+def merge_branch_start(
+    lhs: BranchStartSymbol,
+    rhs: BranchStartSymbol,
+) -> BranchStartSymbol:
+    return BranchStartSymbol(
+        joint_type=random.choice([lhs.joint_type, rhs.joint_type]),
+    )
+
+
 def merge_adaptive_max_pool1d(
     lhs: AdaptiveMaxPool1DSymbol, rhs: AdaptiveMaxPool1DSymbol, jitter: float
 ) -> AdaptiveMaxPool1DSymbol:
@@ -101,6 +111,8 @@ def merge_parameter_symbol(lhs: Symbol, rhs: Symbol, jitter: float):
         )
     elif isinstance(lhs, RepeatStartSymbol):
         return merge_repeat(lhs, rhs, jitter=jitter)
+    elif isinstance(lhs, BranchStartSymbol):
+        return merge_branch_start(lhs, rhs)
     elif isinstance(lhs, AdaptiveMaxPool1DSymbol):
         return merge_adaptive_max_pool1d(
             lhs,

@@ -24,7 +24,6 @@ class Joint(nn.Module):
             self.register_module(str(i), module)
 
     def forward(self, x):
-        # TODO: provide other ways of joining branches
         tensors = list((module(x) for module in self.branch_modules))
         if self.joint_type == JointType.CONCAT:
             return torch.cat(
