@@ -49,7 +49,7 @@ test_data = datasets.MNIST(
     transform=ToTensor(),
 )
 batch_size = 64
-train_dataloader = DataLoader(training_data, batch_size=batch_size)
+train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
 test_dataloader = DataLoader(test_data, batch_size=batch_size)
 
 
