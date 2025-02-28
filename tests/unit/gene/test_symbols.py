@@ -1,5 +1,6 @@
 import pytest
 
+from maze.gene.symbols import LearningParameters
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import Symbol
@@ -14,11 +15,30 @@ from maze.gene.symbols import SymbolType
         (
             [
                 SimpleSymbol(type=SymbolType.RELU),
-                LinearSymbol(bias=True, out_features=1234),
+                LinearSymbol(
+                    bias=True,
+                    out_features=1234,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
             ],
             [
                 dict(type=SymbolType.RELU),
-                dict(type=SymbolType.LINEAR, bias=True, out_features=1234),
+                dict(
+                    type=SymbolType.LINEAR,
+                    bias=True,
+                    out_features=1234,
+                    learning_parameters=dict(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
             ],
         ),
     ],
@@ -42,21 +62,59 @@ def test_serialization(
         (
             [
                 dict(type=SymbolType.RELU),
-                dict(type=SymbolType.LINEAR, bias=True, out_features=1234),
+                dict(
+                    type=SymbolType.LINEAR,
+                    bias=True,
+                    out_features=1234,
+                    learning_parameters=dict(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
             ],
             [
                 SimpleSymbol(type=SymbolType.RELU),
-                LinearSymbol(bias=True, out_features=1234),
+                LinearSymbol(
+                    bias=True,
+                    out_features=1234,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
             ],
         ),
         (
             [
                 dict(type=SymbolType.RELU.value),
-                dict(type=SymbolType.LINEAR.value, bias=True, out_features=1234),
+                dict(
+                    type=SymbolType.LINEAR.value,
+                    bias=True,
+                    out_features=1234,
+                    learning_parameters=dict(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
             ],
             [
                 SimpleSymbol(type=SymbolType.RELU),
-                LinearSymbol(bias=True, out_features=1234),
+                LinearSymbol(
+                    bias=True,
+                    out_features=1234,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
             ],
         ),
     ],
