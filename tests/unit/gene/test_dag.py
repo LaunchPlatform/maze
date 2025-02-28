@@ -5,6 +5,8 @@ from maze.gene.dag import build_dag
 from maze.gene.dag import DAG
 from maze.gene.dag import Edge
 from maze.gene.dag import Node
+from maze.gene.symbols import JointType
+from maze.gene.symbols import LearningParameters
 
 
 @pytest.mark.parametrize(
@@ -25,6 +27,12 @@ from maze.gene.dag import Node
                         in_features=28 * 28,
                         out_features=123,
                         bias=True,
+                        learning_parameters=LearningParameters(
+                            lr=0.01,
+                            momentum=0.02,
+                            dampening=0.03,
+                            weight_decay=0.04,
+                        ),
                     ),
                     pipeline.Tanh(
                         input_shape=(123,),
@@ -54,6 +62,22 @@ from maze.gene.dag import Node
                             "bias",
                             "True",
                         ),
+                        (
+                            "lr",
+                            "1.00E-02",
+                        ),
+                        (
+                            "momentum",
+                            "2.00E-02",
+                        ),
+                        (
+                            "dampening",
+                            "3.00E-02",
+                        ),
+                        (
+                            "weight_decay",
+                            "4.00E-02",
+                        ),
                     ],
                 ),
                 Node(name="Tanh"),
@@ -68,6 +92,7 @@ from maze.gene.dag import Node
         ),
         (
             pipeline.Joint(
+                joint_type=JointType.ADD,
                 input_shape=(28, 28),
                 output_shape=(28, 28),
                 branches=[
@@ -85,6 +110,12 @@ from maze.gene.dag import Node
                                 in_features=28 * 28,
                                 out_features=123,
                                 bias=True,
+                                learning_parameters=LearningParameters(
+                                    lr=0.01,
+                                    momentum=0.02,
+                                    dampening=0.03,
+                                    weight_decay=0.04,
+                                ),
                             ),
                         ],
                     ),
@@ -97,7 +128,15 @@ from maze.gene.dag import Node
             ),
             [
                 Node(name="INPUT"),
-                Node(name="Joint"),
+                Node(
+                    name="Joint",
+                    attributes=[
+                        (
+                            "joint_type",
+                            "ADD",
+                        ),
+                    ],
+                ),
                 Node(name="Flatten"),
                 Node(
                     name="Linear",
@@ -113,6 +152,22 @@ from maze.gene.dag import Node
                         (
                             "bias",
                             "True",
+                        ),
+                        (
+                            "lr",
+                            "1.00E-02",
+                        ),
+                        (
+                            "momentum",
+                            "2.00E-02",
+                        ),
+                        (
+                            "dampening",
+                            "3.00E-02",
+                        ),
+                        (
+                            "weight_decay",
+                            "4.00E-02",
                         ),
                     ],
                 ),
