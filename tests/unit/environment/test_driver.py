@@ -6,6 +6,7 @@ from maze import models
 from maze.environment.driver import Driver
 from maze.environment.templates import EnvironmentTemplate
 from maze.environment.templates import LinearEnvironment
+from maze.gene.mutation import MutationType
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import SymbolType
 
@@ -34,6 +35,11 @@ def env_template() -> EnvironmentTemplate:
                 agent = models.Agent(
                     gene=[SimpleSymbol(type=SymbolType.RELU).model_dump(mode="json")],
                     input_shape=[28, 28],
+                    mutation_probabilities={
+                        MutationType.DUPLICATE.value: 0.01,
+                        MutationType.DELETE.value: 0.02,
+                        MutationType.REVERSE.value: 0.03,
+                    },
                 )
                 db.add(agent)
                 avatar = models.Avatar(
