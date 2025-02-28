@@ -4,6 +4,8 @@ import math
 import random
 import typing
 
+import torch
+import torch.utils.data as data
 from sqlalchemy.orm import object_session
 from torch import nn
 from torch.utils.data import DataLoader
@@ -12,6 +14,7 @@ from torchvision.transforms import ToTensor
 
 from maze import models
 from maze.environment.templates import LinearEnvironment
+from maze.environment.vehicle import detect_device
 from maze.environment.vehicle import Vehicle
 from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
@@ -34,19 +37,42 @@ MUTATION_LENGTH_RANGE = {
     MutationType.REVERSE: [1, 3],
 }
 
-training_data = datasets.MNIST(
-    root="data",
-    train=True,
-    download=True,
-    transform=ToTensor(),
+
+class CachedDataset(data.Dataset):
+    def __init__(self, src_dataset: data.Dataset):
+        self.device = detect_device()
+        self.images = []
+        self.labels = []
+        for img, label in src_dataset:
+            self.images.append(img)
+            self.labels.append(label)
+        self.images = torch.stack(self.images).to(self.device)
+        self.labels = torch.LongTensor(self.labels).to(self.device)
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.images[index], self.labels[index]
+
+
+training_data = CachedDataset(
+    datasets.MNIST(
+        root="data",
+        train=True,
+        download=True,
+        transform=ToTensor(),
+    )
 )
 
 # Download test data from open datasets.
-test_data = datasets.MNIST(
-    root="data",
-    train=False,
-    download=True,
-    transform=ToTensor(),
+test_data = CachedDataset(
+    datasets.MNIST(
+        root="data",
+        train=False,
+        download=True,
+        transform=ToTensor(),
+    )
 )
 batch_size = 64
 train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
