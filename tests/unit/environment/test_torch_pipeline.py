@@ -8,6 +8,7 @@ from maze.environment.torch_pipeline import build_pipeline
 from maze.environment.torch_pipeline import Joint
 from maze.gene import pipeline
 from maze.gene.symbols import JointType
+from maze.gene.symbols import LearningParameters
 
 
 def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
@@ -90,6 +91,12 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                 in_features=28 * 28,
                 out_features=123,
                 bias=True,
+                learning_parameters=LearningParameters(
+                    lr=0.01,
+                    momentum=0.02,
+                    dampening=0.03,
+                    weight_decay=0.04,
+                ),
             ),
             nn.Linear(in_features=28 * 28, out_features=123, bias=True),
         ),
@@ -128,6 +135,12 @@ def module_type_kwargs(module: nn.Module) -> (typing.Type, dict):
                                 in_features=28 * 28,
                                 out_features=123,
                                 bias=True,
+                                learning_parameters=LearningParameters(
+                                    lr=0.01,
+                                    momentum=0.02,
+                                    dampening=0.03,
+                                    weight_decay=0.04,
+                                ),
                             ),
                         ],
                     ),
