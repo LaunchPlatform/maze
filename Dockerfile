@@ -9,4 +9,5 @@ EXPOSE 8080
 
 COPY . /app/
 
-RUN uv pip compile pyproject.toml -o requirements.txt --extra torch-gpu
+RUN uv pip compile pyproject.toml -o requirements.txt --extra torch-gpu && \
+  uv pip install -r requirements.txt
