@@ -9,5 +9,6 @@ EXPOSE 8080
 
 COPY . /app/
 
-RUN uv pip compile pyproject.toml -o requirements.txt --extra torch-gpu && \
-  uv pip install -r requirements.txt --system
+RUN uv pip compile pyproject.toml -o requirements.txt && \
+  uv pip install -r requirements.txt --system && \
+  uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 --system
