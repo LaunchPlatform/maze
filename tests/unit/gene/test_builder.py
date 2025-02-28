@@ -11,6 +11,7 @@ from maze.gene.builder import ModelCost
 from maze.gene.builder import read_enclosure
 from maze.gene.builder import skip_enclosure
 from maze.gene.symbols import is_symbol_type
+from maze.gene.symbols import LearningParameters
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import RepeatStartSymbol
 from maze.gene.symbols import SimpleSymbol
@@ -26,6 +27,12 @@ from maze.gene.symbols import SymbolType
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 SimpleSymbol(type=SymbolType.REPEAT_END),
@@ -37,6 +44,12 @@ from maze.gene.symbols import SymbolType
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
             ],
@@ -91,7 +104,18 @@ def test_read_enclosure(
         ),
         (
             (28, 28),
-            [LinearSymbol(bias=False, out_features=123)],
+            [
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                )
+            ],
             (123,),
             28 * 28 * 123,
             [
@@ -102,12 +126,29 @@ def test_read_enclosure(
                     bias=False,
                     in_features=28 * 28,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
             ],
         ),
         (
             (28 * 28,),
-            [LinearSymbol(bias=False, out_features=123)],
+            [
+                LinearSymbol(
+                    bias=False,
+                    out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                )
+            ],
             (123,),
             28 * 28 * 123,
             [
@@ -117,6 +158,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=28 * 28,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 )
             ],
         ),
@@ -127,6 +174,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=False,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
             ],
             (123,),
@@ -139,6 +192,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=28 * 28,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Linear(
                     input_shape=(123,),
@@ -146,6 +205,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=123,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Linear(
                     input_shape=(123,),
@@ -153,6 +218,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=123,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
             ],
         ),
@@ -163,6 +234,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=True,
                     out_features=456,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.REPEAT_END),
             ],
@@ -176,6 +253,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=28 * 28,
                     out_features=456,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Linear(
                     input_shape=(456,),
@@ -183,6 +266,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=456,
                     out_features=456,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Linear(
                     input_shape=(456,),
@@ -190,6 +279,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=456,
                     out_features=456,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
             ],
         ),
@@ -201,6 +296,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 SimpleSymbol(type=SymbolType.REPEAT_END),
@@ -217,6 +318,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=28 * 28,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
                 pipeline.Linear(
@@ -225,6 +332,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=789,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
                 pipeline.Tanh(input_shape=(789,), output_shape=(789,)),
@@ -238,6 +351,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 RepeatStartSymbol(times=3),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
@@ -245,6 +364,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=False,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.REPEAT_END),
                 SimpleSymbol(type=SymbolType.TANH),
@@ -273,6 +398,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=28 * 28,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
@@ -283,6 +414,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=789,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Linear(
                     input_shape=(123,),
@@ -290,6 +427,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=123,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
@@ -300,6 +443,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=789,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Tanh(input_shape=(123,), output_shape=(123,)),
             ],
@@ -313,12 +462,24 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 SimpleSymbol(type=SymbolType.ACTIVATE),
                 LinearSymbol(
                     bias=False,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.TANH),
             ],
@@ -333,6 +494,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=28 * 28,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Tanh(
                     input_shape=(123,),
@@ -352,12 +519,24 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 SimpleSymbol(type=SymbolType.ACTIVATE),
                 LinearSymbol(
                     bias=False,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.ACTIVATE),
                 SimpleSymbol(type=SymbolType.TANH),
@@ -380,6 +559,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=28 * 28,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Tanh(input_shape=(123,), output_shape=(123,)),
             ],
@@ -393,6 +578,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=True,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.DEACTIVATE),
                 RepeatStartSymbol(times=3),
@@ -402,6 +593,12 @@ def test_read_enclosure(
                 LinearSymbol(
                     bias=False,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.REPEAT_END),
                 SimpleSymbol(type=SymbolType.TANH),
@@ -425,6 +622,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=28 * 28,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
                 pipeline.Linear(
@@ -433,6 +636,12 @@ def test_read_enclosure(
                     bias=True,
                     in_features=789,
                     out_features=789,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.LeakyReLU(input_shape=(789,), output_shape=(789,)),
                 pipeline.Linear(
@@ -441,6 +650,12 @@ def test_read_enclosure(
                     bias=False,
                     in_features=789,
                     out_features=123,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 pipeline.Tanh(input_shape=(123,), output_shape=(123,)),
             ],
@@ -469,6 +684,12 @@ def test_build_models_exceed_quota():
                 LinearSymbol(
                     bias=True,
                     out_features=100,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
             ]
         ),
@@ -482,6 +703,12 @@ def test_build_models_exceed_quota():
                     LinearSymbol(
                         bias=True,
                         out_features=100,
+                        learning_parameters=LearningParameters(
+                            lr=0.01,
+                            momentum=0.02,
+                            dampening=0.03,
+                            weight_decay=0.04,
+                        ),
                     ),
                 ]
             ),
@@ -500,6 +727,12 @@ def test_build_models_exceed_quota():
                 LinearSymbol(
                     bias=True,
                     out_features=100,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
@@ -511,6 +744,12 @@ def test_build_models_exceed_quota():
                     LinearSymbol(
                         bias=True,
                         out_features=100,
+                        learning_parameters=LearningParameters(
+                            lr=0.01,
+                            momentum=0.02,
+                            dampening=0.03,
+                            weight_decay=0.04,
+                        ),
                     ),
                     SimpleSymbol(type=SymbolType.BRANCH_STOP),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
@@ -524,6 +763,12 @@ def test_build_models_exceed_quota():
                 LinearSymbol(
                     bias=True,
                     out_features=100,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
@@ -536,6 +781,12 @@ def test_build_models_exceed_quota():
                     LinearSymbol(
                         bias=True,
                         out_features=100,
+                        learning_parameters=LearningParameters(
+                            lr=0.01,
+                            momentum=0.02,
+                            dampening=0.03,
+                            weight_decay=0.04,
+                        ),
                     ),
                     SimpleSymbol(type=SymbolType.BRANCH_STOP),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
@@ -550,6 +801,12 @@ def test_build_models_exceed_quota():
                 LinearSymbol(
                     bias=True,
                     out_features=100,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
                 ),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
@@ -562,6 +819,12 @@ def test_build_models_exceed_quota():
                     LinearSymbol(
                         bias=True,
                         out_features=100,
+                        learning_parameters=LearningParameters(
+                            lr=0.01,
+                            momentum=0.02,
+                            dampening=0.03,
+                            weight_decay=0.04,
+                        ),
                     ),
                     SimpleSymbol(type=SymbolType.BRANCH_STOP),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
