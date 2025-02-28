@@ -8,6 +8,7 @@ from maze.gene.mutation import mutate_delete
 from maze.gene.mutation import mutate_duplicate
 from maze.gene.mutation import mutate_reverse
 from maze.gene.mutation import MutationType
+from maze.gene.symbols import LearningParameters
 from maze.gene.symbols import LinearSymbol
 from maze.gene.symbols import SimpleSymbol
 from maze.gene.symbols import Symbol
@@ -91,7 +92,16 @@ def test_decide_mutations(
             [
                 SimpleSymbol(type=SymbolType.RELU),
                 SimpleSymbol(type=SymbolType.SOFTMAX),
-                LinearSymbol(bias=True, out_features=1024),
+                LinearSymbol(
+                    bias=True,
+                    out_features=1024,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
                 SimpleSymbol(type=SymbolType.BRANCH_START),
                 SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
@@ -127,7 +137,16 @@ def test_mutate_delete(symbols: list[Symbol], length_range: tuple[int, int]):
             [
                 SimpleSymbol(type=SymbolType.RELU),
                 SimpleSymbol(type=SymbolType.SOFTMAX),
-                LinearSymbol(bias=True, out_features=1024),
+                LinearSymbol(
+                    bias=True,
+                    out_features=1024,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
                 SimpleSymbol(type=SymbolType.BRANCH_START),
                 SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
@@ -175,7 +194,16 @@ def test_mutate_duplicate(symbols: list[Symbol], length_range: tuple[int, int]):
             [
                 SimpleSymbol(type=SymbolType.RELU),
                 SimpleSymbol(type=SymbolType.SOFTMAX),
-                LinearSymbol(bias=True, out_features=1024),
+                LinearSymbol(
+                    bias=True,
+                    out_features=1024,
+                    learning_parameters=LearningParameters(
+                        lr=0.01,
+                        momentum=0.02,
+                        dampening=0.03,
+                        weight_decay=0.04,
+                    ),
+                ),
                 SimpleSymbol(type=SymbolType.BRANCH_START),
                 SimpleSymbol(type=SymbolType.BRANCH_SEGMENT_MARKER),
                 SimpleSymbol(type=SymbolType.BRANCH_STOP),
