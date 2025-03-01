@@ -22,8 +22,14 @@ logger = logging.getLogger(__name__)
     "TEMPLATE_CLS",
     type=str,
 )
+@click.option(
+    "-p",
+    "--till-period",
+    type=int,
+    help="Run the experiment till the given period (inclusive)",
+)
 @pass_env
-def main(env: CliEnvironment, template_cls: str):
+def main(env: CliEnvironment, template_cls: str, till_period: int | None):
     template_cls: typing.Type[EnvironmentTemplate] = load_module_var(template_cls)
     template = template_cls()
     driver = Driver(template)
@@ -87,6 +93,8 @@ def main(env: CliEnvironment, template_cls: str):
                 db.rollback()
                 continue
             # TODO: extract this into driver?
+            if till_period is not None and period.index + 1 >= till_period:
+                break
             new_period = models.Period(
                 experiment=experiment,
                 index=period.index + 1,
@@ -99,3 +107,4 @@ def main(env: CliEnvironment, template_cls: str):
             driver.promote_agents(old_period=period, new_period=new_period)
             period = new_period
             db.commit()
+    logger.info("Done")
