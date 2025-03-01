@@ -192,6 +192,7 @@ class KingOfMnistV2(LinearEnvironment):
             format_number(avatar.agent.parameters_count),
         )
         logger.info("Avatar %s PyTorch Model:\n%r", avatar.id, vehicle.torch_model)
+        logger.info("Using device: %s", detect_device())
 
         credit = args.initial_credit
         avatar.initial_credit = args.initial_credit
