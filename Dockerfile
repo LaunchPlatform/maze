@@ -1,10 +1,6 @@
-FROM python:3.11.11-bookworm
+FROM 022497628448.dkr.ecr.us-west-2.amazonaws.com/pet-projects/maze-base:0.0.1
 
 ENV PYTHONPATH=/app
-
-RUN pip install uv
-RUN uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126 --system
-
 WORKDIR /app
 EXPOSE 8080
 
