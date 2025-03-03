@@ -2,8 +2,6 @@ import dataclasses
 import enum
 import random
 
-from numpy.random import binomial
-
 from .symbols import Symbol
 
 
@@ -24,6 +22,8 @@ class MutationRecord:
 def decide_mutations(
     probabilities: dict[MutationType, float], gene_length: int
 ) -> list[MutationType]:
+    from numpy.random import binomial
+
     mutations = []
     for mutation_type, probability in probabilities.items():
         occurrence = binomial(gene_length, probability)
