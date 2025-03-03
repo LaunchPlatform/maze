@@ -1,6 +1,9 @@
+import functools
 import logging
+import threading
 import time
 import typing
+from wsgiref.simple_server import make_server
 
 import click
 
@@ -17,6 +20,19 @@ from .utils import load_module_var
 logger = logging.getLogger(__name__)
 
 
+def health_app(environ, start_response):
+    status = "200 OK"  # HTTP Status
+    headers = [("Content-type", "text/plain")]  # HTTP Headers
+    start_response(status, headers)
+    return [b"ok"]
+
+
+def run_health_server(host: str, port: int):
+    with make_server(host, port, health_app) as httpd:
+        logger.info("Listening on port %s:%s ....", host, port)
+        httpd.serve_forever()
+
+
 @cli.command(name="run", help="Run MAZE environments locally")
 @click.argument(
     "TEMPLATE_CLS",
@@ -28,8 +44,41 @@ logger = logging.getLogger(__name__)
     type=int,
     help="Run the experiment till the given period (inclusive)",
 )
+@click.option(
+    "--enable-health-endpoint",
+    is_flag=True,
+    help="Run the health HTTP endpoint for Kubernetes health check",
+)
+@click.option(
+    "--health-port",
+    type=int,
+    default=8080,
+    help="The health HTTP service port",
+)
+@click.option(
+    "--health-host",
+    type=str,
+    default="0.0.0.0",
+    help="The health HTTP service host",
+)
 @pass_env
-def main(env: CliEnvironment, template_cls: str, till_period: int | None):
+def main(
+    env: CliEnvironment,
+    template_cls: str,
+    till_period: int | None,
+    enable_health_endpoint: bool,
+    health_port: int,
+    health_host: str,
+):
+    if enable_health_endpoint:
+        health_thread = threading.Thread(
+            target=functools.partial(
+                run_health_server, host=health_host, port=health_port
+            ),
+            daemon=True,
+        )
+        health_thread.start()
+
     template_cls: typing.Type[EnvironmentTemplate] = load_module_var(template_cls)
     template = template_cls()
     driver = Driver(template)
@@ -107,4 +156,5 @@ def main(env: CliEnvironment, template_cls: str, till_period: int | None):
             driver.promote_agents(old_period=period, new_period=new_period)
             period = new_period
             db.commit()
+
     logger.info("Done")
