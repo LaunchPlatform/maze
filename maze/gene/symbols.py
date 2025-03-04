@@ -26,15 +26,67 @@ class SymbolType(enum.StrEnum):
     # deactivate the following gene
     DEACTIVATE = "DEACTIVATE"
 
+    # Non-linear Activations (weighted sum, nonlinearity)
+    # Add ELU
+    ELU = "ELU"
+    # Add Hardshrink
+    HARDSHRINK = "HARDSHRINK"
+    # Add Hardsigmoid
+    HARDSIGMOID = "HARDSIGMOID"
+    # Add Hardtanh
+    HARDTANH = "HARDTANH"
+    # Add Hardswish
+    HARDSWISH = "HARDSWISH"
+    # Add LeakyReLU
+    LEAKY_RELU = "LEAKY_RELU"
+    # Add LogSigmoid
+    LOGSIGMOID = "LOGSIGMOID"
+    # Add PReLU
+    PRELU = "PRELU"
     # Add ReLU
     RELU = "RELU"
-    # Add LeakyReLU
-    # TODO: add slope for anti-entropy purpose
-    LEAKY_RELU = "LEAKY_RELU"
+    # Add ReLU6
+    RELU6 = "RELU6"
+    # Add RReLU
+    RRELU = "RRELU"
+    # Add SELU
+    SELU = "SELU"
+    # Add CELU
+    CELU = "CELU"
+    # Add SELU
+    GELU = "GELU"
+    # Add SELU
+    SIGMOID = "SIGMOID"
+    # Add SiLU
+    SILU = "SILU"
+    # Add Mish
+    MISH = "MISH"
+    # Add Softplus
+    SOFTPLUS = "SOFTPLUS"
+    # Add Softshrink
+    SOFTSHRINK = "SOFTSHRINK"
+    # Add Softsign
+    SOFTSIGN = "SOFTSIGN"
     # Add Tanh
     TANH = "TANH"
+    # Add Tanhshrink
+    TANHSHRINK = "TANHSHRINK"
+    # Add Threshold
+    THRESHOLD = "THRESHOLD"
+    # Add GLU
+    GLU = "GLU"
+
+    # Non-linear Activations (other)
     # Add Softmax
     SOFTMAX = "SOFTMAX"
+    # Add Softmin
+    SOFTMIN = "SOFTMIN"
+    # Add Softmax
+    LOGSOFTMAX = "LOGSOFTMAX"
+
+    # Dropout
+    DROPOUT = "DROPOUT"
+
     # Linear, take one arg (bias, output_features), 1 bit and 12 bits
     # TODO: alternative idea - make the size as yet another freq symbol table plus a huffman tree to encode
     #       the size as binary code.
