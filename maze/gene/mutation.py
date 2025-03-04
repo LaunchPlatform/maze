@@ -11,6 +11,7 @@ from .symbols import JointType
 from .symbols import LearningParameters
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
+from .symbols import SimpleSymbol
 from .symbols import Symbol
 
 
@@ -73,6 +74,9 @@ def tune_symbol(symbol: Symbol, jitter: float) -> Symbol:
         )
     elif isinstance(symbol, BranchStartSymbol):
         return BranchStartSymbol(joint_type=random.choice(list(JointType)))
+    elif isinstance(symbol, SimpleSymbol):
+        # TODO: swap with similar symbols?
+        return symbol
     else:
         raise ValueError(f"Unknown symbol type {type(symbol)}")
 
