@@ -90,9 +90,9 @@ class Arguments:
 
 def make_mutation_probabilities() -> dict:
     return {
-        MutationType.DUPLICATE: random.uniform(0.01, 0.02),
-        MutationType.DELETE: random.uniform(0.01, 0.02),
-        MutationType.REVERSE: random.uniform(0.01, 0.02),
+        MutationType.DUPLICATE: random.uniform(5e-3, 1.5e-2),
+        MutationType.DELETE: random.uniform(5e-3, 1.5e-2),
+        MutationType.REVERSE: random.uniform(5e-3, 1.5e-2),
     }
 
 
