@@ -18,6 +18,10 @@ class OutOfCreditError(ZoneError):
     pass
 
 
+class QualityTooLowError(ZoneError):
+    pass
+
+
 @dataclasses.dataclass
 class EpochReport:
     index: int

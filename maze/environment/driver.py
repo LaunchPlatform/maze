@@ -14,6 +14,7 @@ from ..gene.builder import ExceedOperationBudgetError
 from .templates import EnvironmentTemplate
 from .vehicle import NoParametersError
 from .zone import OutOfCreditError
+from .zone import QualityTooLowError
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +147,10 @@ class Driver:
         except OutOfCreditError:
             logger.info("Avatar %s runs out of credit", avatar.id)
             avatar.status = models.AvatarStatus.OUT_OF_CREDIT
+            db.add(avatar)
+        except QualityTooLowError:
+            logger.info("Avatar %s quality too low", avatar.id)
+            avatar.status = models.AvatarStatus.QUALITY_TOO_LOW
             db.add(avatar)
         except RuntimeError as exc:
             if exc.args[0].startswith("CUDA error:"):
