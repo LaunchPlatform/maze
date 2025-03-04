@@ -288,6 +288,7 @@ class KingOfMnistV3(LinearEnvironment):
                 symbols=gene,
                 mutations=mutation_types,
                 length_ranges=MUTATION_LENGTH_RANGE,
+                jitter=args.jitter,
             )
             new_agent = models.Agent(
                 lhs_parent=lhs,
