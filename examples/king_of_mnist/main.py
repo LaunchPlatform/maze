@@ -211,6 +211,7 @@ class KingOfMnistV3(LinearEnvironment):
             test_dataloader=test_dataloader,
             epochs=args.epoch,
         ):
+            logger.info("Running epoch %s/%s", epoch, args.epoch)
             epoch.cost = epoch_cost
             epoch.income = int(
                 args.reward
@@ -321,7 +322,7 @@ class KingOfMnistV3(LinearEnvironment):
             # no source env, it means this is the first env.
             # let's fill the slots with random new ones
             for _ in range(agent_count):
-                gene_length = random.randint(5, 200)
+                gene_length = random.randint(5, 100)
                 symbols = list(
                     generate_gene(
                         length=gene_length,

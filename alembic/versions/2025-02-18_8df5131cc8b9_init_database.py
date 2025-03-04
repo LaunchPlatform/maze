@@ -93,7 +93,7 @@ def upgrade() -> None:
         sa.Column("agent_id", sa.UUID(), nullable=False),
         sa.Column(
             "type",
-            sa.Enum("DELETE", "DUPLICATE", "REVERSE", name="mutationtype"),
+            sa.Enum("DELETE", "DUPLICATE", "REVERSE", "TUNE", name="mutationtype"),
             nullable=False,
         ),
         sa.Column("order", sa.Integer(), nullable=False),
