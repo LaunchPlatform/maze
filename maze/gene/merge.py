@@ -5,6 +5,7 @@ import random
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BranchStartSymbol
+from .symbols import DropoutSymbol
 from .symbols import LearningParameters
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
@@ -71,6 +72,16 @@ def merge_branch_start(
     )
 
 
+def merge_dropout(
+    lhs: DropoutSymbol,
+    rhs: DropoutSymbol,
+    jitter: float,
+) -> DropoutSymbol:
+    return DropoutSymbol(
+        probability=merge_float(lhs.probability, rhs.probability, jitter=jitter),
+    )
+
+
 def merge_adaptive_max_pool1d(
     lhs: AdaptiveMaxPool1DSymbol, rhs: AdaptiveMaxPool1DSymbol, jitter: float
 ) -> AdaptiveMaxPool1DSymbol:
@@ -122,6 +133,8 @@ def merge_parameter_symbol(lhs: Symbol, rhs: Symbol, jitter: float):
         return merge_repeat(lhs, rhs, jitter=jitter)
     elif isinstance(lhs, BranchStartSymbol):
         return merge_branch_start(lhs, rhs)
+    elif isinstance(lhs, DropoutSymbol):
+        return merge_dropout(lhs, rhs, jitter=jitter)
     elif isinstance(lhs, AdaptiveMaxPool1DSymbol):
         return merge_adaptive_max_pool1d(
             lhs,
