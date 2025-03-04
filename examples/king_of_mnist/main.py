@@ -32,9 +32,9 @@ from maze.gene.symbols import symbols_adapter
 
 JITTER = 0.1
 MUTATION_LENGTH_RANGE = {
-    MutationType.DUPLICATE: [1, 3],
-    MutationType.DELETE: [1, 3],
-    MutationType.REVERSE: [1, 3],
+    MutationType.DUPLICATE: [1, 5],
+    MutationType.DELETE: [1, 5],
+    MutationType.REVERSE: [1, 5],
 }
 
 
@@ -109,23 +109,23 @@ def enum_key_to_str(value: dict) -> dict:
 
 
 class KingOfMnistV2(LinearEnvironment):
-    count = 5
+    count = 12
     group = "king-of-mnist"
-    experiment = "king-of-mnist-v2"
+    experiment = "king-of-mnist-v3"
 
     def make_zones(self, index: int) -> list[models.Zone]:
-        zone_count = [10, 5, 2, 1, 1][index]
+        zone_count = [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 3, 1][index]
         return [
-            models.Zone(agent_slots=30, index=zone_index)
+            models.Zone(agent_slots=50, index=zone_index)
             for zone_index in range(zone_count)
         ]
 
     def make_arguments(self, index: int) -> dict | None:
         mi = 1_000_000
         basic_cost = to_millions([1, 2, 3, 4, 5])[index]
-        reward = to_millions([100, 100, 100, 100, 100])[index]
-        reward_difficulty = [3, 5, 7, 9, 11][index]
-        epoch = [10, 25, 50, 75, 100][index]
+        reward = to_millions([100] * self.count)[index]
+        reward_difficulty = [10, 12, 14, 12, 10, 12, 14, 12, 10, 12, 14, 16][index]
+        epoch = [10, 10, 10, 10, 10, 10, 10, 10, 10, 25, 50, 100][index]
         return dataclasses.asdict(
             Arguments(
                 epoch=epoch,
