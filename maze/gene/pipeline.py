@@ -38,6 +38,11 @@ class SimpleModule(Module):
 
 
 @dataclasses.dataclass(frozen=True)
+class Dropout(Module):
+    probability: float
+
+
+@dataclasses.dataclass(frozen=True)
 class Linear(Module):
     bias: bool
     in_features: int

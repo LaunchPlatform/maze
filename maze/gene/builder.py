@@ -7,6 +7,7 @@ from . import pipeline
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BranchStartSymbol
+from .symbols import DropoutSymbol
 from .symbols import is_symbol_type
 from .symbols import JointType
 from .symbols import LinearSymbol
@@ -177,6 +178,16 @@ def _do_build_models(
                     check_budget()
                     model.output_shape = repeating_model.output_shape
                     model.modules.extend(repeating_model.modules)
+            case DropoutSymbol(probability=probability):
+                model.modules.append(
+                    pipeline.Dropout(
+                        input_shape=model.output_shape,
+                        output_shape=model.output_shape,
+                        probability=probability,
+                    )
+                )
+                model.cost.operation += math.prod(model.output_shape)
+                check_budget()
             case LinearSymbol(
                 bias=bias,
                 out_features=out_features,

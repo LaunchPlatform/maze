@@ -130,6 +130,8 @@ def build_pipeline(
                     )
                 )
             return result
+        case pipeline.Dropout(out_features=out_features):
+            return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveMaxPool1d(out_features=out_features):
             return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
