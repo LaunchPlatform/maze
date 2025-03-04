@@ -93,6 +93,7 @@ def make_mutation_probabilities() -> dict:
         MutationType.DUPLICATE: random.uniform(5e-3, 1.5e-2),
         MutationType.DELETE: random.uniform(5e-3, 1.5e-2),
         MutationType.REVERSE: random.uniform(5e-3, 1.5e-2),
+        MutationType.TUNE: random.uniform(5e-3, 1.5e-2),
     }
 
 
