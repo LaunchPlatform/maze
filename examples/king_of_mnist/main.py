@@ -34,6 +34,7 @@ MUTATION_LENGTH_RANGE = {
     MutationType.DUPLICATE: [1, 5],
     MutationType.DELETE: [1, 5],
     MutationType.REVERSE: [1, 5],
+    MutationType.TUNE: [1, 5],
 }
 
 
@@ -212,7 +213,7 @@ class KingOfMnistV3(LinearEnvironment):
             test_dataloader=test_dataloader,
             epochs=args.epoch,
         ):
-            logger.info("Running epoch %s/%s", epoch, args.epoch)
+            logger.info("Running epoch %s/%s", epoch.index, args.epoch)
             epoch.cost = epoch_cost
             epoch.income = int(
                 args.reward
