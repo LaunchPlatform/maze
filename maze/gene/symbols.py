@@ -136,38 +136,42 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
 ]
 
 
-class SimpleSymbol(BaseSymbol):
+class ParameterSymbol(BaseSymbol):
+    pass
+
+
+class SimpleSymbol(ParameterSymbol):
     type: SymbolType
 
 
-class RepeatStartSymbol(BaseSymbol):
+class RepeatStartSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.REPEAT_START] = SymbolType.REPEAT_START
     times: int
 
 
-class BranchStartSymbol(BaseSymbol):
+class BranchStartSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.BRANCH_START] = SymbolType.BRANCH_START
     joint_type: JointType
 
 
-class DropoutSymbol(BaseSymbol):
+class DropoutSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.DROPOUT] = SymbolType.DROPOUT
     probability: float
 
 
-class LinearSymbol(BaseSymbol):
+class LinearSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.LINEAR] = SymbolType.LINEAR
     bias: bool
     out_features: int
     learning_parameters: LearningParameters
 
 
-class AdaptiveMaxPool1DSymbol(BaseSymbol):
+class AdaptiveMaxPool1DSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.ADAPTIVE_MAXPOOL1D] = SymbolType.ADAPTIVE_MAXPOOL1D
     out_features: int
 
 
-class AdaptiveAvgPool1DSymbol(BaseSymbol):
+class AdaptiveAvgPool1DSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.ADAPTIVE_AVGPOOL1D] = SymbolType.ADAPTIVE_AVGPOOL1D
     out_features: int
 
