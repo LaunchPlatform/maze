@@ -72,7 +72,8 @@ class SymbolType(enum.StrEnum):
     # Add Tanhshrink
     TANHSHRINK = "TANHSHRINK"
     # Add Threshold
-    THRESHOLD = "THRESHOLD"
+    # TODO:
+    # THRESHOLD = "THRESHOLD"
     # Add GLU
     GLU = "GLU"
 
@@ -152,7 +153,8 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.SOFTSIGN,
     SymbolType.TANH,
     SymbolType.TANHSHRINK,
-    SymbolType.THRESHOLD,
+    # TODO:
+    # SymbolType.THRESHOLD,
     SymbolType.GLU,
     # Non-linear Activations (other)
     SymbolType.SOFTMAX,

@@ -41,7 +41,8 @@ SIMPLE_MODULES_MAP = {
     SymbolType.SOFTSIGN: nn.Softsign,
     SymbolType.TANH: nn.Tanh,
     SymbolType.TANHSHRINK: nn.Tanhshrink,
-    SymbolType.THRESHOLD: nn.Threshold,
+    # TODO:
+    # SymbolType.THRESHOLD: nn.Threshold,
     SymbolType.GLU: nn.GLU,
     # Non-linear Activations (other)
     SymbolType.SOFTMAX: nn.Softmax,
@@ -130,8 +131,8 @@ def build_pipeline(
                     )
                 )
             return result
-        case pipeline.Dropout(out_features=out_features):
-            return nn.AdaptiveMaxPool1d(out_features)
+        case pipeline.Dropout(probability=probability):
+            return nn.Dropout(probability)
         case pipeline.AdaptiveMaxPool1d(out_features=out_features):
             return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
