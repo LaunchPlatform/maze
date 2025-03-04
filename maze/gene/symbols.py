@@ -49,18 +49,8 @@ class SymbolType(enum.StrEnum):
     RELU6 = "RELU6"
     # Add RReLU
     RRELU = "RRELU"
-    # Add SELU
-    SELU = "SELU"
-    # Add CELU
-    CELU = "CELU"
-    # Add SELU
-    GELU = "GELU"
-    # Add SELU
+    # Add SIGMOID
     SIGMOID = "SIGMOID"
-    # Add SiLU
-    SILU = "SILU"
-    # Add Mish
-    MISH = "MISH"
     # Add Softplus
     SOFTPLUS = "SOFTPLUS"
     # Add Softshrink
@@ -74,8 +64,6 @@ class SymbolType(enum.StrEnum):
     # Add Threshold
     # TODO:
     # THRESHOLD = "THRESHOLD"
-    # Add GLU
-    GLU = "GLU"
 
     # Non-linear Activations (other)
     # Add Softmax
@@ -142,12 +130,7 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.RELU,
     SymbolType.RELU6,
     SymbolType.RRELU,
-    SymbolType.SELU,
-    SymbolType.CELU,
-    SymbolType.GELU,
     SymbolType.SIGMOID,
-    SymbolType.SILU,
-    SymbolType.MISH,
     SymbolType.SOFTPLUS,
     SymbolType.SOFTSHRINK,
     SymbolType.SOFTSIGN,
@@ -155,7 +138,6 @@ ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.TANHSHRINK,
     # TODO:
     # SymbolType.THRESHOLD,
-    SymbolType.GLU,
     # Non-linear Activations (other)
     SymbolType.SOFTMAX,
     SymbolType.SOFTMIN,

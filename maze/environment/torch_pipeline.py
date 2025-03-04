@@ -30,12 +30,7 @@ SIMPLE_MODULES_MAP = {
     SymbolType.RELU: nn.ReLU,
     SymbolType.RELU6: nn.ReLU6,
     SymbolType.RRELU: nn.RReLU,
-    SymbolType.SELU: nn.SELU,
-    SymbolType.CELU: nn.CELU,
-    SymbolType.GELU: nn.SELU,
     SymbolType.SIGMOID: nn.SELU,
-    SymbolType.SILU: nn.SiLU,
-    SymbolType.MISH: nn.Mish,
     SymbolType.SOFTPLUS: nn.Softplus,
     SymbolType.SOFTSHRINK: nn.Softshrink,
     SymbolType.SOFTSIGN: nn.Softsign,
@@ -43,7 +38,6 @@ SIMPLE_MODULES_MAP = {
     SymbolType.TANHSHRINK: nn.Tanhshrink,
     # TODO:
     # SymbolType.THRESHOLD: nn.Threshold,
-    SymbolType.GLU: nn.GLU,
     # Non-linear Activations (other)
     SymbolType.SOFTMAX: nn.Softmax,
     SymbolType.SOFTMIN: nn.Softmin,

@@ -337,7 +337,11 @@ def _do_build_models(
                     )
                     model.output_shape = (new_output_size,)
             case SimpleSymbol(type=symbol_type):
-                if symbol_type in (SymbolType.BRANCH_END, SymbolType.REPEAT_END):
+                if symbol_type in (
+                    SymbolType.BRANCH_END,
+                    SymbolType.BRANCH_SEGMENT_MARKER,
+                    SymbolType.REPEAT_END,
+                ):
                     continue
                 model.modules.append(
                     pipeline.SimpleModule(

@@ -108,7 +108,7 @@ def enum_key_to_str(value: dict) -> dict:
     return {key.value: value for key, value in value.items()}
 
 
-class KingOfMnistV2(LinearEnvironment):
+class KingOfMnistV3(LinearEnvironment):
     count = 12
     group = "king-of-mnist"
     experiment = "king-of-mnist-v3"
