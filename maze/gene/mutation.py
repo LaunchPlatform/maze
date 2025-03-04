@@ -44,33 +44,34 @@ def tune_learning_parameters(
     )
 
 
+def tune_int(value: int, jitter: float) -> int:
+    delta = max(1, int(value * jitter))
+    start = value - delta
+    end = value + delta
+    return random.randrange(start, end)
+
+
 def tune_symbol(symbol: Symbol, jitter: float) -> Symbol:
     if isinstance(symbol, DropoutSymbol):
         start = symbol.probability * (1 - jitter)
         end = symbol.probability * (1 + jitter)
         return DropoutSymbol(probability=min(max(0.0, random.uniform(start, end)), 1.0))
     elif isinstance(symbol, LinearSymbol):
-        out_features_start = int(symbol.out_features * (1 - jitter))
-        out_features_end = int(symbol.out_features * (1 + jitter))
         return LinearSymbol(
             bias=random.choice([True, False]),
-            out_features=max(1, random.randrange(out_features_start, out_features_end)),
+            out_features=max(1, tune_int(value=symbol.out_features, jitter=jitter)),
             learning_parameters=tune_learning_parameters(
                 symbol.learning_parameters, jitter=jitter
             ),
         )
     elif isinstance(symbol, (AdaptiveMaxPool1DSymbol, AdaptiveAvgPool1DSymbol)):
-        out_features_start = int(symbol.out_features * (1 - jitter))
-        out_features_end = int(symbol.out_features * (1 + jitter))
         cls = symbol.__class__
         return cls(
-            out_features=max(1, random.randrange(out_features_start, out_features_end)),
+            out_features=max(1, tune_int(value=symbol.out_features, jitter=jitter)),
         )
     elif isinstance(symbol, RepeatStartSymbol):
-        times_start = int(symbol.times * (1 - jitter))
-        times_end = int(symbol.times * (1 + jitter))
         return RepeatStartSymbol(
-            times=max(0, random.randrange(times_start, times_end)),
+            times=max(0, tune_int(value=symbol.times, jitter=jitter)),
         )
     elif isinstance(symbol, BranchStartSymbol):
         return BranchStartSymbol(joint_type=random.choice(list(JointType)))
