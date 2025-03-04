@@ -6,9 +6,9 @@ import typing
 from pydantic import BaseModel
 from pydantic import TypeAdapter
 
-from maze.gene.freq_table import build_lookup_table
-from maze.gene.freq_table import LookupTable
-from maze.gene.freq_table import random_lookup
+from .freq_table import build_lookup_table
+from .freq_table import LookupTable
+from .freq_table import random_lookup
 
 
 @enum.unique
