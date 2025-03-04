@@ -30,7 +30,6 @@ from maze.gene.symbols import generate_gene
 from maze.gene.symbols import SymbolParameterRange
 from maze.gene.symbols import symbols_adapter
 
-JITTER = 0.1
 MUTATION_LENGTH_RANGE = {
     MutationType.DUPLICATE: [1, 5],
     MutationType.DELETE: [1, 5],
@@ -86,6 +85,7 @@ class Arguments:
     basic_cost: int
     reward: int
     reward_difficulty: int
+    jitter: float
 
 
 def make_mutation_probabilities() -> dict:
@@ -125,6 +125,9 @@ class KingOfMnistV2(LinearEnvironment):
         basic_cost = to_millions([1, 2, 3, 4, 5])[index]
         reward = to_millions([100] * self.count)[index]
         reward_difficulty = [10, 12, 14, 12, 10, 12, 14, 12, 10, 12, 14, 16][index]
+        jitter = [0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.1][
+            index
+        ]
         epoch = [10, 10, 10, 10, 10, 10, 10, 10, 10, 25, 50, 100][index]
         return dataclasses.asdict(
             Arguments(
@@ -133,6 +136,7 @@ class KingOfMnistV2(LinearEnvironment):
                 basic_cost=basic_cost,
                 reward=reward,
                 reward_difficulty=reward_difficulty,
+                jitter=jitter,
             )
         )
 
@@ -227,6 +231,7 @@ class KingOfMnistV2(LinearEnvironment):
         period: models.Period,
     ) -> list[models.Agent]:
         db = object_session(zone)
+        args = Arguments(**zone.environment.arguments)
 
         agent_credits = (
             db.query(models.Agent, models.Avatar.credit)
@@ -268,11 +273,11 @@ class KingOfMnistV2(LinearEnvironment):
             lhs_gene = lhs.agent_data.symbols
             rhs_gene = rhs.agent_data.symbols
 
-            gene = list(merge_gene(lhs_gene, rhs_gene, jitter=JITTER))
+            gene = list(merge_gene(lhs_gene, rhs_gene, jitter=args.jitter))
             mutation_probabilities = merge_parameter_dict(
                 lhs=lhs.enum_mutation_probabilities,
                 rhs=rhs.enum_mutation_probabilities,
-                jitter=JITTER,
+                jitter=args.jitter,
             )
             mutation_types = decide_mutations(
                 probabilities=mutation_probabilities,
