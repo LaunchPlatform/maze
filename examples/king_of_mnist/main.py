@@ -19,6 +19,7 @@ from maze.environment.vehicle import Vehicle
 from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
 from maze.environment.zone import OutOfCreditError
+from maze.environment.zone import QualityTooLowError
 from maze.gene.freq_table import build_lookup_table
 from maze.gene.freq_table import random_lookup
 from maze.gene.merge import merge_gene
@@ -36,6 +37,7 @@ MUTATION_LENGTH_RANGE = {
     MutationType.REVERSE: [1, 5],
     MutationType.TUNE: [1, 5],
 }
+ACCURACY_THRESHOLD = 0.2
 
 
 class CachedDataset(data.Dataset):
@@ -213,15 +215,14 @@ class KingOfMnistV3(LinearEnvironment):
             test_dataloader=test_dataloader,
             epochs=args.epoch,
         ):
-            logger.info("Running epoch %s/%s", epoch.index, args.epoch)
-            epoch.cost = epoch_cost
-            epoch.income = int(
-                args.reward
-                * (
-                    (epoch.test_correct_count / epoch.test_total_count)
-                    ** args.reward_difficulty
+            logger.info("Ran epoch %s/%s", epoch.index, args.epoch)
+            accuracy = epoch.test_correct_count / epoch.test_total_count
+            if accuracy < ACCURACY_THRESHOLD:
+                raise QualityTooLowError(
+                    f"Accuracy {accuracy} is below threshold {ACCURACY_THRESHOLD}"
                 )
-            )
+            epoch.cost = epoch_cost
+            epoch.income = int(args.reward * (accuracy**args.reward_difficulty))
             credit += epoch.income - epoch.cost
             logger.info("Avatar remaining credit: %s", format_number(credit))
             if credit < 0:

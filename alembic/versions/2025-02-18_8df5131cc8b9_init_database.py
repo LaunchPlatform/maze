@@ -161,6 +161,7 @@ def upgrade() -> None:
                 "OUT_OF_ACTIVATION_BUDGET",
                 "OUT_OF_CREDIT",
                 "NO_PARAMETERS",
+                "QUALITY_TOO_LOW",
                 "ERROR",
                 "DEAD",
                 name="avatarstatus",
