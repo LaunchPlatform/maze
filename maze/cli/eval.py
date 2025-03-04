@@ -4,18 +4,39 @@ import sys
 import click
 import torch
 from torch import nn
+from torch.utils import data
 from torch.utils.data import DataLoader
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
 from .. import models
 from ..db.session import Session
+from ..environment.vehicle import detect_device
 from ..environment.vehicle import Vehicle
 from .cli import cli
 from .environment import CliEnvironment
 from .environment import pass_env
 
 logger = logging.getLogger(__name__)
+
+
+# DRY:
+class CachedDataset(data.Dataset):
+    def __init__(self, src_dataset: data.Dataset):
+        self.device = detect_device()
+        self.images = []
+        self.labels = []
+        for img, label in src_dataset:
+            self.images.append(img)
+            self.labels.append(label)
+        self.images = torch.stack(self.images).to(self.device)
+        self.labels = torch.LongTensor(self.labels).to(self.device)
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+        return self.images[index], self.labels[index]
 
 
 @cli.command(name="eval", help="Evaluate an agent")
@@ -57,17 +78,21 @@ def main(
     )
     logger.info("Loading dataset %s", dataset)
     dataset_cls = getattr(datasets, dataset)
-    training_data = dataset_cls(
-        root="data",
-        train=True,
-        download=True,
-        transform=ToTensor(),
+    training_data = CachedDataset(
+        dataset_cls(
+            root="data",
+            train=True,
+            download=True,
+            transform=ToTensor(),
+        )
     )
-    test_data = dataset_cls(
-        root="data",
-        train=False,
-        download=True,
-        transform=ToTensor(),
+    test_data = CachedDataset(
+        dataset_cls(
+            root="data",
+            train=False,
+            download=True,
+            transform=ToTensor(),
+        )
     )
     train_dataloader = DataLoader(training_data, batch_size=batch_size)
     test_dataloader = DataLoader(test_data, batch_size=batch_size)
