@@ -321,7 +321,7 @@ class KingOfMnistV2(LinearEnvironment):
             # no source env, it means this is the first env.
             # let's fill the slots with random new ones
             for _ in range(agent_count):
-                gene_length = random.randint(5, 100)
+                gene_length = random.randint(5, 200)
                 symbols = list(
                     generate_gene(
                         length=gene_length,

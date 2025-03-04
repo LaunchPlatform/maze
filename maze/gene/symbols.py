@@ -150,6 +150,11 @@ class BranchStartSymbol(BaseSymbol):
     joint_type: JointType
 
 
+class DropoutSymbol(BaseSymbol):
+    type: typing.Literal[SymbolType.DROPOUT] = SymbolType.DROPOUT
+    probability: float
+
+
 class LinearSymbol(BaseSymbol):
     type: typing.Literal[SymbolType.LINEAR] = SymbolType.LINEAR
     bias: bool
@@ -171,6 +176,7 @@ Symbol = (
     SimpleSymbol
     | RepeatStartSymbol
     | BranchStartSymbol
+    | DropoutSymbol
     | LinearSymbol
     | AdaptiveMaxPool1DSymbol
     | AdaptiveAvgPool1DSymbol
@@ -183,6 +189,7 @@ symbols_adapter = TypeAdapter(list[Symbol])
 @dataclasses.dataclass(frozen=True)
 class SymbolParameterRange:
     repeat_times: tuple[int, int] = (0, 10)
+    dropout_probability: tuple[float, float] = (0.0, 1.0)
     linear_out_features: tuple[int, int] = (1, 8192)
     linear_bias: tuple[bool, ...] = (False, True)
     adaptive_max_pool1d_out_features: tuple[int, int] = (1, 8192)
@@ -211,6 +218,10 @@ def generate_random_symbol(
     elif symbol_type == SymbolType.BRANCH_START:
         return BranchStartSymbol(
             joint_type=random.choice(list(JointType)),
+        )
+    elif symbol_type == SymbolType.DROPOUT:
+        return DropoutSymbol(
+            probability=random.uniform(*param_range.dropout_probability),
         )
     elif symbol_type == SymbolType.LINEAR:
         return LinearSymbol(
