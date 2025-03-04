@@ -43,6 +43,8 @@ def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
     match module:
         case pipeline.SimpleModule() | pipeline.Flatten() | pipeline.Reshape():
             pass
+        case pipeline.Dropout(probability=probability):
+            attrs.append(("probability", format_float(probability)))
         case pipeline.Linear(
             in_features=in_features,
             out_features=out_features,
@@ -80,6 +82,7 @@ def build_dag(module: pipeline.Module, prev_node: int, dag: DAG) -> int:
             pipeline.Flatten()
             | pipeline.Reshape()
             | pipeline.Linear()
+            | pipeline.Dropout()
             | pipeline.AdaptiveAvgPool1d()
             | pipeline.AdaptiveMaxPool1d()
         ):
