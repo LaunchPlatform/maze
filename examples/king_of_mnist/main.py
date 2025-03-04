@@ -122,7 +122,7 @@ class KingOfMnistV2(LinearEnvironment):
 
     def make_arguments(self, index: int) -> dict | None:
         mi = 1_000_000
-        basic_cost = to_millions([1, 2, 3, 4, 5])[index]
+        basic_cost = to_millions([1] * self.count)[index]
         reward = to_millions([100] * self.count)[index]
         reward_difficulty = [10, 12, 14, 12, 10, 12, 14, 12, 10, 12, 14, 16][index]
         jitter = [0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.1][

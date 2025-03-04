@@ -41,14 +41,7 @@ def format_float(value: float) -> str:
 def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
     attrs = []
     match module:
-        case (
-            pipeline.ReLU()
-            | pipeline.LeakyReLU()
-            | pipeline.Tanh()
-            | pipeline.Softmax()
-            | pipeline.Flatten()
-            | pipeline.Reshape()
-        ):
+        case pipeline.SimpleModule() | pipeline.Flatten() | pipeline.Reshape():
             pass
         case pipeline.Linear(
             in_features=in_features,
@@ -79,12 +72,12 @@ def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
 
 def build_dag(module: pipeline.Module, prev_node: int, dag: DAG) -> int:
     match module:
+        case pipeline.SimpleModule(symbol_type=symbol_type):
+            new_node = dag.add_node(
+                Node(name=symbol_type.value, attributes=extract_attrs(module))
+            )
         case (
-            pipeline.ReLU()
-            | pipeline.LeakyReLU()
-            | pipeline.Tanh()
-            | pipeline.Softmax()
-            | pipeline.Flatten()
+            pipeline.Flatten()
             | pipeline.Reshape()
             | pipeline.Linear()
             | pipeline.AdaptiveAvgPool1d()
