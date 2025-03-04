@@ -734,7 +734,7 @@ def test_build_models_exceed_quota():
                         weight_decay=0.04,
                     ),
                 ),
-                SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                SimpleSymbol(type=SymbolType.BRANCH_END),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
             ],
             [
@@ -751,7 +751,7 @@ def test_build_models_exceed_quota():
                             weight_decay=0.04,
                         ),
                     ),
-                    SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                    SimpleSymbol(type=SymbolType.BRANCH_END),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 ]
             ],
@@ -770,7 +770,7 @@ def test_build_models_exceed_quota():
                         weight_decay=0.04,
                     ),
                 ),
-                SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                SimpleSymbol(type=SymbolType.BRANCH_END),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
             ],
             [
@@ -788,7 +788,7 @@ def test_build_models_exceed_quota():
                             weight_decay=0.04,
                         ),
                     ),
-                    SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                    SimpleSymbol(type=SymbolType.BRANCH_END),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 ],
             ],
@@ -808,7 +808,7 @@ def test_build_models_exceed_quota():
                         weight_decay=0.04,
                     ),
                 ),
-                SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                SimpleSymbol(type=SymbolType.BRANCH_END),
                 SimpleSymbol(type=SymbolType.LEAKY_RELU),
             ],
             [
@@ -826,7 +826,7 @@ def test_build_models_exceed_quota():
                             weight_decay=0.04,
                         ),
                     ),
-                    SimpleSymbol(type=SymbolType.BRANCH_STOP),
+                    SimpleSymbol(type=SymbolType.BRANCH_END),
                     SimpleSymbol(type=SymbolType.LEAKY_RELU),
                 ],
             ],

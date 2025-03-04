@@ -101,7 +101,7 @@ def break_branch_segments(
         if is_symbol_type(SymbolType.BRANCH_START, symbol):
             nest_level += 1
             current_segment.append(symbol)
-        elif is_symbol_type(SymbolType.BRANCH_STOP, symbol):
+        elif is_symbol_type(SymbolType.BRANCH_END, symbol):
             nest_level -= 1
             # In case of more stops than start
             if nest_level < 0:
@@ -275,9 +275,7 @@ def _do_build_models(
                     start_symbol=functools.partial(
                         is_symbol_type, SymbolType.BRANCH_START
                     ),
-                    end_symbol=functools.partial(
-                        is_symbol_type, SymbolType.BRANCH_STOP
-                    ),
+                    end_symbol=functools.partial(is_symbol_type, SymbolType.BRANCH_END),
                 )
                 segment_models = [
                     _do_build_models(
@@ -339,6 +337,8 @@ def _do_build_models(
                     )
                     model.output_shape = (new_output_size,)
             case SimpleSymbol(type=symbol_type):
+                if symbol_type in (SymbolType.BRANCH_END, SymbolType.REPEAT_END):
+                    continue
                 model.modules.append(
                     pipeline.SimpleModule(
                         symbol_type=symbol_type,

@@ -17,7 +17,7 @@ class SymbolType(enum.StrEnum):
     BRANCH_START = "BRANCH_START"
     # marker for different segment of branch
     BRANCH_SEGMENT_MARKER = "BRANCH_SEGMENT_MARKER"
-    BRANCH_STOP = "BRANCH_STOP"
+    BRANCH_END = "BRANCH_END"
     # repeat the following gene until REPEAT_END, takes 4 bits argument for the repeating times
     REPEAT_START = "REPEAT_START"
     REPEAT_END = "REPEAT_END"
@@ -126,7 +126,7 @@ class BaseSymbol(BaseModel):
 
 ALL_SIMPLE_TYPES: list[SymbolType] = [
     SymbolType.BRANCH_SEGMENT_MARKER,
-    SymbolType.BRANCH_STOP,
+    SymbolType.BRANCH_END,
     SymbolType.REPEAT_END,
     SymbolType.ACTIVATE,
     SymbolType.DEACTIVATE,
