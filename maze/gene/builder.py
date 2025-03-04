@@ -328,43 +328,15 @@ def _do_build_models(
                     )
                     model.output_shape = (new_output_size,)
             case SimpleSymbol(type=symbol_type):
-                match symbol_type:
-                    case SymbolType.RELU:
-                        model.modules.append(
-                            pipeline.ReLU(
-                                input_shape=model.output_shape,
-                                output_shape=model.output_shape,
-                            )
-                        )
-                        model.cost.operation += math.prod(model.output_shape)
-                        check_budget()
-                    case SymbolType.LEAKY_RELU:
-                        model.modules.append(
-                            pipeline.LeakyReLU(
-                                input_shape=model.output_shape,
-                                output_shape=model.output_shape,
-                            )
-                        )
-                        model.cost.operation += math.prod(model.output_shape)
-                        check_budget()
-                    case SymbolType.TANH:
-                        model.modules.append(
-                            pipeline.Tanh(
-                                input_shape=model.output_shape,
-                                output_shape=model.output_shape,
-                            )
-                        )
-                        model.cost.operation += math.prod(model.output_shape)
-                        check_budget()
-                    case SymbolType.SOFTMAX:
-                        model.modules.append(
-                            pipeline.Softmax(
-                                input_shape=model.output_shape,
-                                output_shape=model.output_shape,
-                            )
-                        )
-                        model.cost.operation += math.prod(model.output_shape)
-                        check_budget()
+                model.modules.append(
+                    pipeline.SimpleModule(
+                        symbol_type=symbol_type,
+                        input_shape=model.output_shape,
+                        output_shape=model.output_shape,
+                    )
+                )
+                model.cost.operation += math.prod(model.output_shape)
+                check_budget()
             case _:
                 raise ValueError(f"Unknown symbol type {symbol}")
     return model

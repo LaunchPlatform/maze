@@ -8,11 +8,45 @@ from torch.nn import functional as fn
 
 from ..gene import pipeline
 from ..gene.symbols import JointType
+from ..gene.symbols import SymbolType
 
 JOINT_OP_FUNC_MAP: dict[JointType, typing.Callable] = {
     JointType.ADD: torch.add,
     JointType.SUB: torch.sub,
     JointType.MUL: torch.mul,
+}
+
+
+SIMPLE_MODULES_MAP = {
+    # Non-linear Activations (weighted sum, nonlinearity)
+    SymbolType.ELU: nn.ELU,
+    SymbolType.HARDSHRINK: nn.Hardshrink,
+    SymbolType.HARDSIGMOID: nn.Hardsigmoid,
+    SymbolType.HARDTANH: nn.Hardtanh,
+    SymbolType.HARDSWISH: nn.Hardswish,
+    SymbolType.LEAKY_RELU: nn.LeakyReLU,
+    SymbolType.LOGSIGMOID: nn.LogSigmoid,
+    SymbolType.PRELU: nn.PReLU,
+    SymbolType.RELU: nn.ReLU,
+    SymbolType.RELU6: nn.ReLU6,
+    SymbolType.RRELU: nn.RReLU,
+    SymbolType.SELU: nn.SELU,
+    SymbolType.CELU: nn.CELU,
+    SymbolType.GELU: nn.SELU,
+    SymbolType.SIGMOID: nn.SELU,
+    SymbolType.SILU: nn.SiLU,
+    SymbolType.MISH: nn.Mish,
+    SymbolType.SOFTPLUS: nn.Softplus,
+    SymbolType.SOFTSHRINK: nn.Softshrink,
+    SymbolType.SOFTSIGN: nn.Softsign,
+    SymbolType.TANH: nn.Tanh,
+    SymbolType.TANHSHRINK: nn.Tanhshrink,
+    SymbolType.THRESHOLD: nn.Threshold,
+    SymbolType.GLU: nn.GLU,
+    # Non-linear Activations (other)
+    SymbolType.SOFTMAX: nn.Softmax,
+    SymbolType.SOFTMIN: nn.Softmin,
+    SymbolType.LOGSOFTMAX: nn.Softmax,
 }
 
 
@@ -68,14 +102,8 @@ def build_pipeline(
     module_learning_parameters: list[dict[str, typing.Any]] | None = None,
 ) -> nn.Module:
     match module:
-        case pipeline.ReLU():
-            return nn.ReLU()
-        case pipeline.LeakyReLU():
-            return nn.LeakyReLU()
-        case pipeline.Tanh():
-            return nn.Tanh()
-        case pipeline.Softmax():
-            return nn.Softmax()
+        case pipeline.SimpleModule(symbol_type=symbol_type):
+            return SIMPLE_MODULES_MAP[symbol_type]()
         case pipeline.Flatten():
             return nn.Flatten()
         case pipeline.Reshape(output_shape=output_shape):

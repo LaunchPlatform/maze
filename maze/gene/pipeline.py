@@ -2,6 +2,7 @@ import dataclasses
 
 from .symbols import JointType
 from .symbols import LearningParameters
+from .symbols import SymbolType
 
 
 @dataclasses.dataclass(frozen=True)
@@ -32,23 +33,8 @@ class Joint(Module):
 
 
 @dataclasses.dataclass(frozen=True)
-class ReLU(Module):
-    pass
-
-
-@dataclasses.dataclass(frozen=True)
-class LeakyReLU(Module):
-    pass
-
-
-@dataclasses.dataclass(frozen=True)
-class Tanh(Module):
-    pass
-
-
-@dataclasses.dataclass(frozen=True)
-class Softmax(Module):
-    pass
+class SimpleModule(Module):
+    symbol_type: SymbolType
 
 
 @dataclasses.dataclass(frozen=True)
