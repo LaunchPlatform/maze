@@ -128,7 +128,7 @@ class KingOfMnistV3(LinearEnvironment):
     def make_arguments(self, index: int) -> dict | None:
         mi = 1_000_000
         basic_cost = to_millions([1] * self.count)[index]
-        reward = to_millions([100] * self.count)[index]
+        reward = to_millions([1_000] * self.count)[index]
         reward_difficulty = [10, 12, 14, 12, 10, 12, 14, 12, 10, 12, 14, 16][index]
         jitter = [0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.1][
             index
@@ -182,7 +182,9 @@ class KingOfMnistV3(LinearEnvironment):
             agent=avatar.agent.agent_data,
             loss_fn=nn.CrossEntropyLoss(),
             budget=ModelCost(
-                operation=1_000_000_000, build=10_000, activation=100_000_000
+                operation=1_000_000_000,
+                build=10_000,
+                activation=100_000_000,
             ),
         )
         vehicle.build_models()
@@ -211,8 +213,6 @@ class KingOfMnistV3(LinearEnvironment):
         db.add(avatar)
 
         epoch_cost = avatar.agent.op_cost + args.basic_cost
-        if epoch_cost > credit:
-            raise OutOfCreditError("Cost exceeds initial credit")
         for epoch in eval_agent(
             vehicle=vehicle,
             train_dataloader=train_dataloader,
@@ -229,9 +229,9 @@ class KingOfMnistV3(LinearEnvironment):
             epoch.income = int(args.reward * (accuracy**args.reward_difficulty))
             credit += epoch.income - epoch.cost
             logger.info("Avatar remaining credit: %s", format_number(credit))
+            yield epoch
             if credit < 0:
                 raise OutOfCreditError("Out of credit")
-            yield epoch
 
     def breed_agents(
         self,

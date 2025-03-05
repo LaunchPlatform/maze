@@ -38,7 +38,11 @@ def view_agent(
         model = build_models(
             symbols=iter(agent_data.symbols),
             input_shape=agent_data.input_shape,
-            budget=ModelCost(operation=100_000_000, build=1_000),
+            budget=ModelCost(
+                operation=1_000_000_000,
+                build=10_000,
+                activation=100_000_000,
+            ),
         )
         dag = DAG()
         input_node = dag.add_node(Node(name="INPUT"))
