@@ -118,7 +118,7 @@ class KingOfMnistV3(LinearEnvironment):
     experiment = "king-of-mnist-v3"
 
     def make_zones(self, index: int) -> list[models.Zone]:
-        zone_count = [10, 10, 10, 10, 10, 10, 10, 10, 10, 5, 3, 1][index]
+        zone_count = [10, 5, 3, 5, 10, 5, 3, 5, 10, 5, 3, 1][index]
         return [
             models.Zone(agent_slots=50, index=zone_index)
             for zone_index in range(zone_count)
@@ -132,7 +132,7 @@ class KingOfMnistV3(LinearEnvironment):
         jitter = [0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.1][
             index
         ]
-        epoch = [10, 10, 10, 10, 10, 10, 15, 20, 25, 50, 75, 100][index]
+        epoch = [10, 10, 10, 10, 20, 30, 40, 50, 70, 80, 90, 100][index]
         return dataclasses.asdict(
             Arguments(
                 epoch=epoch,
@@ -359,6 +359,8 @@ class KingOfMnistV3(LinearEnvironment):
             .filter(models.Avatar.status == models.AvatarStatus.DEAD)
             .order_by(models.Avatar.credit.desc())
         ).all()
+        if len(agent_credits) <= 1:
+            return []
         lookup_table = build_lookup_table(
             [(agent.id, credit) for agent, credit in agent_credits]
         )
