@@ -274,45 +274,50 @@ class KingOfMnistV3(LinearEnvironment):
             lhs = db.get(models.Agent, lhs)
             rhs = db.get(models.Agent, rhs)
 
-            lhs_gene = lhs.agent_data.symbols
-            rhs_gene = rhs.agent_data.symbols
-
-            gene = list(merge_gene(lhs_gene, rhs_gene, jitter=args.jitter))
-            mutation_probabilities = merge_parameter_dict(
-                lhs=lhs.enum_mutation_probabilities,
-                rhs=rhs.enum_mutation_probabilities,
-                jitter=args.jitter,
-            )
-            mutation_types = decide_mutations(
-                probabilities=mutation_probabilities,
-                gene_length=len(gene),
-            )
-            mutation_records, mutated_gene = mutate(
-                symbols=gene,
-                mutations=mutation_types,
-                length_ranges=MUTATION_LENGTH_RANGE,
-                jitter=args.jitter,
-            )
-            new_agent = models.Agent(
-                lhs_parent=lhs,
-                rhs_parent=rhs,
-                gene=symbols_adapter.dump_python(mutated_gene, mode="json"),
-                input_shape=lhs.input_shape,
-                mutation_probabilities={
-                    key.value: value for key, value in mutation_probabilities.items()
-                },
-                mutations=[
-                    models.Mutation(
-                        order=index,
-                        type=record.type,
-                        position=record.position,
-                        length=record.length,
-                    )
-                    for index, record in enumerate(mutation_records)
-                ],
-            )
+            new_agent = self.breed_agent(args, lhs, rhs)
             offspring_agents.append(new_agent)
         return offspring_agents
+
+    def breed_agent(
+        self, args: Arguments, lhs: models.Agent, rhs: models.Agent
+    ) -> models.Agent:
+        lhs_gene = lhs.agent_data.symbols
+        rhs_gene = rhs.agent_data.symbols
+        gene = list(merge_gene(lhs_gene, rhs_gene, jitter=args.jitter))
+        mutation_probabilities = merge_parameter_dict(
+            lhs=lhs.enum_mutation_probabilities,
+            rhs=rhs.enum_mutation_probabilities,
+            jitter=args.jitter,
+        )
+        mutation_types = decide_mutations(
+            probabilities=mutation_probabilities,
+            gene_length=len(gene),
+        )
+        mutation_records, mutated_gene = mutate(
+            symbols=gene,
+            mutations=mutation_types,
+            length_ranges=MUTATION_LENGTH_RANGE,
+            jitter=args.jitter,
+        )
+        new_agent = models.Agent(
+            lhs_parent=lhs,
+            rhs_parent=rhs,
+            gene=symbols_adapter.dump_python(mutated_gene, mode="json"),
+            input_shape=lhs.input_shape,
+            mutation_probabilities={
+                key.value: value for key, value in mutation_probabilities.items()
+            },
+            mutations=[
+                models.Mutation(
+                    order=index,
+                    type=record.type,
+                    position=record.position,
+                    length=record.length,
+                )
+                for index, record in enumerate(mutation_records)
+            ],
+        )
+        return new_agent
 
     def promote_agents(
         self,
@@ -342,17 +347,41 @@ class KingOfMnistV3(LinearEnvironment):
                 )
                 agents.append(agent)
             return agents
-        return (
-            (
-                db.query(models.Agent)
-                .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
-                .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
-                .filter(models.Zone.environment == environment)
-                .filter(models.Avatar.period == period)
-                .filter(models.Avatar.credit > 0)
-                .filter(models.Avatar.status == models.AvatarStatus.DEAD)
-                .order_by(models.Avatar.credit.desc())
-            )
-            .limit(agent_count)
-            .all()
+
+        args = Arguments(**environment.arguments)
+        agent_credits = (
+            db.query(models.Agent, models.Avatar.credit)
+            .join(models.Avatar, models.Avatar.agent_id == models.Agent.id)
+            .join(models.Zone, models.Avatar.zone_id == models.Zone.id)
+            .filter(models.Zone.environment == environment)
+            .filter(models.Avatar.period == period)
+            .filter(models.Avatar.credit > 0)
+            .filter(models.Avatar.status == models.AvatarStatus.DEAD)
+            .order_by(models.Avatar.credit.desc())
+        ).all()
+        lookup_table = build_lookup_table(
+            [(agent.id, credit) for agent, credit in agent_credits]
         )
+
+        offspring_agents = []
+        for _ in range(agent_count):
+            lhs = random_lookup(lookup_table)
+
+            # TODO: well, this is not the most performant way to do it. could find a time to improve it later
+            excluded_agent_credits = list(
+                filter(lambda item: item[0].id != lhs, agent_credits)
+            )
+            excluded_lookup_table = build_lookup_table(
+                [(agent.id, credit) for agent, credit in excluded_agent_credits]
+            )
+            rhs = random_lookup(excluded_lookup_table)
+
+            if lhs == rhs:
+                raise ValueError("Self breeding is not allowed")
+
+            lhs = db.get(models.Agent, lhs)
+            rhs = db.get(models.Agent, rhs)
+
+            new_agent = self.breed_agent(args=args, lhs=lhs, rhs=rhs)
+            offspring_agents.append(new_agent)
+        return offspring_agents
