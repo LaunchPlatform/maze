@@ -143,7 +143,7 @@ def mutate_tune(
     tuned = list(
         map(
             functools.partial(tune_symbol, jitter=jitter),
-            symbols[pos : pos + length][::-1],
+            symbols[pos : pos + length],
         )
     )
     suffix = symbols[pos + length :]

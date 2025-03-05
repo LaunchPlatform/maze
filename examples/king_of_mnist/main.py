@@ -132,7 +132,7 @@ class KingOfMnistV3(LinearEnvironment):
         jitter = [0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.12, 0.1, 0.12, 0.13, 0.1][
             index
         ]
-        epoch = [10, 10, 10, 10, 10, 10, 10, 10, 10, 25, 50, 100][index]
+        epoch = [10, 10, 10, 10, 10, 10, 15, 20, 25, 50, 75, 100][index]
         return dataclasses.asdict(
             Arguments(
                 epoch=epoch,
