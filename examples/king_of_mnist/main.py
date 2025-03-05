@@ -20,6 +20,7 @@ from maze.environment.zone import EpochReport
 from maze.environment.zone import eval_agent
 from maze.environment.zone import OutOfCreditError
 from maze.environment.zone import QualityTooLowError
+from maze.gene.builder import ModelCost
 from maze.gene.freq_table import build_lookup_table
 from maze.gene.freq_table import random_lookup
 from maze.gene.merge import merge_gene
@@ -180,6 +181,9 @@ class KingOfMnistV3(LinearEnvironment):
         vehicle = Vehicle(
             agent=avatar.agent.agent_data,
             loss_fn=nn.CrossEntropyLoss(),
+            budget=ModelCost(
+                operation=1_000_000_000, build=10_000, activation=100_000_000
+            ),
         )
         vehicle.build_models()
 
