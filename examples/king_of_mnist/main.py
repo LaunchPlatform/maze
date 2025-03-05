@@ -90,6 +90,9 @@ class Arguments:
     reward: int
     reward_difficulty: int
     jitter: float
+    op_budget: int
+    build_budget: int
+    activation_budget: int
 
 
 def make_mutation_probabilities() -> dict:
@@ -134,6 +137,27 @@ class KingOfMnistV3(LinearEnvironment):
             index
         ]
         epoch = [10, 10, 10, 10, 20, 30, 40, 50, 70, 80, 90, 100][index]
+
+        op_budget = to_millions(
+            [100, 200, 300, 400, 500, 600, 700, 800, 900, 1_000, 1_200, 2_000]
+        )[index]
+        build_budget = [
+            1_000,
+            2_000,
+            3_000,
+            4_000,
+            5_000,
+            6_000,
+            7_000,
+            8_000,
+            9_000,
+            10_000,
+            15_000,
+            20_000,
+        ][index]
+        activation_budget = to_millions(
+            [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 150, 200]
+        )[index]
         return dataclasses.asdict(
             Arguments(
                 epoch=epoch,
@@ -142,6 +166,9 @@ class KingOfMnistV3(LinearEnvironment):
                 reward=reward,
                 reward_difficulty=reward_difficulty,
                 jitter=jitter,
+                op_budget=op_budget,
+                build_budget=build_budget,
+                activation_budget=activation_budget,
             )
         )
 
@@ -182,9 +209,9 @@ class KingOfMnistV3(LinearEnvironment):
             agent=avatar.agent.agent_data,
             loss_fn=nn.CrossEntropyLoss(),
             budget=ModelCost(
-                operation=1_000_000_000,
-                build=10_000,
-                activation=100_000_000,
+                operation=args.op_budget,
+                build=args.build_budget,
+                activation=args.activation_budget,
             ),
         )
         vehicle.build_models()
