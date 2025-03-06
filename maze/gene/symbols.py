@@ -73,6 +73,10 @@ class SymbolType(enum.StrEnum):
     # Add Softmax
     LOGSOFTMAX = "LOGSOFTMAX"
 
+    # Normalizing
+    BATCH_NORM1D = "BATCH_NORM1D"
+    INSTANCE_NORM1D = "INSTANCE_NORM1D"
+
     # Dropout
     DROPOUT = "DROPOUT"
 
@@ -175,6 +179,20 @@ class LinearSymbol(ParameterSymbol):
     learning_parameters: LearningParameters
 
 
+class BatchNorm1dSymbol(ParameterSymbol):
+    type: typing.Literal[SymbolType.BATCH_NORM1D] = SymbolType.BATCH_NORM1D
+    eps: float
+    momentum: float
+    affine: bool
+
+
+class InstanceNorm1dSymbol(ParameterSymbol):
+    type: typing.Literal[SymbolType.INSTANCE_NORM1D] = SymbolType.INSTANCE_NORM1D
+    eps: float
+    momentum: float
+    affine: bool
+
+
 class AdaptiveMaxPool1DSymbol(ParameterSymbol):
     type: typing.Literal[SymbolType.ADAPTIVE_MAXPOOL1D] = SymbolType.ADAPTIVE_MAXPOOL1D
     out_features: int
@@ -191,6 +209,8 @@ Symbol = (
     | BranchStartSymbol
     | DropoutSymbol
     | LinearSymbol
+    | BatchNorm1dSymbol
+    | InstanceNorm1dSymbol
     | AdaptiveMaxPool1DSymbol
     | AdaptiveAvgPool1DSymbol
 )
@@ -207,6 +227,12 @@ class SymbolParameterRange:
     linear_bias: tuple[bool, ...] = (False, True)
     adaptive_max_pool1d_out_features: tuple[int, int] = (1, 8192)
     adaptive_avg_pool1d_out_features: tuple[int, int] = (1, 8192)
+    batch_norm1d_eps: tuple[float, float] = (1e-04, 1e-06)
+    batch_norm1d_momentum: tuple[float, float] = (0.8e-1, 1.2e-1)
+    batch_norm1d_affine: tuple[bool, ...] = (False, True)
+    instance_norm1d_eps: tuple[float, float] = (1e-04, 1e-06)
+    instance_norm1d_momentum: tuple[float, float] = (0.8e-1, 1.2e-1)
+    instance_norm1d_affine: tuple[bool, ...] = (False, True)
 
 
 def is_symbol_type(symbol_type: SymbolType, symbol: Symbol) -> bool:
@@ -258,6 +284,18 @@ def generate_random_symbol(
             out_features=random.randrange(
                 *param_range.adaptive_avg_pool1d_out_features
             ),
+        )
+    elif symbol_type == SymbolType.BATCH_NORM1D:
+        return BatchNorm1dSymbol(
+            eps=random.uniform(*param_range.batch_norm1d_eps),
+            momentum=random.uniform(*param_range.batch_norm1d_momentum),
+            affine=random.choice(param_range.instance_norm1d_affine),
+        )
+    elif symbol_type == SymbolType.INSTANCE_NORM1D:
+        return InstanceNorm1dSymbol(
+            eps=random.uniform(*param_range.instance_norm1d_eps),
+            momentum=random.uniform(*param_range.instance_norm1d_momentum),
+            affine=random.choice(param_range.instance_norm1d_affine),
         )
     else:
         raise ValueError(f"Unexpected symbol type {symbol_type}")

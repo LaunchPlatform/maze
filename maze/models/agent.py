@@ -90,7 +90,19 @@ class Agent(Base):
     @property
     def agent_data(self) -> AgentData:
         return AgentData(
-            symbols=symbols_adapter.validate_python(self.gene),
+            symbols=symbols_adapter.validate_python(
+                list(
+                    map(
+                        lambda symbol: symbol
+                        | (
+                            dict(type="BRANCH_END")
+                            if symbol["type"] == "BRANCH_STOP"
+                            else {}
+                        ),
+                        self.gene,
+                    )
+                )
+            ),
             input_shape=tuple(self.input_shape),
         )
 

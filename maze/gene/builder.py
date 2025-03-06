@@ -6,8 +6,10 @@ import typing
 from . import pipeline
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
+from .symbols import BatchNorm1dSymbol
 from .symbols import BranchStartSymbol
 from .symbols import DropoutSymbol
+from .symbols import InstanceNorm1dSymbol
 from .symbols import is_symbol_type
 from .symbols import JointType
 from .symbols import LinearSymbol
@@ -268,6 +270,56 @@ def _do_build_models(
                 )
                 model.cost.operation += in_features
                 model.output_shape = (out_features,)
+                check_budget()
+            case (
+                BatchNorm1dSymbol(eps=eps, momentum=momentum, affine=affine)
+                | InstanceNorm1dSymbol(eps=eps, momentum=momentum, affine=affine)
+            ):
+                in_features = math.prod(model.output_shape)
+                # TODO: currently let's assume there's only one channel in the input, it should support multiple
+                #       channels in the future
+                pool_input_shape = (1, in_features)
+                model.modules.append(
+                    pipeline.Reshape(
+                        input_shape=model.output_shape,
+                        output_shape=pool_input_shape,
+                    )
+                )
+                if is_symbol_type(symbol_type=SymbolType.BATCH_NORM1D, symbol=symbol):
+                    model.modules.append(
+                        pipeline.BatchNorm1d(
+                            eps=eps,
+                            momentum=momentum,
+                            affine=affine,
+                            input_shape=pool_input_shape,
+                            output_shape=(in_features,),
+                        )
+                    )
+                elif is_symbol_type(
+                    symbol_type=SymbolType.ADAPTIVE_AVGPOOL1D, symbol=symbol
+                ):
+                    model.modules.append(
+                        pipeline.InstanceNorm1d(
+                            eps=eps,
+                            momentum=momentum,
+                            affine=affine,
+                            input_shape=pool_input_shape,
+                            output_shape=(in_features,),
+                        )
+                    )
+                else:
+                    raise ValueError("Unexpected symbol type")
+                # TODO: flatten back to 1D for now as we assume one channel at this moment.
+                # TODO: currently let's assume there's only one channel in the input, it should support multiple
+                #       channels in the future
+                model.modules.append(
+                    pipeline.Flatten(
+                        input_shape=(1, in_features),
+                        output_shape=(in_features,),
+                    )
+                )
+                model.cost.operation += in_features
+                model.output_shape = (in_features,)
                 check_budget()
             case BranchStartSymbol(joint_type=joint_type):
                 branch_symbols, _ = read_enclosure(

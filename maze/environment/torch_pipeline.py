@@ -1,4 +1,5 @@
 import functools
+import math
 import typing
 from functools import reduce
 
@@ -131,6 +132,24 @@ def build_pipeline(
             return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
             return nn.AdaptiveAvgPool1d(out_features)
+        case pipeline.BatchNorm1d(
+            input_shape=input_shape, eps=eps, momentum=momentum, affine=affine
+        ):
+            return nn.BatchNorm1d(
+                num_features=math.prod(input_shape),
+                eps=eps,
+                momentum=momentum,
+                affine=affine,
+            )
+        case pipeline.InstanceNorm1d(
+            input_shape=input_shape, eps=eps, momentum=momentum, affine=affine
+        ):
+            return nn.InstanceNorm1d(
+                num_features=math.prod(input_shape),
+                eps=eps,
+                momentum=momentum,
+                affine=affine,
+            )
         case pipeline.Sequential(modules=modules):
             return nn.Sequential(
                 *map(

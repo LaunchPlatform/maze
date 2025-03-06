@@ -60,10 +60,18 @@ def extract_attrs(module: pipeline.Module) -> list[tuple[str, str]]:
             attrs.append(
                 ("weight_decay", format_float(learning_parameters.weight_decay))
             )
-        case pipeline.AdaptiveMaxPool1d(out_features=out_features):
+        case (
+            pipeline.AdaptiveMaxPool1d(out_features=out_features)
+            | pipeline.AdaptiveAvgPool1d(out_features=out_features)
+        ):
             attrs.append(("out_features", format_int(out_features)))
-        case pipeline.AdaptiveAvgPool1d(out_features=out_features):
-            attrs.append(("out_features", format_int(out_features)))
+        case (
+            pipeline.BatchNorm1d(eps=eps, momentum=momentum, affine=affine)
+            | pipeline.InstanceNorm1d(eps=eps, momentum=momentum, affine=affine)
+        ):
+            attrs.append(("eps", format_float(eps)))
+            attrs.append(("momentum", format_float(momentum)))
+            attrs.append(("affine", str(affine)))
         case pipeline.Joint(joint_type=joint_type):
             attrs.append(("joint_type", joint_type.value))
 
@@ -85,6 +93,8 @@ def build_dag(module: pipeline.Module, prev_node: int, dag: DAG) -> int:
             | pipeline.Dropout()
             | pipeline.AdaptiveAvgPool1d()
             | pipeline.AdaptiveMaxPool1d()
+            | pipeline.BatchNorm1d()
+            | pipeline.InstanceNorm1d()
         ):
             new_node = dag.add_node(
                 Node(name=module.__class__.__name__, attributes=extract_attrs(module))

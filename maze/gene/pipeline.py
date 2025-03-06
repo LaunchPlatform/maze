@@ -58,3 +58,17 @@ class AdaptiveMaxPool1d(Module):
 @dataclasses.dataclass(frozen=True)
 class AdaptiveAvgPool1d(Module):
     out_features: int
+
+
+@dataclasses.dataclass(frozen=True)
+class BatchNorm1d(Module):
+    eps: float
+    momentum: float
+    affine: bool
+
+
+@dataclasses.dataclass(frozen=True)
+class InstanceNorm1d(Module):
+    eps: float
+    momentum: float
+    affine: bool
