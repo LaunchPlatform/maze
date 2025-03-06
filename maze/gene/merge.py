@@ -4,8 +4,10 @@ import random
 
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
+from .symbols import BatchNorm1dSymbol
 from .symbols import BranchStartSymbol
 from .symbols import DropoutSymbol
+from .symbols import InstanceNorm1dSymbol
 from .symbols import LearningParameters
 from .symbols import LinearSymbol
 from .symbols import RepeatStartSymbol
@@ -102,6 +104,26 @@ def merge_adaptive_avg_pool1d(
     )
 
 
+def merge_batch_norm1d(
+    lhs: BatchNorm1dSymbol, rhs: BatchNorm1dSymbol, jitter: float
+) -> BatchNorm1dSymbol:
+    return BatchNorm1dSymbol(
+        affine=merge_bool(lhs.affine, rhs.affine),
+        eps=merge_float(lhs.eps, lhs.eps, jitter=jitter),
+        momentum=merge_float(lhs.momentum, lhs.momentum, jitter=jitter),
+    )
+
+
+def merge_instance_norm1d(
+    lhs: InstanceNorm1dSymbol, rhs: InstanceNorm1dSymbol, jitter: float
+) -> InstanceNorm1dSymbol:
+    return InstanceNorm1dSymbol(
+        affine=merge_bool(lhs.affine, rhs.affine),
+        eps=merge_float(lhs.eps, lhs.eps, jitter=jitter),
+        momentum=merge_float(lhs.momentum, lhs.momentum, jitter=jitter),
+    )
+
+
 def merge_liner(lhs: LinearSymbol, rhs: LinearSymbol, jitter: float) -> LinearSymbol:
     return LinearSymbol(
         bias=merge_bool(lhs.bias, rhs.bias),
@@ -143,6 +165,18 @@ def merge_parameter_symbol(lhs: Symbol, rhs: Symbol, jitter: float):
         )
     elif isinstance(lhs, AdaptiveAvgPool1DSymbol):
         return merge_adaptive_avg_pool1d(
+            lhs,
+            rhs,
+            jitter=jitter,
+        )
+    elif isinstance(lhs, BatchNorm1dSymbol):
+        return merge_batch_norm1d(
+            lhs,
+            rhs,
+            jitter=jitter,
+        )
+    elif isinstance(lhs, InstanceNorm1dSymbol):
+        return merge_instance_norm1d(
             lhs,
             rhs,
             jitter=jitter,
