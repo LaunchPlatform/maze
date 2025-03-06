@@ -132,20 +132,16 @@ def build_pipeline(
             return nn.AdaptiveMaxPool1d(out_features)
         case pipeline.AdaptiveAvgPool1d(out_features=out_features):
             return nn.AdaptiveAvgPool1d(out_features)
-        case pipeline.BatchNorm1d(
-            input_shape=input_shape, eps=eps, momentum=momentum, affine=affine
-        ):
+        case pipeline.BatchNorm1d(eps=eps, momentum=momentum, affine=affine):
             return nn.BatchNorm1d(
-                num_features=math.prod(input_shape),
+                num_features=1,
                 eps=eps,
                 momentum=momentum,
                 affine=affine,
             )
-        case pipeline.InstanceNorm1d(
-            input_shape=input_shape, eps=eps, momentum=momentum, affine=affine
-        ):
+        case pipeline.InstanceNorm1d(eps=eps, momentum=momentum, affine=affine):
             return nn.InstanceNorm1d(
-                num_features=math.prod(input_shape),
+                num_features=1,
                 eps=eps,
                 momentum=momentum,
                 affine=affine,
