@@ -296,7 +296,7 @@ def _do_build_models(
                         )
                     )
                 elif is_symbol_type(
-                    symbol_type=SymbolType.ADAPTIVE_AVGPOOL1D, symbol=symbol
+                    symbol_type=SymbolType.INSTANCE_NORM1D, symbol=symbol
                 ):
                     model.modules.append(
                         pipeline.InstanceNorm1d(
