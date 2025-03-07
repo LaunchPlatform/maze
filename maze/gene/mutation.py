@@ -3,10 +3,13 @@ import enum
 import functools
 import random
 
+from ..web.deps import Jinja2TemplatesDep
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
+from .symbols import BatchNorm1dSymbol
 from .symbols import BranchStartSymbol
 from .symbols import DropoutSymbol
+from .symbols import InstanceNorm1dSymbol
 from .symbols import JointType
 from .symbols import LearningParameters
 from .symbols import LinearSymbol
@@ -51,6 +54,12 @@ def tune_int(value: int, jitter: float) -> int:
     return random.randrange(start, end)
 
 
+def tune_float(value: float, jitter: float) -> float:
+    start = value - jitter
+    end = value + jitter
+    return random.uniform(start, end)
+
+
 def tune_symbol(symbol: Symbol, jitter: float) -> Symbol:
     if isinstance(symbol, DropoutSymbol):
         start = symbol.probability * (1 - jitter)
@@ -68,6 +77,13 @@ def tune_symbol(symbol: Symbol, jitter: float) -> Symbol:
         cls = symbol.__class__
         return cls(
             out_features=max(1, tune_int(value=symbol.out_features, jitter=jitter)),
+        )
+    elif isinstance(symbol, (InstanceNorm1dSymbol, BatchNorm1dSymbol)):
+        cls = symbol.__class__
+        return cls(
+            eps=tune_float(value=symbol.eps, jitter=jitter),
+            momentum=tune_float(value=symbol.momentum, jitter=jitter),
+            affine=random.choice([False, True]),
         )
     elif isinstance(symbol, RepeatStartSymbol):
         return RepeatStartSymbol(
