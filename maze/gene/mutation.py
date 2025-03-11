@@ -3,7 +3,6 @@ import enum
 import functools
 import random
 
-from ..web.deps import Jinja2TemplatesDep
 from .symbols import AdaptiveAvgPool1DSymbol
 from .symbols import AdaptiveMaxPool1DSymbol
 from .symbols import BatchNorm1dSymbol
